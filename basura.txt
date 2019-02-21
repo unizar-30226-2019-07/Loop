@@ -1,22 +1,7 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-modificacion dos prueba de git 2 - Alonso
-asd
-asd
-asd
-=======
-modificacion dos prueba de git 3
->>>>>>> a3d7543078bd3749003ba5a0e0e3d92245b2826e
-asd
-asd
-=======
-cambios de diego
-cambios de diego
-cambios de diego
->>>>>>> 8502b107860b0ecd4690f7000c37fd7d41395d56
-=======
-modificacion dos prueba de git 3
-asd
-asd
->>>>>>> a3d7543078bd3749003ba5a0e0e3d92245b2826e
+Cambios:
+
+Sitio 1
+
+Sitio 2
+
+Sitio 3
