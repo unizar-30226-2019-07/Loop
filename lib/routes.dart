@@ -13,8 +13,7 @@ class Routes {
       title: 'Selit! by Allenship',
       routes: routes,
       theme: ThemeData(
-        // TODO modificar por el verdadero color de la marca
-				primarySwatch: Colors.red,
+				primaryColor: Color(0xFFC0392B)
 			),
       home: new DebugMain(),
     ));
