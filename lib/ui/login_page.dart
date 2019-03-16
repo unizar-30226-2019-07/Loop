@@ -22,16 +22,26 @@ class _LoginPageState extends State<LoginPage>
   final FocusNode myFocusNodePassword = FocusNode();
   final FocusNode myFocusNodeEmail = FocusNode();
   final FocusNode myFocusNodeName = FocusNode();
+  final FocusNode myFocusNodeLastName = FocusNode();
 
   TextEditingController loginEmailController = new TextEditingController();
   TextEditingController loginPasswordController = new TextEditingController();
 
+  
+
+  IconData _eye_open = FontAwesomeIcons.eye;
+  IconData _eye_slash = FontAwesomeIcons.eyeSlash;
+
+  IconData _eye_login = FontAwesomeIcons.eye;
+  IconData _eye_signup = FontAwesomeIcons.eye;
+  IconData _eye_signup_confirm = FontAwesomeIcons.eye;
   bool _obscureTextLogin = true;
   bool _obscureTextSignup = true;
   bool _obscureTextSignupConfirm = true;
 
   TextEditingController signupEmailController = new TextEditingController();
   TextEditingController signupNameController = new TextEditingController();
+  TextEditingController signupLastNameController = new TextEditingController();
   TextEditingController signupPasswordController = new TextEditingController();
   TextEditingController signupConfirmPasswordController =
       new TextEditingController();
@@ -52,9 +62,9 @@ class _LoginPageState extends State<LoginPage>
         child: SingleChildScrollView(
               child: Container(
                 width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height >= 775.0
+                height: MediaQuery.of(context).size.height >= 900.0
                     ? MediaQuery.of(context).size.height
-                    : 775.0,
+                    : 900.0,
                 decoration: new BoxDecoration(
                   gradient: new LinearGradient(
                       colors: [
@@ -68,7 +78,19 @@ class _LoginPageState extends State<LoginPage>
                 ),
                 child: Column(
                   mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: <Widget>[
+                    Container(
+                      alignment: FractionalOffset(1.0, 0.0),
+                      child: GestureDetector(
+                          onTap: _toggleLogin, //Cambiar acción
+                          child: Icon(
+                            FontAwesomeIcons.times,
+                            size: 40.0,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ),                   
                     Padding(
                       padding: EdgeInsets.only(top: 75.0),
                       child: new Image(
@@ -123,6 +145,7 @@ class _LoginPageState extends State<LoginPage>
     myFocusNodePassword.dispose();
     myFocusNodeEmail.dispose();
     myFocusNodeName.dispose();
+    myFocusNodeLastName.dispose();
     _pageController?.dispose();
     super.dispose();
   }
@@ -175,7 +198,7 @@ class _LoginPageState extends State<LoginPage>
                 highlightColor: Colors.transparent,
                 onPressed: _onSignInButtonPress,
                 child: Text(
-                  "Existing",
+                  "Iniciar sesión",
                   style: TextStyle(
                       color: left,
                       fontSize: 16.0,
@@ -190,7 +213,7 @@ class _LoginPageState extends State<LoginPage>
                 highlightColor: Colors.transparent,
                 onPressed: _onSignUpButtonPress,
                 child: Text(
-                  "New",
+                  "Crear cuenta",
                   style: TextStyle(
                       color: right,
                       fontSize: 16.0,
@@ -242,7 +265,7 @@ class _LoginPageState extends State<LoginPage>
                               color: Colors.black,
                               size: 22.0,
                             ),
-                            hintText: "Email Address",
+                            hintText: "Correo electrónico",
                             hintStyle: TextStyle(
                                 fontFamily: "Nunito", fontSize: 17.0),
                           ),
@@ -271,13 +294,13 @@ class _LoginPageState extends State<LoginPage>
                               size: 22.0,
                               color: Colors.black,
                             ),
-                            hintText: "Password",
+                            hintText: "Contraseña",
                             hintStyle: TextStyle(
                                 fontFamily: "Nunito", fontSize: 17.0),
                             suffixIcon: GestureDetector(
                               onTap: _toggleLogin,
                               child: Icon(
-                                FontAwesomeIcons.eye,
+                                _eye_login,
                                 size: 15.0,
                                 color: Colors.black,
                               ),
@@ -323,7 +346,7 @@ class _LoginPageState extends State<LoginPage>
                       padding: const EdgeInsets.symmetric(
                           vertical: 10.0, horizontal: 42.0),
                       child: Text(
-                        "LOGIN",
+                        "ACCEDER",
                         style: TextStyle(
                             color: Colors.white,
                             fontSize: 25.0,
@@ -340,7 +363,7 @@ class _LoginPageState extends State<LoginPage>
             child: FlatButton(
                 onPressed: () {},
                 child: Text(
-                  "Forgot Password?",
+                  "He olvidado mi contraseña",
                   style: TextStyle(
                       decoration: TextDecoration.underline,
                       color: Colors.white,
@@ -370,7 +393,7 @@ class _LoginPageState extends State<LoginPage>
                 ),
                 child: Container(
                   width: 300.0,
-                  height: 360.0,
+                  height: 450.0,
                   child: Column(
                     children: <Widget>[
                       Padding(
@@ -391,7 +414,36 @@ class _LoginPageState extends State<LoginPage>
                               FontAwesomeIcons.user,
                               color: Colors.black,
                             ),
-                            hintText: "Name",
+                            hintText: "Nombre",
+                            hintStyle: TextStyle(
+                                fontFamily: "Nunito", fontSize: 16.0),
+                          ),
+                        ),
+                      ),
+                      Container(
+                        width: 250.0,
+                        height: 1.0,
+                        color: Colors.grey[400],
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(
+                            top: 20.0, bottom: 20.0, left: 25.0, right: 25.0),
+                        child: TextField(
+                          focusNode: myFocusNodeLastName,
+                          controller: signupLastNameController,
+                          keyboardType: TextInputType.text,
+                          textCapitalization: TextCapitalization.words,
+                          style: TextStyle(
+                              fontFamily: "Nunito",
+                              fontSize: 16.0,
+                              color: Colors.black),
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                            icon: Icon(
+                              FontAwesomeIcons.user,
+                              color: Colors.black,
+                            ),
+                            hintText: "Apellidos",
                             hintStyle: TextStyle(
                                 fontFamily: "Nunito", fontSize: 16.0),
                           ),
@@ -419,7 +471,7 @@ class _LoginPageState extends State<LoginPage>
                               FontAwesomeIcons.envelope,
                               color: Colors.black,
                             ),
-                            hintText: "Email Address",
+                            hintText: "Correo electrónico",
                             hintStyle: TextStyle(
                                 fontFamily: "Nunito", fontSize: 16.0),
                           ),
@@ -447,13 +499,13 @@ class _LoginPageState extends State<LoginPage>
                               FontAwesomeIcons.lock,
                               color: Colors.black,
                             ),
-                            hintText: "Password",
+                            hintText: "Contraseña",
                             hintStyle: TextStyle(
                                 fontFamily: "Nunito", fontSize: 16.0),
                             suffixIcon: GestureDetector(
                               onTap: _toggleSignup,
                               child: Icon(
-                                FontAwesomeIcons.eye,
+                                _eye_signup,
                                 size: 15.0,
                                 color: Colors.black,
                               ),
@@ -482,13 +534,13 @@ class _LoginPageState extends State<LoginPage>
                               FontAwesomeIcons.lock,
                               color: Colors.black,
                             ),
-                            hintText: "Confirmation",
+                            hintText: "Confirmar contraseña",
                             hintStyle: TextStyle(
                                 fontFamily: "Nunito", fontSize: 16.0),
                             suffixIcon: GestureDetector(
                               onTap: _toggleSignupConfirm,
                               child: Icon(
-                                FontAwesomeIcons.eye,
+                                _eye_signup_confirm,
                                 size: 15.0,
                                 color: Colors.black,
                               ),
@@ -501,7 +553,7 @@ class _LoginPageState extends State<LoginPage>
                 ),
               ),
               Container(
-                margin: EdgeInsets.only(top: 340.0),
+                margin: EdgeInsets.only(top: 430.0),
                 decoration: new BoxDecoration(
                   borderRadius: BorderRadius.all(Radius.circular(5.0)),
                   boxShadow: <BoxShadow>[
@@ -534,7 +586,7 @@ class _LoginPageState extends State<LoginPage>
                       padding: const EdgeInsets.symmetric(
                           vertical: 10.0, horizontal: 42.0),
                       child: Text(
-                        "SIGN UP",
+                        "UNIRSE",
                         style: TextStyle(
                             color: Colors.white,
                             fontSize: 25.0,
@@ -563,18 +615,36 @@ class _LoginPageState extends State<LoginPage>
 
   void _toggleLogin() {
     setState(() {
+      if(_obscureTextLogin){
+        _eye_login = _eye_slash;
+      }
+      else{
+        _eye_login = _eye_open;
+      }
       _obscureTextLogin = !_obscureTextLogin;
     });
   }
 
   void _toggleSignup() {
     setState(() {
+      if(_obscureTextSignup){
+        _eye_signup = _eye_slash;
+      }
+      else{
+        _eye_signup = _eye_open;
+      }
       _obscureTextSignup = !_obscureTextSignup;
     });
   }
 
   void _toggleSignupConfirm() {
     setState(() {
+      if(_obscureTextSignupConfirm){
+        _eye_signup_confirm = _eye_slash;
+      }
+      else{
+        _eye_signup_confirm = _eye_open;
+      }
       _obscureTextSignupConfirm = !_obscureTextSignupConfirm;
     });
   }
