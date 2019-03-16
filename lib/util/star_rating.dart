@@ -6,7 +6,7 @@ class StarRating extends StatelessWidget {
   // TODO posibilidad de añadir funcionalidad (mover las estrellas al tocar una)
   // https://stackoverflow.com/questions/46637566/how-to-create-rating-star-bar-properly
 
-  final _starColor = Colors.yellow[600];
+  final _starColor = Colors.yellow[300];
 
   final double starRating;
 
