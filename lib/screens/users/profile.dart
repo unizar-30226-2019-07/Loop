@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:selit/models/usuario_model.dart';
 import 'package:selit/util/star_rating.dart';
 
-/// Perfil de usuario, tal como aparece en el wireframe
-/// dividido en dos partes: profile_user (superior) y profile_products (inferior)
+/// Perfil de usuario: muestra sus datos, foto de perfil y
+/// dos listas: una con los productos en venta y otra con los vendidos
 class Profile extends StatefulWidget {
   @override
   _ProfileState createState() => new _ProfileState();
@@ -65,6 +65,7 @@ class _ProfileState extends State<Profile> {
   }
 
   /// Widget correspondiente al perfil del usuario _user
+  /// Si un campo de _user es nulo, se muestran los campos por defecto
   Widget _buildProfile() {
     // wUserData (parte superior)
     // - wUserDataLeft (parte izquierda: foto de perfil, estrellas)

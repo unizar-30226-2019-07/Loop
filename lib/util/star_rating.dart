@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-/// Perfil de usuario, tal como aparece en el wireframe
-/// dividido en dos partes: profile_user (superior) y profile_products (inferior)
+/// Widget con rating de estrellas (estático) de 1 a 5 (sin incluir el 0)
+/// Ejemplo de uso: child: StarRating(starRating: 3.5)
 class StarRating extends StatelessWidget {
   // TODO posibilidad de añadir funcionalidad (mover las estrellas al tocar una)
   // https://stackoverflow.com/questions/46637566/how-to-create-rating-star-bar-properly
@@ -10,7 +10,9 @@ class StarRating extends StatelessWidget {
 
   final double starRating;
 
-  StarRating({Key key, this.starRating}) : super(key: key);
+  StarRating({Key key, this.starRating})
+      : assert(starRating >= 1 && starRating <= 5),
+        super(key: key);
 
   /// Devuelve una estrella entera, media o vacía dependiendo
   /// de la puntuación y el numero de estrella a mostrar

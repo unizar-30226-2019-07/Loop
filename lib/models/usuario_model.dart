@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 
+/// Datos de usuario registrado, ya sea para mostrarlos en el perfil
+/// o para cualquier otro uso. Puede tener campos nulos aunque sean
+/// campos obligatorios para un usuario registrado, ya que un campo nulo
+/// representa el usuario por defecto hasta que cargue el usuario real
 class UsuarioModel {
   // TODO por ahora contiene los datos que se muestran en el perfil,
   // supongo más adelante contendrá toda la información relacionada
@@ -15,10 +19,13 @@ class UsuarioModel {
 
   dynamic _getProfilePicture(String url) {
     if (url == null || url.isEmpty) {
+      // No existe foto de perfil: foto por defecto
       return Image.asset(
         'images/profile_default.jpg',
       );
     } else {
+      // Tiene foto de perfil: mostrar la foto por defecto
+      // hasta que cargue la foto real
       return FadeInImage.assetNetwork(
         placeholder: 'images/profile_default.jpg',
         image: url,
