@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:selit/models/usuario_model.dart';
-import 'package:selit/util/star_rating.dart';
+import 'package:selit/widgets/star_rating.dart';
 
 /// Perfil de usuario: muestra sus datos, foto de perfil y
 /// dos listas: una con los productos en venta y otra con los vendidos
