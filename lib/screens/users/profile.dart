@@ -30,13 +30,13 @@ class _ProfileClipper extends CustomClipper<Path> {
 class _ProfileState extends State<Profile> {
   // Estilos para los diferentes textos
   static final _styleNombre = const TextStyle(
-      fontWeight: FontWeight.bold, fontSize: 18.0, color: Colors.black);
+      fontWeight: FontWeight.bold, fontSize: 18.0, color: Colors.black, fontFamily: "Nunito");
   static final _styleSexoEdad = const TextStyle(
-      fontStyle: FontStyle.italic, fontSize: 15.0, color: Colors.black);
+      fontStyle: FontStyle.italic, fontSize: 15.0, color: Colors.black, fontFamily: "Nunito");
   static final _styleUbicacion =
-      const TextStyle(fontSize: 15.0, color: Colors.black);
+      const TextStyle(fontSize: 15.0, color: Colors.black, fontFamily: "Nunito");
   static final _styleReviews =
-      const TextStyle(fontSize: 15.0, color: Colors.white);
+      const TextStyle(fontSize: 15.0, color: Colors.white, fontFamily: "Nunito");
   static final _textAlignment = TextAlign.left;
 
   /// Usuario a mostrar en el perfil
