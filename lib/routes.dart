@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'screens/debug_main.dart';
 import 'screens/users/profile.dart';
+import 'screens/users/edit_profile.dart';
 
 class Routes {
   final routes = <String, WidgetBuilder>{
     '/debug-main': (BuildContext context) => new DebugMain(),
     '/profile': (BuildContext context) => new Profile(),
+    '/edit_profile': (BuildContext context) => new EditProfile(),
   };
 
   Routes() {
