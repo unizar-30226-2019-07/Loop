@@ -130,7 +130,7 @@ class _ProfileState extends State<Profile> {
                   children: <Widget>[
                     Container(
                       margin: EdgeInsets.all(2),
-                      child: Icon(Icons.location_on),
+                      child: Icon(Icons.location_on, color: Colors.white),
                     ),
                     Text(
                       _user.ubicacionCiudad ?? '---',

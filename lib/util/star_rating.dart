@@ -11,7 +11,8 @@ class StarRating extends StatelessWidget {
   final double starRating;
 
   StarRating({Key key, this.starRating})
-      : assert(starRating >= 1 && starRating <= 5),
+      : assert(starRating >= 1 && starRating <= 5,
+            'El valor de starRating debe estar entre 1 y 5'),
         super(key: key);
 
   /// Devuelve una estrella entera, media o vacía dependiendo

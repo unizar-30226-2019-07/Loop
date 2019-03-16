@@ -45,10 +45,11 @@ class UsuarioModel {
       this.numeroEstrellas,
       this.reviews,
       urlPerfil})
-      : assert(edad > 0 &&
-            reviews > 0 &&
-            numeroEstrellas >= 1 &&
-            numeroEstrellas <= 5) {
+      : assert(edad > 0, 'Un usuario no puede tener edad negativa'),
+        assert(reviews > 0,
+            'Un usuario no puede tener número de reviews negativo'),
+        assert(numeroEstrellas >= 1 && numeroEstrellas <= 5,
+            'Un usuario debe tener un número de estrellas entre 1 y 5') {
     fotoPerfil = _getProfilePicture(urlPerfil);
   }
 
