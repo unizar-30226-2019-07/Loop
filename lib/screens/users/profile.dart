@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:selit/models/usuario_model.dart';
+import 'package:selit/screens/users/edit_profile.dart';
 import 'package:selit/widgets/star_rating.dart';
 
 /// Perfil de usuario: muestra sus datos, foto de perfil y
@@ -30,13 +31,13 @@ class _ProfileClipper extends CustomClipper<Path> {
 class _ProfileState extends State<Profile> {
   // Estilos para los diferentes textos
   static final _styleNombre = const TextStyle(
-      fontWeight: FontWeight.bold, fontSize: 18.0, color: Colors.black, fontFamily: "Nunito");
+      fontWeight: FontWeight.bold, fontSize: 18.0, color: Colors.black);
   static final _styleSexoEdad = const TextStyle(
-      fontStyle: FontStyle.italic, fontSize: 15.0, color: Colors.black, fontFamily: "Nunito");
+      fontStyle: FontStyle.italic, fontSize: 15.0, color: Colors.black);
   static final _styleUbicacion =
-      const TextStyle(fontSize: 15.0, color: Colors.black, fontFamily: "Nunito");
+      const TextStyle(fontSize: 15.0, color: Colors.black);
   static final _styleReviews =
-      const TextStyle(fontSize: 15.0, color: Colors.white, fontFamily: "Nunito");
+      const TextStyle(fontSize: 15.0, color: Colors.white);
   static final _textAlignment = TextAlign.left;
 
   /// Usuario a mostrar en el perfil
@@ -67,6 +68,7 @@ class _ProfileState extends State<Profile> {
   /// Widget correspondiente al perfil del usuario _user
   /// Si un campo de _user es nulo, se muestran los campos por defecto
   Widget _buildProfile() {
+    // wTopStack (parte superior junto con botón de edición)
     // wUserData (parte superior)
     // - wUserDataLeft (parte izquierda: foto de perfil, estrellas)
     // - wUserDataRight (parte derecha: nombre, apellidos, etc.)
@@ -176,6 +178,26 @@ class _ProfileState extends State<Profile> {
       child: Row(children: <Widget>[wUserDataLeft, wUserDataRight]),
     );
 
+
+    Widget wTopStack = Stack(
+      children: <Widget>[
+        wUserData,
+         new Positioned(
+                left: 350,
+                top:40,
+                child: IconButton(
+              icon: Icon(Icons.edit),
+              onPressed: () {
+                Navigator.push(context, new MaterialPageRoute(
+                  builder: (context) =>
+                    new EditProfile())
+                  );
+              },
+            ),
+              ),
+      ]
+    );
+
     Widget wProductListSelling = ListView.builder(
       padding: EdgeInsets.all(25),
       //itemExtent: 20, <- cuanto mide cada item (?) dice que es más eficiente
@@ -212,9 +234,11 @@ class _ProfileState extends State<Profile> {
       ),
     );
 
+  
+
     return Column(
       children: <Widget>[
-        wUserData,
+        wTopStack,
         Expanded(
           child: Container(
             color: Colors.grey[200],

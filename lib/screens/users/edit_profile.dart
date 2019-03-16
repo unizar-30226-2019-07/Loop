@@ -1,65 +1,61 @@
 import 'package:flutter/material.dart';
+import 'package:selit/models/usuario_model.dart';
 
 class EditProfile extends StatefulWidget {
-	@override
-	EditProfileState createState() => new EditProfileState();
-}
-
-// TODO mover a otro fichero
-class UsuarioVO {
-
-  // Atributos a mostrar del usuario en la edición del perfil
-  Text nombre;
-  Text apellidos;
-  dynamic fotoPerfil; // TODO tipo común image-fadeinimage
-  Text sexo;
-  Text edad;
-  Text ubicacion;
-
-  // Estilos para los diferentes textos
-	static final _styleNombre = const TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0);
-	static final _styleSexoEdad = const TextStyle(fontStyle: FontStyle.italic, fontSize: 15.0);
-	static final _styleUbicacion = const TextStyle(fontSize: 15.0);
-	static final _styleReviews = const TextStyle(fontSize: 15.0);
-
-  // TODO cargar datos del usuario del JSON
-  UsuarioVO(jsonData) {
-    nombre = new Text('Nombre', style: _styleNombre, textAlign: TextAlign.left);
-    apellidos = new Text('Apellidos', style: _styleNombre, textAlign: TextAlign.left);
-    sexo = new Text('Hombre', style: _styleSexoEdad, textAlign: TextAlign.left);
-    edad = new Text('21', style: _styleSexoEdad, textAlign: TextAlign.left);
-    ubicacion = new Text('Zaragoza, España', style: _styleUbicacion, textAlign: TextAlign.left);
-    fotoPerfil = FadeInImage.assetNetwork(
-      placeholder: 'images/profile_default.jpg',
-      image: 'https://avatars0.githubusercontent.com/u/17049331',
-      fadeInCurve: Curves.linear,
-      fadeInDuration: const Duration(milliseconds: 100),
-    );
-  }
-
-  // Usuario por defecto, para mostrarlo mientras carga
-  UsuarioVO.placeholder() {
-    nombre = new Text('-----', style: _styleNombre, textAlign: TextAlign.left);
-    apellidos = new Text('-----', style: _styleNombre, textAlign: TextAlign.left);
-    sexo = new Text('---', style: _styleSexoEdad, textAlign: TextAlign.left);
-    edad = new Text('---', style: _styleSexoEdad, textAlign: TextAlign.left);
-    ubicacion = new Text('---', style: _styleUbicacion, textAlign: TextAlign.left);
-    fotoPerfil = Image.asset(
-      'images/profile_default.jpg',
-    );
-  }
-
+  @override
+  EditProfileState createState() => new EditProfileState();
 }
 
 class EditProfileState extends State<EditProfile> {
+  final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
 
-   final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
+  final TextEditingController _nameController = new TextEditingController();
+  final TextEditingController _surnameController = new TextEditingController();
+  final TextEditingController _locationController = new TextEditingController();
+  final TextEditingController _sexController = new TextEditingController();
+  final TextEditingController _yearController = new TextEditingController();
 
-  UsuarioVO user = UsuarioVO.placeholder();
+  /// Usuario a mostrar en el perfil
+  UsuarioModel _user = UsuarioModel.placeholder();
 
+  /// Realiza una petición GET para obtener los datos del usuario
+  /// userId y al recibirlos actualiza la edición del perfil para que muestre
+  /// los datos de dicho usuario
+  Future<void> _loadProfile(userId) async {
+    // TODO hacer una petición en lugar de simular una carga de 1 segundo
+    return Future.delayed(Duration(seconds: 1), () {
+      setState(() {
+        _user = new UsuarioModel(
+            nombre: 'Nombre',
+            apellidos: 'Apellidos',
+            sexo: 'Hombre',
+            edad: 21,
+            ubicacionCiudad: 'Zaragoza',
+            ubicacionResto: 'Aragon, España',
+            numeroEstrellas: 2.5,
+            reviews: 30,
+            urlPerfil:
+                'https://avatars0.githubusercontent.com/u/17049331'); // TODO modificar por JSON
+
+        _nameController.text = _user.nombre;
+        _surnameController.text = _user.apellidos;
+        _locationController.text = _user.ubicacionCiudad;
+        _sexController.text = _user.sexo;
+        _yearController.text = _user.edad.toString();
+      });
+    });
+  }
+
+  /// Widget correspondiente a la edición del perfil del usuario _user
+  /// Si un campo de _user es nulo, se muestran los campos por defecto
   Widget _buildForm() {
+    // wDataTop
+    // wLocation
+    // wPassword
+    // wSex
+    // wAge
 
-  Widget widgetUserBasics = Row(
+    Widget wDataTop = Row(
       children: <Widget>[
         Expanded(
           flex: 4,
@@ -69,8 +65,8 @@ class EditProfileState extends State<EditProfile> {
             child: Column(
               children: <Widget>[
                 Container(
-                  margin: EdgeInsets.only(top: 20),
-                  child: user.fotoPerfil,
+                  margin: EdgeInsets.only(top: 50),
+                  child: _user.fotoPerfil,
                 ),
                 Container(
                   margin: EdgeInsets.only(top: 10, left: 25),
@@ -78,7 +74,7 @@ class EditProfileState extends State<EditProfile> {
                   child: Row(
                     children: <Widget>[
                       Container(
-                        margin:EdgeInsets.all(5),
+                        margin: EdgeInsets.all(5),
                         child: Icon(Icons.edit),
                       ),
                       new Text('Editar')
@@ -92,87 +88,79 @@ class EditProfileState extends State<EditProfile> {
         Expanded(
           flex: 6,
           child: Container(
-            margin: EdgeInsets.only(left: 25, right: 10, bottom: 35),
-            //color: Colors.red, // util para ajustar margenes
-            child: Column(
-              children: <Widget>[
-                new TextFormField(
-              decoration: const InputDecoration(
-                labelText: 'Nombre',
-              ),
-              controller: _nameController,
-            ),
-            new TextFormField(
-              decoration: const InputDecoration(
-                labelText: 'Apellidos',
-              ),
-              controller: _surnameController,
-              keyboardType: TextInputType.datetime,
-            ),
-              ],
-            )
-          ),
+              margin: EdgeInsets.only(left: 25, right: 10, bottom: 35),
+              //color: Colors.red, // util para ajustar margenes
+              child: Column(
+                children: <Widget>[
+                  new TextFormField(
+                    decoration: const InputDecoration(
+                      labelText: 'Nombre',
+                    ),
+                    controller: _nameController,
+                  ),
+                  new TextFormField(
+                    decoration: const InputDecoration(
+                      labelText: 'Apellidos',
+                    ),
+                    controller: _surnameController,
+                    keyboardType: TextInputType.datetime,
+                  ),
+                ],
+              )),
         )
       ],
     );
 
-
-Widget widgetUserData = Row(
+    Widget wLocation = Row(
       children: <Widget>[
         Expanded(
           flex: 10,
           child: Container(
-            margin: EdgeInsets.only(left: 25, right: 10, bottom: 20),
-            //color: Colors.red, // util para ajustar margenes
-            child: Column(
-              children: <Widget>[
-                new TextFormField(
-              decoration: const InputDecoration(
-                labelText: 'Ubicación',
-              ),
-              controller: _locationController,
-              keyboardType: TextInputType.emailAddress,
-            ),
-              ],
-            )
-          ),
+              margin: EdgeInsets.only(left: 25, right: 10, bottom: 20),
+              //color: Colors.red, // util para ajustar margenes
+              child: Column(
+                children: <Widget>[
+                  new TextFormField(
+                    decoration: const InputDecoration(
+                      labelText: 'Ubicación',
+                    ),
+                    controller: _locationController,
+                    keyboardType: TextInputType.emailAddress,
+                  ),
+                ],
+              )),
         )
       ],
     );
 
-
-    Widget widgetUserPass = Row(
+    Widget wPassword = Row(
       children: <Widget>[
         Expanded(
           flex: 10,
           child: Container(
-            margin: EdgeInsets.only(left: 25, right: 10, bottom: 20),
-            //color: Colors.red, // util para ajustar margenes
-            child: Column(
-              children: <Widget>[
-            new TextFormField(
-              decoration: const InputDecoration(
-                labelText: 'Nueva contraseña',
-              ),
-              keyboardType: TextInputType.emailAddress,
-            ),
-            
-            new TextFormField(
-              decoration: const InputDecoration(
-                labelText: 'Repetir nueva contraseña',
-              ),
-              keyboardType: TextInputType.emailAddress,
-            ),
-              ],
-            )
-          ),
+              margin: EdgeInsets.only(left: 25, right: 10, bottom: 20),
+              //color: Colors.red, // util para ajustar margenes
+              child: Column(
+                children: <Widget>[
+                  new TextFormField(
+                    decoration: const InputDecoration(
+                      labelText: 'Nueva contraseña',
+                    ),
+                    keyboardType: TextInputType.emailAddress,
+                  ),
+                  new TextFormField(
+                    decoration: const InputDecoration(
+                      labelText: 'Repetir nueva contraseña',
+                    ),
+                    keyboardType: TextInputType.emailAddress,
+                  ),
+                ],
+              )),
         )
       ],
     );
 
-    
-
-  Widget widgetUserSexo = Row(
+    Widget wSex = Row(
       children: <Widget>[
         Expanded(
           flex: 8,
@@ -182,13 +170,13 @@ Widget widgetUserData = Row(
             child: Column(
               children: <Widget>[
                 new TextFormField(
-                decoration: const InputDecoration(
-                  hintText: 'Sexo',
-                  labelText: 'Sexo',
+                  decoration: const InputDecoration(
+                    hintText: 'Sexo',
+                    labelText: 'Sexo',
+                  ),
+                  controller: _sexController,
+                  keyboardType: TextInputType.emailAddress,
                 ),
-                controller: _sexController,
-                keyboardType: TextInputType.emailAddress,
-              ),
               ],
             ),
           ),
@@ -196,22 +184,21 @@ Widget widgetUserData = Row(
         Expanded(
           flex: 2,
           child: Container(
-            margin: EdgeInsets.only(left: 25, right: 10,top: 30),
-            //color: Colors.red, // util para ajustar margenes
-            child: Column(
-              children: <Widget>[
-               Container(
-                 margin:EdgeInsets.all(5),
-                 child: Icon(Icons.delete),
-              ),
-              ],
-            )
-          ),
+              margin: EdgeInsets.only(left: 25, right: 10, top: 30),
+              //color: Colors.red, // util para ajustar margenes
+              child: Column(
+                children: <Widget>[
+                  Container(
+                    margin: EdgeInsets.all(5),
+                    child: Icon(Icons.delete),
+                  ),
+                ],
+              )),
         )
       ],
     );
 
-    Widget widgetUserLYear = Row(
+    Widget wAge = Row(
       children: <Widget>[
         Expanded(
           flex: 8,
@@ -221,13 +208,13 @@ Widget widgetUserData = Row(
             child: Column(
               children: <Widget>[
                 new TextFormField(
-              decoration: const InputDecoration(
-                hintText: 'Edad',
-                labelText: 'Edad',
-              ),
-              controller: _yearController,
-              keyboardType: TextInputType.emailAddress,
-            ),
+                  decoration: const InputDecoration(
+                    hintText: 'Edad',
+                    labelText: 'Edad',
+                  ),
+                  controller: _yearController,
+                  keyboardType: TextInputType.emailAddress,
+                ),
               ],
             ),
           ),
@@ -235,95 +222,50 @@ Widget widgetUserData = Row(
         Expanded(
           flex: 2,
           child: Container(
-            margin: EdgeInsets.only(left: 25, right: 10,top: 30, bottom:20),
-            //color: Colors.red, // util para ajustar margenes
-            child: Column(
-              children: <Widget>[
-               Container(
-                 margin:EdgeInsets.all(5),
-                 child: Icon(Icons.delete),
-              ),
-              ],
-            )
-          ),
+              margin: EdgeInsets.only(left: 25, right: 10, top: 30, bottom: 20),
+              //color: Colors.red, // util para ajustar margenes
+              child: Column(
+                children: <Widget>[
+                  Container(
+                    margin: EdgeInsets.all(5),
+                    child: Icon(Icons.delete),
+                  ),
+                ],
+              )),
         )
       ],
     );
 
-
-
-  return SafeArea(
-    top: false,
-    bottom: false,
-    child: new Form(
-        key: _formKey,
-        autovalidate: true,
-        child: new ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          children: <Widget>[
-            widgetUserBasics,
-            Divider(),
-            widgetUserData,
-            Divider(),
-            widgetUserPass,
-            Divider(),
-            widgetUserSexo,
-            widgetUserLYear,
-            new Container(
-                padding: const EdgeInsets.only(left: 10.0, top: 20.0),
-                child: new RaisedButton(
-                  child: const Text('Guardar cambios'),
-                  onPressed: null,
-                )),
-          ],
-        )));
-}
-
-
-  // Muestra el perfil por defecto e inicia una petición
-  // para obtener los datos del usuario userId
-  // Cuando recibe los datos, actualiza el perfil
-  Future<void> _loadProfile(userId) async {
-    // TODO hacer una petición en lugar de simular una carga de 1 segundo
-    return Future.delayed(
-			Duration(seconds: 1),
-      () {
-        setState(() {
-          user = new UsuarioVO('testData'); // TODO modificar por JSON
-          _nameController.text = user.nombre.data;
-          _surnameController.text = user.apellidos.data;
-          _locationController.text= user.ubicacion.data;
-          _sexController.text= user.sexo.data;
-          _yearController.text= user.edad.data;
-        });
-      }
-    );
+    return SafeArea(
+        top: false,
+        bottom: false,
+        child: new Form(
+            key: _formKey,
+            autovalidate: true,
+            child: new ListView(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              children: <Widget>[
+                wDataTop,
+                Divider(),
+                wLocation,
+                Divider(),
+                wPassword,
+                Divider(),
+                wSex,
+                wAge,
+                new Container(
+                    padding: const EdgeInsets.only(left: 10.0, top: 20.0),
+                    child: new RaisedButton(
+                      child: const Text('Guardar cambios'),
+                      onPressed: null,
+                    )),
+              ],
+            )));
   }
 
-  final TextEditingController _nameController = new TextEditingController();
-  final TextEditingController _surnameController = new TextEditingController();
-  final TextEditingController _locationController = new TextEditingController();
-  final TextEditingController _sexController = new TextEditingController();
-  final TextEditingController _yearController = new TextEditingController();
-
-  void initState() {
-    _nameController.text = user.nombre.data;
-    _surnameController.text = user.apellidos.data;
-    _locationController.text= user.ubicacion.data;
-    _sexController.text= user.sexo.data;
-    _yearController.text= user.edad.data;
-    return super.initState();
+  @override
+  Widget build(BuildContext context) {
+    _loadProfile(1); // TODO sustituir "1" por el ID pasado
+    return Scaffold(body: _buildForm());
   }
-
-	@override
-	Widget build(BuildContext context) {
-    _loadProfile(1);
-		return Scaffold(
-			appBar: AppBar(
-				title: const Text('Editar Perfil'),
-			),
-			body: _buildForm(),
-		);
-	}
-
 }
