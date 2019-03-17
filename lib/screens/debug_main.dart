@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:selit/screens/users/profile.dart';
+
 
 // Vista temporal con varios botones que llevan a diferentes vistas
 // de forma que se pueda acceder a ellas de alguna forma
@@ -18,7 +20,9 @@ class DebugMain extends StatelessWidget {
 							RaisedButton(
 								child: const Text('Perfil'),
 								onPressed: () {
-									Navigator.of(context).pushNamed('/profile');
+                  // Mostrar el perfil del usuario 1
+									Navigator.of(context).pushNamed('/profile',
+                  arguments: 1);
 								},
 							),
 						],

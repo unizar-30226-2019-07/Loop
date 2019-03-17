@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:selit/models/usuario_model.dart';
+import 'package:selit/widgets/profile_picture.dart';
 
 class EditProfile extends StatefulWidget {
+  final UsuarioModel user;
+
+  /// Página de perfil para el usuario userId
+  EditProfile({@required this.user});
+
   @override
-  EditProfileState createState() => new EditProfileState();
+  _EditProfileState createState() => new _EditProfileState(user);
 }
 
-class EditProfileState extends State<EditProfile> {
+class _EditProfileState extends State<EditProfile> {
   final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
 
   final TextEditingController _nameController = new TextEditingController();
@@ -16,35 +22,10 @@ class EditProfileState extends State<EditProfile> {
   final TextEditingController _yearController = new TextEditingController();
 
   /// Usuario a mostrar en el perfil
-  UsuarioModel _user = UsuarioModel.placeholder();
+  UsuarioModel _user;
 
-  /// Realiza una petición GET para obtener los datos del usuario
-  /// userId y al recibirlos actualiza la edición del perfil para que muestre
-  /// los datos de dicho usuario
-  Future<void> _loadProfile(userId) async {
-    // TODO hacer una petición en lugar de simular una carga de 1 segundo
-    return Future.delayed(Duration(seconds: 1), () {
-      setState(() {
-        _user = new UsuarioModel(
-            nombre: 'Nombre',
-            apellidos: 'Apellidos',
-            sexo: 'Hombre',
-            edad: 21,
-            ubicacionCiudad: 'Zaragoza',
-            ubicacionResto: 'Aragon, España',
-            numeroEstrellas: 2.5,
-            reviews: 30,
-            urlPerfil:
-                'https://avatars0.githubusercontent.com/u/17049331'); // TODO modificar por JSON
-
-        _nameController.text = _user.nombre;
-        _surnameController.text = _user.apellidos;
-        _locationController.text = _user.ubicacionCiudad;
-        _sexController.text = _user.sexo;
-        _yearController.text = _user.edad.toString();
-      });
-    });
-  }
+  /// Constructor: mostrar el usuario _user
+  _EditProfileState(this._user);
 
   /// Widget correspondiente a la edición del perfil del usuario _user
   /// Si un campo de _user es nulo, se muestran los campos por defecto
@@ -66,7 +47,7 @@ class EditProfileState extends State<EditProfile> {
               children: <Widget>[
                 Container(
                   margin: EdgeInsets.only(top: 50),
-                  child: _user.fotoPerfil,
+                  child: ProfilePicture(_user.urlPerfil),
                 ),
                 Container(
                   margin: EdgeInsets.only(top: 10, left: 25),
@@ -265,7 +246,6 @@ class EditProfileState extends State<EditProfile> {
 
   @override
   Widget build(BuildContext context) {
-    _loadProfile(1); // TODO sustituir "1" por el ID pasado
     return Scaffold(body: _buildForm());
   }
 }

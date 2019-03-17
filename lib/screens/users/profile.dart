@@ -1,32 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:selit/models/usuario_model.dart';
 import 'package:selit/screens/users/edit_profile.dart';
+import 'package:selit/util/api.dart';
 import 'package:selit/widgets/star_rating.dart';
+import 'package:selit/widgets/profile_picture.dart';
 
 /// Perfil de usuario: muestra sus datos, foto de perfil y
 /// dos listas: una con los productos en venta y otra con los vendidos
 class Profile extends StatefulWidget {
-  @override
-  _ProfileState createState() => new _ProfileState();
-}
+  final int userId;
 
-/* TODO ver https://marcinszalek.pl/flutter/filter-menu-ui-challenge/
- * para el diseño del perfil
-class _ProfileClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    Path path = new Path();
-    path.lineTo(0.0, size.height - 60.0);
-    path.lineTo(size.width, size.height);
-    path.lineTo(size.width, 0.0);
-    path.close();
-    return path;
-  }
+  /// Página de perfil para el usuario userId
+  Profile({@required this.userId});
 
   @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) => true;
+  _ProfileState createState() => new _ProfileState(userId);
 }
-*/
 
 class _ProfileState extends State<Profile> {
   // Estilos para los diferentes textos
@@ -40,29 +29,25 @@ class _ProfileState extends State<Profile> {
       const TextStyle(fontSize: 15.0, color: Colors.white);
   static final _textAlignment = TextAlign.left;
 
-  /// Usuario a mostrar en el perfil
-  UsuarioModel _user = UsuarioModel.placeholder();
+  static final _styleTabs =
+      const TextStyle(fontSize: 16.0, color: Colors.white);
 
-  /// Realiza una petición GET para obtener los datos del usuario
-  /// userId y al recibirlos actualiza el perfil para que muestre
-  /// los datos de dicho usuario
-  Future<void> _loadProfile(userId) async {
-    // TODO hacer una petición en lugar de simular una carga de 1 segundo
-    return Future.delayed(Duration(seconds: 1), () {
-      setState(() {
-        _user = new UsuarioModel(
-            nombre: 'Nombre',
-            apellidos: 'Apellidos',
-            sexo: 'Hombre',
-            edad: 21,
-            ubicacionCiudad: 'Zaragoza',
-            ubicacionResto: 'Aragon, España',
-            numeroEstrellas: 2.5,
-            reviews: 30,
-            urlPerfil:
-                'https://avatars0.githubusercontent.com/u/17049331'); // TODO modificar por JSON
+  /// Usuario a mostrar en el perfil (null = placeholder)
+  static UsuarioModel _user;
+
+  _ProfileState(int _userId) {
+    _loadProfile(_userId);
+  }
+
+  Future<void> _loadProfile(int _userId) async {
+    // Mostrar usuario placeholder mientras carga el real
+    if (_user == null) {
+      API.getUser(_userId).then((realUser) {
+        setState(() {
+          _user = realUser;
+        });
       });
-    });
+    }
   }
 
   /// Widget correspondiente al perfil del usuario _user
@@ -89,17 +74,17 @@ class _ProfileState extends State<Profile> {
                   decoration: BoxDecoration(
                     color: Colors.white,
                   ),
-                  child: _user.fotoPerfil,
+                  child: ProfilePicture(_user?.urlPerfil),
                 ),
               ),
             ),
             Container(
                 margin: EdgeInsets.only(top: 10),
-                child: StarRating(starRating: _user.numeroEstrellas ?? 5)),
+                child: StarRating(starRating: _user?.numeroEstrellas ?? 5)),
             Container(
                 margin: EdgeInsets.only(top: 5, bottom: 15),
                 alignment: Alignment.center,
-                child: Text('${_user.reviews} reviews',
+                child: Text('${_user?.reviews} reviews',
                     style: _styleReviews, textAlign: _textAlignment))
           ],
         ),
@@ -116,17 +101,17 @@ class _ProfileState extends State<Profile> {
               Container(
                   alignment: Alignment.topLeft,
                   padding: EdgeInsets.only(top: 15),
-                  child: Text(_user.nombre ?? '---',
+                  child: Text(_user?.nombre ?? '---',
                       style: _styleNombre, textAlign: _textAlignment)),
               Container(
                   alignment: Alignment.topLeft,
                   margin: EdgeInsets.only(top: 5),
-                  child: Text(_user.apellidos ?? '---',
+                  child: Text(_user?.apellidos ?? '---',
                       style: _styleNombre, textAlign: _textAlignment)),
               Container(
                   alignment: Alignment.topLeft,
                   margin: EdgeInsets.only(top: 10),
-                  child: Text('${_user.sexo}, ${_user.edad} años',
+                  child: Text('${_user?.sexo}, ${_user?.edad} años',
                       style: _styleSexoEdad, textAlign: _textAlignment)),
               Container(
                 alignment: Alignment.topLeft,
@@ -138,7 +123,7 @@ class _ProfileState extends State<Profile> {
                       child: Icon(Icons.location_on, color: Colors.black),
                     ),
                     Text(
-                      _user.ubicacionCiudad ?? '---',
+                      _user?.ubicacionCiudad ?? '---',
                       style: _styleUbicacion,
                       textAlign: _textAlignment,
                     ),
@@ -149,7 +134,7 @@ class _ProfileState extends State<Profile> {
                 alignment: Alignment.topLeft,
                 margin: EdgeInsets.only(top: 5, left: 15, bottom: 45),
                 child: Text(
-                  _user.ubicacionResto ?? '---',
+                  _user?.ubicacionResto ?? '---',
                   style: _styleUbicacion,
                   textAlign: _textAlignment,
                 ),
@@ -178,25 +163,21 @@ class _ProfileState extends State<Profile> {
       child: Row(children: <Widget>[wUserDataLeft, wUserDataRight]),
     );
 
+    print(_user);
 
-    Widget wTopStack = Stack(
-      children: <Widget>[
-        wUserData,
-         new Positioned(
-                left: 350,
-                top:40,
-                child: IconButton(
-              icon: Icon(Icons.edit),
-              onPressed: () {
-                Navigator.push(context, new MaterialPageRoute(
-                  builder: (context) =>
-                    new EditProfile())
-                  );
-              },
-            ),
-              ),
-      ]
-    );
+    Widget wTopStack = Stack(children: <Widget>[
+      wUserData,
+      Positioned(
+        right: _user != null ? 10 : -50,
+        top: 40,
+        child: IconButton(
+          icon: Icon(Icons.edit),
+          onPressed: () {
+            Navigator.of(context).pushNamed('/edit-profile', arguments: _user);
+          },
+        ),
+      ),
+    ]);
 
     Widget wProductListSelling = ListView.builder(
       padding: EdgeInsets.all(25),
@@ -221,20 +202,18 @@ class _ProfileState extends State<Profile> {
       length: 2,
       child: Scaffold(
         appBar: PreferredSize(
-            preferredSize: Size.fromHeight(
-                40), // TODO seguro que hay algun valor por defecto en lugar de una constante 40
+            preferredSize: Size.fromHeight(50),
             child: Container(
                 color: Theme.of(context).primaryColor,
                 child: TabBar(
                   tabs: [Tab(text: 'En venta'), Tab(text: 'Vendidos')],
                   indicatorColor: Colors.grey[200],
+                  labelStyle: _styleTabs,
                 ))),
         body: TabBarView(
             children: <Widget>[wProductListSelling, wProductListSold]),
       ),
     );
-
-  
 
     return Column(
       children: <Widget>[
@@ -251,7 +230,6 @@ class _ProfileState extends State<Profile> {
 
   @override
   Widget build(BuildContext context) {
-    _loadProfile(1); // TODO sustituir "1" por el ID pasado
     return Scaffold(body: _buildProfile());
   }
 }
