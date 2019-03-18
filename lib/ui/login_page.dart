@@ -15,6 +15,7 @@ class _LoginPageState extends State<LoginPage>
     with SingleTickerProviderStateMixin {
 
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  
 
   final FocusNode myFocusNodeEmailLogin = FocusNode();
   final FocusNode myFocusNodePasswordLogin = FocusNode();
@@ -59,7 +60,8 @@ class _LoginPageState extends State<LoginPage>
         onNotification: (overscroll) {
           overscroll.disallowGlow();
         },
-        child: SingleChildScrollView(
+        child: SafeArea(
+          child: SingleChildScrollView(
               child: Container(
                 width: MediaQuery.of(context).size.width,
                 height: MediaQuery.of(context).size.height >= 900.0
@@ -87,7 +89,7 @@ class _LoginPageState extends State<LoginPage>
                           child: Icon(
                             FontAwesomeIcons.times,
                             size: 40.0,
-                            color: Colors.grey,
+                            color: Colors.white70,
                           ),
                         ),
                       ),                   
@@ -136,6 +138,7 @@ class _LoginPageState extends State<LoginPage>
                 ),
               ),
             ),
+        ),
       ),
     );
   }
@@ -294,7 +297,7 @@ class _LoginPageState extends State<LoginPage>
                               size: 22.0,
                               color: Colors.black,
                             ),
-                            hintText: "Contraseña",
+                            hintText: "Contraeña",
                             hintStyle: TextStyle(
                                 fontFamily: "Nunito", fontSize: 17.0),
                             suffixIcon: GestureDetector(
