@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:selit/style/theme.dart' as Theme;
 import 'package:selit/utils/bubble_indication_painter.dart';
+import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 
 class LoginPage extends StatefulWidget {
   LoginPage({Key key}) : super(key: key);
@@ -54,6 +55,7 @@ class _LoginPageState extends State<LoginPage>
 
   @override
   Widget build(BuildContext context) {
+    FlutterStatusbarcolor.setStatusBarColor(Color(0xffC11328));
     return new Scaffold(
       key: _scaffoldKey,
       body: NotificationListener<OverscrollIndicatorNotification>(
@@ -297,7 +299,7 @@ class _LoginPageState extends State<LoginPage>
                               size: 22.0,
                               color: Colors.black,
                             ),
-                            hintText: "Contraeña",
+                            hintText: "Contraseña",
                             hintStyle: TextStyle(
                                 fontFamily: "Nunito", fontSize: 17.0),
                             suffixIcon: GestureDetector(
