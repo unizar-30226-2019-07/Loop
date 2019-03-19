@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:selit/models/usuario_model.dart';
 import 'package:selit/widgets/profile_picture.dart';
+import 'package:image_picker/image_picker.dart';
 
 class EditProfile extends StatefulWidget {
   final UsuarioModel user;
@@ -21,11 +24,13 @@ class _EditProfileState extends State<EditProfile> {
   final TextEditingController _sexController = new TextEditingController();
   final TextEditingController _yearController = new TextEditingController();
 
+  //Fichero de galería
+  File _galleryFile;
+
   /// Usuario a mostrar en el perfil
   UsuarioModel _user;
 
   /// Constructor: mostrar el usuario _user
-
   _EditProfileState(UsuarioModel _user) {
     this._user = _user;
     _nameController.text = _user.nombre;
@@ -33,6 +38,7 @@ class _EditProfileState extends State<EditProfile> {
     _locationController.text = _user.ubicacionCiudad;
     _sexController.text = _user.sexo;
     _yearController.text = _user.edad.toString();
+    _galleryFile = null;
   }
 
   /// Widget correspondiente a la edición del perfil del usuario _user
@@ -44,29 +50,50 @@ class _EditProfileState extends State<EditProfile> {
     // wSex
     // wAge
 
+    //Selección de foto de galería
+    imageSelectorGallery() async {
+      _galleryFile = await ImagePicker.pickImage(
+        source: ImageSource.gallery,
+      );
+      setState(() {});
+    }
+
     Widget wDataTop = Row(
       children: <Widget>[
         Expanded(
           flex: 4,
           child: Container(
-            margin: EdgeInsets.only(left: 10, bottom: 5),
+            margin: EdgeInsets.only(
+              left: 10,
+            ),
             //color: Colors.red, // util para ajustar margenes
             child: Column(
               children: <Widget>[
                 Container(
                   margin: EdgeInsets.only(top: 50),
-                  child: ProfilePicture(_user.urlPerfil),
+                  child: _galleryFile == null
+                      ? ProfilePicture(_user.urlPerfil)
+                      //TODO No deja crear ProfilePicture() con path local al seleccionar de galería
+                      : new CircleAvatar(
+                          backgroundImage: new FileImage(_galleryFile),
+                          radius: 70.0,
+                        ),
                 ),
                 Container(
-                  margin: EdgeInsets.only(top: 10, left: 25),
+                  margin: EdgeInsets.only(top: 10, left: 15),
                   alignment: Alignment.center,
                   child: Row(
                     children: <Widget>[
-                      Container(
-                        margin: EdgeInsets.all(5),
-                        child: Icon(Icons.edit),
-                      ),
-                      new Text('Editar')
+                      new FlatButton(
+                          onPressed: imageSelectorGallery,
+                          shape: new RoundedRectangleBorder(
+                              borderRadius: new BorderRadius.circular(30.0)),
+                          child: Row(
+                            children: <Widget>[
+                              Icon(Icons.edit),
+                              Text("Editar")
+                            ],
+                          ))
                     ],
                   ),
                 )
@@ -77,7 +104,7 @@ class _EditProfileState extends State<EditProfile> {
         Expanded(
           flex: 6,
           child: Container(
-              margin: EdgeInsets.only(left: 25, right: 10, bottom: 35),
+              margin: EdgeInsets.only(left: 25, right: 10, bottom: 35, top: 20),
               //color: Colors.red, // util para ajustar margenes
               child: Column(
                 children: <Widget>[
@@ -87,12 +114,15 @@ class _EditProfileState extends State<EditProfile> {
                     ),
                     controller: _nameController,
                   ),
-                  new TextFormField(
-                    decoration: const InputDecoration(
-                      labelText: 'Apellidos',
+                  Container(
+                    margin: EdgeInsets.only(top: 15),
+                    child: new TextFormField(
+                      decoration: const InputDecoration(
+                        labelText: 'Apellidos',
+                      ),
+                      controller: _surnameController,
+                      keyboardType: TextInputType.datetime,
                     ),
-                    controller: _surnameController,
-                    keyboardType: TextInputType.datetime,
                   ),
                 ],
               )),
