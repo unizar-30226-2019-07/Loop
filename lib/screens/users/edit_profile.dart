@@ -30,6 +30,7 @@ class _EditProfileState extends State<EditProfile> {
   //Fichero de galería
   File _galleryFile;
 
+  //Lista opciones sexo
   List<String> _sexos = <String>['', 'Hombre', 'Mujer', 'Otro'];
   String _sexo = '';
 
@@ -300,8 +301,9 @@ class _EditProfileState extends State<EditProfile> {
                 new Container(
                     padding: const EdgeInsets.only(left: 10.0, top: 20.0),
                     child: new RaisedButton(
-                      child: const Text('Guardar cambios'),
-                      onPressed: null,
+                      color: Color(0xffc0392b),
+                      child: const Text('Guardar cambios', style: TextStyle( color: Colors.white)),
+                      onPressed: () {},
                     )),
               ],
             )));
