@@ -24,11 +24,14 @@ class _EditProfileState extends State<EditProfile> {
   final TextEditingController _sexController = new TextEditingController();
   final TextEditingController _yearController = new TextEditingController();
 
+  /// Usuario a mostrar en el perfil
+  UsuarioModel _user;
+
   //Fichero de galería
   File _galleryFile;
 
-  /// Usuario a mostrar en el perfil
-  UsuarioModel _user;
+  List<String> _sexos = <String>['', 'Hombre', 'Mujer', 'Otro'];
+  String _sexo = '';
 
   /// Constructor: mostrar el usuario _user
   _EditProfileState(UsuarioModel _user) {
@@ -39,6 +42,7 @@ class _EditProfileState extends State<EditProfile> {
     _sexController.text = _user.sexo;
     _yearController.text = _user.edad.toString();
     _galleryFile = null;
+    _sexo = _user.sexo;
   }
 
   /// Widget correspondiente a la edición del perfil del usuario _user
@@ -182,34 +186,60 @@ class _EditProfileState extends State<EditProfile> {
     Widget wSex = Row(
       children: <Widget>[
         Expanded(
-          flex: 10,
+          flex: 8,
           child: Container(
-            margin: EdgeInsets.only(left: 25, right: 10),
-            //color: Colors.red, // util para ajustar margenes
-            child: Column(
-              children: <Widget>[
-                new Stack(
-                    alignment: const Alignment(1.0, 1.0),
-                    children: <Widget>[
-                      new TextFormField(
-                        decoration: const InputDecoration(
-                          hintText: 'Sexo',
-                          labelText: 'Sexo',
-                        ),
-                        controller: _sexController,
-                        keyboardType: TextInputType.emailAddress,
+              margin: EdgeInsets.only(
+                left: 25,
+                bottom: 7
+              ),
+              //color: Colors.red, // util para ajustar margenes
+              child: Column(children: <Widget>[
+                new FormField(
+                  builder: (FormFieldState state) {
+                    return InputDecorator(
+                      decoration: InputDecoration(
+                        labelText: 'Sexo',
                       ),
-                      new FlatButton(
-                          onPressed: () {
-                            _sexController.clear();
+                      isEmpty: _sexo == '',
+                      child: new DropdownButtonHideUnderline(
+                        child: new DropdownButton(
+                          value: _sexo,
+                          isDense: true,
+                          onChanged: (String newValue) {
+                            setState(() {
+                              _sexo = newValue;
+                              state.didChange(newValue);
+                            });
                           },
-                          shape: new RoundedRectangleBorder(
-                              borderRadius: new BorderRadius.circular(30.0)),
-                          child: new Icon(Icons.clear))
-                    ])
-              ],
-            ),
-          ),
+                          items: _sexos.map((String value) {
+                            return new DropdownMenuItem(
+                              value: value,
+                              child: new Text(value),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ])),
+        ),
+        Expanded(
+          flex: 2,
+          child: Container(
+              margin: EdgeInsets.only(left: 5, top: 20),
+              //color: Colors.red, // util para ajustar margenes
+              child: Column(children: <Widget>[
+                new FlatButton(
+                    onPressed: () {
+                      setState(() {
+                        _sexo = null;
+                      });
+                    },
+                    shape: new RoundedRectangleBorder(
+                        borderRadius: new BorderRadius.circular(30.0)),
+                    child: new Icon(Icons.delete))
+              ])),
         )
       ],
     );
@@ -217,34 +247,35 @@ class _EditProfileState extends State<EditProfile> {
     Widget wAge = Row(
       children: <Widget>[
         Expanded(
-          flex: 10,
+          flex: 8,
           child: Container(
-            margin: EdgeInsets.only(left: 25, bottom: 30, right: 10),
-            //color: Colors.red, // util para ajustar margenes
-            child: Column(
-              children: <Widget>[
-                new Stack(
-                    alignment: const Alignment(1.0, 1.0),
-                    children: <Widget>[
-                      new TextFormField(
-                        decoration: const InputDecoration(
-                          hintText: 'Edad',
-                          labelText: 'Edad',
-                        ),
-                        controller: _yearController,
-                        keyboardType: TextInputType.emailAddress,
-                      ),
-                      new FlatButton(
-                          onPressed: () {
-                            _yearController.clear();
-                          },
-                          shape: new RoundedRectangleBorder(
-                              borderRadius: new BorderRadius.circular(30.0)),
-                          child: new Icon(Icons.clear))
-                    ])
-              ],
-            ),
-          ),
+              margin: EdgeInsets.only(left: 25, bottom: 30),
+              //color: Colors.red, // util para ajustar margenes
+              child: Column(children: <Widget>[
+                new TextFormField(
+                  decoration: const InputDecoration(
+                    hintText: 'Edad',
+                    labelText: 'Edad',
+                  ),
+                  controller: _yearController,
+                  keyboardType: TextInputType.emailAddress,
+                )
+              ])),
+        ),
+        Expanded(
+          flex: 2,
+          child: Container(
+              margin: EdgeInsets.only(left: 5),
+              //color: Colors.red, // util para ajustar margenes
+              child: Column(children: <Widget>[
+                new FlatButton(
+                    onPressed: () {
+                      _yearController.clear();
+                    },
+                    shape: new RoundedRectangleBorder(
+                        borderRadius: new BorderRadius.circular(30.0)),
+                    child: new Icon(Icons.delete))
+              ])),
         )
       ],
     );
