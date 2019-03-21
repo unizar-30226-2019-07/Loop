@@ -66,3 +66,4 @@ build/
 .history
 
 # End of https://www.gitignore.io/api/flutter,visualstudiocode
+*.db
