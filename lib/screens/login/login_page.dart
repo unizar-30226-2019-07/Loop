@@ -92,7 +92,9 @@ class _LoginPageState extends State<LoginPage>
                     Container(
                       alignment: FractionalOffset(1.0, 0.0),
                       child: GestureDetector(
-                          onTap: _toggleLogin, //Cambiar acción
+                          onTap: () {
+                            Navigator.of(context).pushNamed('/debug-main');
+                          },
                           child: Icon(
                             FontAwesomeIcons.times,
                             size: 40.0,

@@ -1,3 +1,4 @@
+/*
 import 'package:flutter/material.dart';
 import 'package:selit/ui/login_page.dart';
 
@@ -16,3 +17,8 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+*/
+
+import 'routes.dart';
+
+void main() => new Routes();

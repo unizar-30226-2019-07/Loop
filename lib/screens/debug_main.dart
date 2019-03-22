@@ -21,6 +21,12 @@ class DebugMain extends StatelessWidget {
 									Navigator.of(context).pushNamed('/profile');
 								},
 							),
+              RaisedButton(
+								child: const Text('Login'),
+								onPressed: () {
+									Navigator.of(context).pushNamed('/login_page');
+								},
+							),
 						],
 					),
 				),
