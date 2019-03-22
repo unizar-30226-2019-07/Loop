@@ -40,6 +40,11 @@ class _LoginPageState extends State<LoginPage>
   bool _obscureTextLogin = true;
   bool _obscureTextSignup = true;
   bool _obscureTextSignupConfirm = true;
+ 
+  static double height_login = 550.0;
+  static double height_signup = 850.0;
+  double var_height = height_login;
+
 
   TextEditingController signupEmailController = new TextEditingController();
   TextEditingController signupNameController = new TextEditingController();
@@ -66,9 +71,9 @@ class _LoginPageState extends State<LoginPage>
           child: SingleChildScrollView(
               child: Container(
                 width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height >= 900.0
+                height: MediaQuery.of(context).size.height >= var_height //850.0
                     ? MediaQuery.of(context).size.height
-                    : 900.0,
+                    : var_height,
                 decoration: new BoxDecoration(
                   gradient: new LinearGradient(
                       colors: [
@@ -96,7 +101,7 @@ class _LoginPageState extends State<LoginPage>
                         ),
                       ),                   
                     Padding(
-                      padding: EdgeInsets.only(top: 75.0),
+                      padding: EdgeInsets.only(top: 5.0),
                       child: new Image(
                           width: 150.0,
                           height: 177.0,
@@ -114,11 +119,13 @@ class _LoginPageState extends State<LoginPage>
                         onPageChanged: (i) {
                           if (i == 0) {
                             setState(() {
+                              var_height = height_login;
                               right = Colors.white;
                               left = Colors.black;
                             });
                           } else if (i == 1) {
                             setState(() {
+                              var_height = height_signup;
                               right = Colors.black;
                               left = Colors.white;
                             });
