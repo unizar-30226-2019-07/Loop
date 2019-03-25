@@ -14,7 +14,7 @@ class Routes {
 
   Routes() {
     runApp(new MaterialApp(
-      title: 'Selit! by Allenship',
+      title: 'Selit!',
       routes: routes,
       theme: ThemeData(
 				primaryColor: Color(0xFFC0392B)

@@ -21,6 +21,7 @@ dependencies:
   requests: ^1.0.2
   font_awesome_flutter: ^8.4.0
   flutter_range_slider: "^1.1.0"
+  flutter_tags: "^0.1.9"
   flutter_statusbarcolor: any
   flutter:
     sdk: flutter
