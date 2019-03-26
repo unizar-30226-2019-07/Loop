@@ -3,7 +3,7 @@ import 'package:selit/screens/debug_main.dart';
 import 'package:selit/screens/users/profile.dart';
 import 'package:selit/screens/users/edit_profile.dart';
 import 'package:selit/screens/login/login_page.dart';
-import 'package:selit/screens/items/items_list.dart';
+import 'package:selit/screens/items/item_list.dart';
 
 class Routes {
   final routes = <String, dynamic>{

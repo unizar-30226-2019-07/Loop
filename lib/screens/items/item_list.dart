@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:selit/class/item_class.dart';
-import 'package:selit/util/item_repository.dart';
+import 'package:selit/util/api/item_request.dart';
 import 'package:selit/widgets/items/item_tile.dart';
 import 'dart:async';
 
@@ -26,7 +26,7 @@ class _ItemList extends State<ItemList> {
   }
 
   void listenForItems() async {
-    final Stream<ItemClass> stream = await getItems();
+    final Stream<ItemClass> stream = await ItemRequest.getItems();
     stream.listen((ItemClass item) =>
       setState(() =>  _items.add(item))
     );
