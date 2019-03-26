@@ -1,16 +1,16 @@
-import 'package:selit/models/usuario_model.dart';
+import 'package:selit/class/usuario_class.dart';
 
 class API { // TODO elegir un nombre mejor
   
   /// Realiza una petición GET para obtener los datos del usuario
   /// userId y al recibirlos actualiza el perfil para que muestre
   /// los datos de dicho usuario
-  static Future<UsuarioModel> getUser(userId) async {
+  static Future<UsuarioClass> getUser(userId) async {
     // TODO hacer una petición en lugar de simular una carga de 1 segundo
     // y usar el constructor de JSON
     return Future.delayed(Duration(seconds: 3), () {
       print('cargando el perfil con id ' + userId.toString());
-      return new UsuarioModel(
+      return new UsuarioClass(
           nombre: 'Nombre',
           apellidos: 'Apellidos',
           sexo: 'Hombre',

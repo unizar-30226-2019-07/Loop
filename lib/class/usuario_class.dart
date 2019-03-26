@@ -2,7 +2,7 @@
 /// o para cualquier otro uso. Puede tener campos nulos aunque sean
 /// campos obligatorios para un usuario registrado, ya que un campo nulo
 /// representa el usuario por defecto hasta que cargue el usuario real
-class UsuarioModel {
+class UsuarioClass {
   // TODO por ahora contiene los datos que se muestran en el perfil,
   // supongo más adelante contendrá toda la información relacionada
   String nombre;
@@ -15,7 +15,7 @@ class UsuarioModel {
   int reviews;
   String urlPerfil;
 
-  UsuarioModel(
+  UsuarioClass(
       {this.nombre,
       this.apellidos,
       this.sexo,
@@ -32,7 +32,7 @@ class UsuarioModel {
             'Un usuario debe tener un número de estrellas entre 1 y 5');
 
   // TODO una vez acordado el formato del JSON, crear el constructor
-  //UsuarioModel.fromJson(Map<String, dynamic> json)
+  //UsuarioClass.fromJson(Map<String, dynamic> json)
   //    : this(nombre: json['nombre'], apellidos: json['apellidos']);
 
 }

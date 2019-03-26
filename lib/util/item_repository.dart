@@ -1,8 +1,8 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'item.dart';
+import 'package:selit/class/item_class.dart';
   
-Future<Stream<Item>> getItems() async {
+Future<Stream<ItemClass>> getItems() async {
  final String url = 'https://api.punkapi.com/v2/beers';
 
  final client = new http.Client();
@@ -14,5 +14,5 @@ Future<Stream<Item>> getItems() async {
      .transform(utf8.decoder)
      .transform(json.decoder)
      .expand((data) => (data as List))
-     .map((data) => Item.fromJSON(data));
+     .map((data) => ItemClass.fromJSON(data));
 }

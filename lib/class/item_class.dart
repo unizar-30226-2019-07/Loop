@@ -1,4 +1,4 @@
-class Item {
+class ItemClass {
   final int id;
   final String name;
   final String tagline;
@@ -6,7 +6,7 @@ class Item {
   final String image_url;
   final String price;
 
-  Item.fromJSON(Map<String, dynamic> jsonMap) :
+  ItemClass.fromJSON(Map<String, dynamic> jsonMap) :
     id = jsonMap['id'],
     name = jsonMap['name'],
     tagline = jsonMap['tagline'],
