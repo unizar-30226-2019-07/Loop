@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:selit/class/usuario_class.dart';
-import 'package:selit/util/api.dart';
+import 'package:selit/util/api/usuario_request.dart';
 import 'package:selit/widgets/star_rating.dart';
 import 'package:selit/widgets/profile_picture.dart';
 //import 'package:selit/widgets/items/items_list.dart';
@@ -44,7 +44,7 @@ class _ProfileState extends State<Profile> {
   Future<void> _loadProfile(int _userId) async {
     // Mostrar usuario placeholder mientras carga el real
     if (_user == null) {
-      API.getUser(_userId).then((realUser) {
+      UsuarioRequest.getUserById(_userId).then((realUser) {
         setState(() {
           _user = realUser;
         });

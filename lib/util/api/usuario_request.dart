@@ -1,11 +1,12 @@
 import 'package:selit/class/usuario_class.dart';
 
-class API { // TODO elegir un nombre mejor
-  
+/// Interacciones con la API relacionadas con usuarios
+class UsuarioRequest {
+
   /// Realiza una petición GET para obtener los datos del usuario
   /// userId y al recibirlos actualiza el perfil para que muestre
   /// los datos de dicho usuario
-  static Future<UsuarioClass> getUser(userId) async {
+  static Future<UsuarioClass> getUserById(userId) async {
     // TODO hacer una petición en lugar de simular una carga de 1 segundo
     // y usar el constructor de JSON
     return Future.delayed(Duration(seconds: 3), () {
