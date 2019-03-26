@@ -37,19 +37,19 @@ class _LoginPageState extends State<LoginPage>
 
   
 
-  IconData _eye_open = FontAwesomeIcons.eye;
-  IconData _eye_slash = FontAwesomeIcons.eyeSlash;
+  IconData _eyeOpen = FontAwesomeIcons.eye;
+  IconData _eyeSlash = FontAwesomeIcons.eyeSlash;
 
-  IconData _eye_login = FontAwesomeIcons.eye;
-  IconData _eye_signup = FontAwesomeIcons.eye;
-  IconData _eye_signup_confirm = FontAwesomeIcons.eye;
+  IconData _eyeLogin = FontAwesomeIcons.eye;
+  IconData _eyeSignup = FontAwesomeIcons.eye;
+  IconData _eyeSignupConfirm = FontAwesomeIcons.eye;
   bool _obscureTextLogin = true;
   bool _obscureTextSignup = true;
   bool _obscureTextSignupConfirm = true;
  
-  static double height_login = 550.0;
-  static double height_signup = 850.0;
-  double var_height = height_login;
+  static double heightLogin = 550.0;
+  static double heightSignup = 850.0;
+  double varHeight = heightLogin;
 
   TextEditingController signupEmailController = new TextEditingController();
   TextEditingController signupNameController = new TextEditingController();
@@ -76,9 +76,9 @@ class _LoginPageState extends State<LoginPage>
           child: SingleChildScrollView(
               child: Container(
                 width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height >= var_height //850.0
+                height: MediaQuery.of(context).size.height >= varHeight //850.0
                     ? MediaQuery.of(context).size.height
-                    : var_height,
+                    : varHeight,
                 decoration: new BoxDecoration(
                   gradient: new LinearGradient(
                       colors: [
@@ -126,13 +126,13 @@ class _LoginPageState extends State<LoginPage>
                         onPageChanged: (i) {
                           if (i == 0) {
                             setState(() {
-                              var_height = height_login;
+                              varHeight = heightLogin;
                               right = Colors.white;
                               left = Colors.black;
                             });
                           } else if (i == 1) {
                             setState(() {
-                              var_height = height_signup;
+                              varHeight = heightSignup;
                               right = Colors.black;
                               left = Colors.white;
                             });
@@ -320,7 +320,7 @@ class _LoginPageState extends State<LoginPage>
                             suffixIcon: GestureDetector(
                               onTap: _toggleLogin,
                               child: Icon(
-                                _eye_login,
+                                _eyeLogin,
                                 size: 15.0,
                                 color: Colors.black,
                               ),
@@ -389,17 +389,17 @@ class _LoginPageState extends State<LoginPage>
                             );
                           }
 
-                          final Color LEGIT = Colors.blue.withOpacity(0.5);
-                          final Color FAKE = Colors.red.withOpacity(0.5);
+                          final Color legit = Colors.blue.withOpacity(0.5);
+                          final Color fake = Colors.red.withOpacity(0.5);
                             if(response.statusCode == 200){
                               print(response.body);
-                              showInSnackBar("Logueado satisfactoriamente", LEGIT);
+                              showInSnackBar("Logueado satisfactoriamente", legit);
                               countDownTime();
                               //Navigator.of(context).pushReplacementNamed('/debug-main');
                             }
                              else{
                               print(response.statusCode);
-                              showInSnackBar("Usuario o contraseña incorrectos", FAKE);
+                              showInSnackBar("Usuario o contraseña incorrectos", fake);
                              }
                         }).catchError((error){
                             print('error : $error');
@@ -560,7 +560,7 @@ class _LoginPageState extends State<LoginPage>
                             suffixIcon: GestureDetector(
                               onTap: _toggleSignup,
                               child: Icon(
-                                _eye_signup,
+                                _eyeSignup,
                                 size: 15.0,
                                 color: Colors.black,
                               ),
@@ -595,7 +595,7 @@ class _LoginPageState extends State<LoginPage>
                             suffixIcon: GestureDetector(
                               onTap: _toggleSignupConfirm,
                               child: Icon(
-                                _eye_signup_confirm,
+                                _eyeSignupConfirm,
                                 size: 15.0,
                                 color: Colors.black,
                               ),
@@ -671,10 +671,10 @@ class _LoginPageState extends State<LoginPage>
   void _toggleLogin() {
     setState(() {
       if(_obscureTextLogin){
-        _eye_login = _eye_slash;
+        _eyeLogin = _eyeSlash;
       }
       else{
-        _eye_login = _eye_open;
+        _eyeLogin = _eyeOpen;
       }
       _obscureTextLogin = !_obscureTextLogin;
     });
@@ -683,10 +683,10 @@ class _LoginPageState extends State<LoginPage>
   void _toggleSignup() {
     setState(() {
       if(_obscureTextSignup){
-        _eye_signup = _eye_slash;
+        _eyeSignup = _eyeSlash;
       }
       else{
-        _eye_signup = _eye_open;
+        _eyeSignup = _eyeOpen;
       }
       _obscureTextSignup = !_obscureTextSignup;
     });
@@ -695,10 +695,10 @@ class _LoginPageState extends State<LoginPage>
   void _toggleSignupConfirm() {
     setState(() {
       if(_obscureTextSignupConfirm){
-        _eye_signup_confirm = _eye_slash;
+        _eyeSignupConfirm = _eyeSlash;
       }
       else{
-        _eye_signup_confirm = _eye_open;
+        _eyeSignupConfirm = _eyeOpen;
       }
       _obscureTextSignupConfirm = !_obscureTextSignupConfirm;
     });

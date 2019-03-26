@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:selit/screens/users/profile.dart';
 
 
 // Vista temporal con varios botones que llevan a diferentes vistas
@@ -28,14 +27,14 @@ class DebugMain extends StatelessWidget {
               RaisedButton(
 								child: const Text('Login'),
 								onPressed: () {
-									Navigator.of(context).pushNamed('/login_page');
+									Navigator.of(context).pushNamed('/login-page');
 								},
                 
 							),
               RaisedButton(
 								child: const Text('Items'),
 								onPressed: () {
-									Navigator.of(context).pushNamed('/items_list');
+									Navigator.of(context).pushNamed('/items-list');
 								},
                 
 							),

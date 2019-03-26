@@ -3,7 +3,7 @@ class ItemClass {
   final String name;
   final String tagline;
   final String description;
-  final String image_url;
+  final String imageUrl; // TODO almacenar imagen y no URL
   final String price;
 
   ItemClass.fromJSON(Map<String, dynamic> jsonMap) :
@@ -11,6 +11,6 @@ class ItemClass {
     name = jsonMap['name'],
     tagline = jsonMap['tagline'],
     description = jsonMap['description'],
-    image_url = jsonMap['image_url'],
+    imageUrl = jsonMap['image_url'],
     price = jsonMap['abv'].toString() + '€';
 }

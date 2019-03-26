@@ -41,7 +41,7 @@ class ItemTile extends StatelessWidget {
                       subtitle: Text(_item.description),
                       leading: Container(
                         margin: EdgeInsets.only(left: 6.0, bottom: 15.0),
-                        child: Image.network(_item.image_url, width: 65.0, fit: BoxFit.contain,)
+                        child: Image.network(_item.imageUrl, width: 65.0, fit: BoxFit.contain,)
                       ),
                     ),
                   ),

@@ -185,7 +185,7 @@ class _ProfileState extends State<Profile> {
       padding: EdgeInsets.all(25),
       //itemExtent: 20, <- cuanto mide cada item (?) dice que es más eficiente
       itemBuilder: (BuildContext context, int index) {
-        return Text('Producto en venta nº ${index}'); // TODO
+        return Text('Producto en venta nº $index'); // TODO
       },
     );
 
@@ -193,7 +193,7 @@ class _ProfileState extends State<Profile> {
       padding: EdgeInsets.all(25),
       //itemExtent: 20, <- cuanto mide cada item (?) dice que es más eficiente
       itemBuilder: (BuildContext context, int index) {
-        return Text('Producto vendido nº ${index}'); // TODO
+        return Text('Producto vendido nº $index'); // TODO
       },
     );
 
