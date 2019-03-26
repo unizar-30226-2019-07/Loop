@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'item_tile.dart';
-import 'item_repository.dart';
-import 'item.dart';
+import 'package:selit/class/item_class.dart';
+import 'package:selit/util/item_repository.dart';
+import 'package:selit/widgets/items/item_tile.dart';
 import 'dart:async';
 
-
+/// Lista con varios productos (por ahora muestra fotos de cervezas
+/// por motivos de test) en vista de 1 columna
 class ItemList extends StatefulWidget {
   
   @override
@@ -14,7 +15,7 @@ class ItemList extends StatefulWidget {
 
 class _ItemList extends State<ItemList> {
 
-  List<Item> _items = <Item>[];
+  List<ItemClass> _items = <ItemClass>[];
 
   static const IconData tune = IconData(0xe429, fontFamily: 'MaterialIcons');
 
@@ -25,8 +26,8 @@ class _ItemList extends State<ItemList> {
   }
 
   void listenForItems() async {
-    final Stream<Item> stream = await getItems();
-    stream.listen((Item item) =>
+    final Stream<ItemClass> stream = await getItems();
+    stream.listen((ItemClass item) =>
       setState(() =>  _items.add(item))
     );
   }
