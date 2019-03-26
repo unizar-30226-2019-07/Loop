@@ -4,6 +4,7 @@ import 'package:selit/screens/users/edit_profile.dart';
 import 'package:selit/util/api.dart';
 import 'package:selit/widgets/star_rating.dart';
 import 'package:selit/widgets/profile_picture.dart';
+import 'package:selit/widgets/ItemList/items_list.dart';
 
 /// Perfil de usuario: muestra sus datos, foto de perfil y
 /// dos listas: una con los productos en venta y otra con los vendidos
@@ -179,6 +180,7 @@ class _ProfileState extends State<Profile> {
       ),
     ]);
 
+  /* No se utiliza ahora
     Widget wProductListSelling = ListView.builder(
       padding: EdgeInsets.all(25),
       //itemExtent: 20, <- cuanto mide cada item (?) dice que es más eficiente
@@ -194,6 +196,7 @@ class _ProfileState extends State<Profile> {
         return Text('Producto vendido nº ${index}'); // TODO
       },
     );
+    */
 
     // NOTA: la 'sincronizacion rapida' de los cambios de Flutter no
     // suele funcionar con los cambios realizados a las listas,
@@ -211,7 +214,7 @@ class _ProfileState extends State<Profile> {
                   labelStyle: _styleTabs,
                 ))),
         body: TabBarView(
-            children: <Widget>[wProductListSelling, wProductListSold]),
+            children: <Widget>[ItemList(), ItemList()]),
       ),
     );
 
