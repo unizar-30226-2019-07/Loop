@@ -2,6 +2,29 @@
 # Created by https://www.gitignore.io/api/flutter,visualstudiocode
 # Edit at https://www.gitignore.io/?templates=flutter,visualstudiocode
 
+.vscode
+pubspec.lock
+
+.dart_tool/
+.packages
+build/
+pubspec.lock
+
+*.dart.js
+*.info.json
+*.js
+*.js_
+*.js.deps
+*.js.map
+
+doc/api/
+
+*.iml
+*.ipr
+*.iws
+.idea/
+.DS_Store
+
 ### Flutter ###
 # Flutter/Dart/Pub related
 **/doc/api/
@@ -55,7 +78,7 @@ build/
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
 
 ### VisualStudioCode ###
-.vscode/*
+.vscode
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
