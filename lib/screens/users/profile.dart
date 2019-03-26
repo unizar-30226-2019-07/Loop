@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:selit/models/usuario_model.dart';
+import 'package:selit/class/usuario_class.dart';
 import 'package:selit/screens/users/edit_profile.dart';
 import 'package:selit/util/api.dart';
 import 'package:selit/widgets/star_rating.dart';
 import 'package:selit/widgets/profile_picture.dart';
-import 'package:selit/widgets/ItemList/items_list.dart';
+import 'package:selit/widgets/items/items_list.dart';
 
 /// Perfil de usuario: muestra sus datos, foto de perfil y
 /// dos listas: una con los productos en venta y otra con los vendidos
+/// Recibe el ID de usuario a mostrar y muestra un perfil por defecto
+/// hasta que recibe los datos.
 class Profile extends StatefulWidget {
   final int userId;
 
@@ -34,7 +36,7 @@ class _ProfileState extends State<Profile> {
       const TextStyle(fontSize: 16.0, color: Colors.white);
 
   /// Usuario a mostrar en el perfil (null = placeholder)
-  static UsuarioModel _user;
+  static UsuarioClass _user;
 
   _ProfileState(int _userId) {
     _loadProfile(_userId);

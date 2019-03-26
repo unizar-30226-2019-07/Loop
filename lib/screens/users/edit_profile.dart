@@ -1,14 +1,17 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:selit/models/usuario_model.dart';
+import 'package:selit/class/usuario_class.dart';
 import 'package:selit/widgets/profile_picture.dart';
 import 'package:image_picker/image_picker.dart';
 
+/// Página de edición de perfil (formulario con los campos
+/// necesarios para modificar los atributos del usuario)
+/// Recibe el UsuarioClass del usuario a editar y, una vez terminado
+/// de editar, realiza una petición para actualizar dichos cambios
 class EditProfile extends StatefulWidget {
-  final UsuarioModel user;
+  final UsuarioClass user;
 
-  /// Página de perfil para el usuario userId
+  /// UsuarioClass del usuario a editar
   EditProfile({@required this.user});
 
   @override
@@ -25,7 +28,7 @@ class _EditProfileState extends State<EditProfile> {
   final TextEditingController _yearController = new TextEditingController();
 
   /// Usuario a mostrar en el perfil
-  UsuarioModel _user;
+  UsuarioClass _user;
 
   //Fichero de galería
   File _galleryFile;
@@ -35,7 +38,7 @@ class _EditProfileState extends State<EditProfile> {
   String _sexo = '';
 
   /// Constructor: mostrar el usuario _user
-  _EditProfileState(UsuarioModel _user) {
+  _EditProfileState(UsuarioClass _user) {
     this._user = _user;
     _nameController.text = _user.nombre;
     _surnameController.text = _user.apellidos;
