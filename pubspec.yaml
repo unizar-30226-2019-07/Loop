@@ -17,7 +17,10 @@ environment:
   sdk: ">=2.1.0 <3.0.0"
 
 dependencies:
+  http: ^0.12.0+1
   font_awesome_flutter: ^8.4.0
+  flutter_range_slider: "^1.1.0"
+  flutter_tags: "^0.1.9"
   flutter_statusbarcolor: any
   flutter:
     sdk: flutter
@@ -31,7 +34,6 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  http: any
 
 
 # For information on the generic Dart part of this file, see the
@@ -44,9 +46,6 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
-
-  assets:
-      - assets/sell.png
 
   fonts:
     - family: WorkSansSemiBold
@@ -72,6 +71,8 @@ flutter:
   #  - images/a_dot_ham.jpeg
   assets:
     - assets/img/profile_default.jpg
+    - assets/img/login_logo.png
+    - assets/img/sell.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.io/assets-and-images/#resolution-aware.

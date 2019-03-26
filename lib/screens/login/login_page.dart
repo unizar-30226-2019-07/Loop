@@ -1,9 +1,15 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:selit/util/user.dart';
 import 'package:selit/style/theme.dart' as Theme;
-import 'package:selit/utils/bubble_indication_painter.dart';
+import 'package:selit/util/bubble_indication_painter.dart';
+import 'package:selit/util/seruser.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
+
+final int splashDuration = 2;
 
 class LoginPage extends StatefulWidget {
   LoginPage({Key key}) : super(key: key);
@@ -44,7 +50,6 @@ class _LoginPageState extends State<LoginPage>
   static double height_login = 550.0;
   static double height_signup = 850.0;
   double var_height = height_login;
-
 
   TextEditingController signupEmailController = new TextEditingController();
   TextEditingController signupNameController = new TextEditingController();
@@ -176,7 +181,8 @@ class _LoginPageState extends State<LoginPage>
     _pageController = PageController();
   }
 
-  void showInSnackBar(String value) {
+  void showInSnackBar(String value, Color alfa) {
+    
     FocusScope.of(context).requestFocus(new FocusNode());
     _scaffoldKey.currentState?.removeCurrentSnackBar();
     _scaffoldKey.currentState.showSnackBar(new SnackBar(
@@ -188,7 +194,7 @@ class _LoginPageState extends State<LoginPage>
             fontSize: 16.0,
             fontFamily: "Nunito"),
       ),
-      backgroundColor: Colors.blue,
+      backgroundColor: alfa,
       duration: Duration(seconds: 3),
     ));
   }
@@ -367,8 +373,43 @@ class _LoginPageState extends State<LoginPage>
                             fontFamily: "WorkSansBold"),
                       ),
                     ),
-                    onPressed: () =>
-                        showInSnackBar("Login button pressed")),
+                    onPressed: () {
+                        User post = User(
+                          user: loginEmailController.text,
+                          password: loginPasswordController.text,
+                        );
+                        auth(post).then((response){
+                          countDownTime() async {
+                            return Timer(
+                                Duration(seconds: splashDuration),
+                                    () {
+                                  SystemChannels.textInput.invokeMethod('TextInput.hide');
+                                  Navigator.of(context).pushNamed('/profile');
+                                }
+                            );
+                          }
+
+                          final Color LEGIT = Colors.blue.withOpacity(0.5);
+                          final Color FAKE = Colors.red.withOpacity(0.5);
+                            if(response.statusCode == 200){
+                              print(response.body);
+                              showInSnackBar("Logueado satisfactoriamente", LEGIT);
+                              countDownTime();
+                              //Navigator.of(context).pushReplacementNamed('/debug-main');
+                            }
+                             else{
+                              print(response.statusCode);
+                              showInSnackBar("Usuario o contraseña incorrectos", FAKE);
+                             }
+                        }).catchError((error){
+                            print('error : $error');
+                      });
+                        //print(post.user);
+                        //print(post.password);
+
+                        
+                    }
+                        ),
               ),
             ],
           ),
@@ -608,7 +649,7 @@ class _LoginPageState extends State<LoginPage>
                       ),
                     ),
                     onPressed: () =>
-                        showInSnackBar("SignUp button pressed")),
+                        showInSnackBar("SignUp button pressed", Colors.yellow)),
               ),
             ],
           ),

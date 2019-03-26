@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'screens/debug_main.dart';
-import 'screens/users/profile.dart';
-import 'screens/users/edit_profile.dart';
+import 'package:selit/screens/debug_main.dart';
+import 'package:selit/screens/users/profile.dart';
+import 'package:selit/screens/users/edit_profile.dart';
+import 'package:selit/screens/login/login_page.dart';
+import 'package:selit/screens/items/items_list.dart';
 
 class Routes {
   final routes = <String, dynamic>{
@@ -10,6 +12,8 @@ class Routes {
         _buildRoute(settings, new Profile(userId: settings.arguments)),
     '/edit-profile': (settings) =>
         _buildRoute(settings, new EditProfile(user: settings.arguments)),
+    '/login-page': (settings) => _buildRoute(settings, new LoginPage()),
+    '/items-list': (settings) => _buildRoute(settings, new ItemList()),
   };
 
   Route<dynamic> _getRoute(RouteSettings settings) {
@@ -25,7 +29,7 @@ class Routes {
 
   Routes() {
     runApp(new MaterialApp(
-      title: 'Selit! by Allenship',
+      title: 'Selit!',
       onGenerateRoute: _getRoute,
       initialRoute: '/',
       theme: ThemeData(primaryColor: Color(0xFFC0392B)),

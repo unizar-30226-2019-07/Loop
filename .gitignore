@@ -93,3 +93,5 @@ build/
 
 # End of https://www.gitignore.io/api/flutter,visualstudiocode
 *.db
+*.lock
+*.pbxproj

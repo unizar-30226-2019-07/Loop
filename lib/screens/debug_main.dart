@@ -30,6 +30,14 @@ class DebugMain extends StatelessWidget {
 								onPressed: () {
 									Navigator.of(context).pushNamed('/login_page');
 								},
+                
+							),
+              RaisedButton(
+								child: const Text('Items'),
+								onPressed: () {
+									Navigator.of(context).pushNamed('/items_list');
+								},
+                
 							),
 						],
 					),
