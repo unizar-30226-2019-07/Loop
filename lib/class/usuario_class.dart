@@ -31,8 +31,7 @@ class UsuarioClass {
         assert(numeroEstrellas >= 1 && numeroEstrellas <= 5,
             'Un usuario debe tener un número de estrellas entre 1 y 5');
 
-  // TODO una vez acordado el formato del JSON, crear el constructor
-  //UsuarioClass.fromJson(Map<String, dynamic> json)
-  //    : this(nombre: json['nombre'], apellidos: json['apellidos']);
+  UsuarioClass.fromJson(Map<String, dynamic> json)
+      : this(nombre: json['first_name'], apellidos: json['last_name'], edad: 24, reviews: 30, numeroEstrellas: 3.5);
 
 }
