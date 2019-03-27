@@ -52,21 +52,29 @@ class User {
  
   String user;
   String password;
+  String first_name;
+  String email;
 
   User({
     this.user,
     this.password,
+    this.first_name,
+    this.email,
   });
 
   factory User.fromJson(Map<String, dynamic> json) => new User(
     user: json["user"],
     password: json["password"],
+    first_name: json["name"],
+    email: json["email"],
 
   );
 
   Map<String, dynamic> toJson() => {
-    "email": user,
+    "username": user,
     "password": password,
+    "first_name": first_name,
+    "email": email,
  
   };
 }

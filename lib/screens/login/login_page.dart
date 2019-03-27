@@ -648,8 +648,41 @@ class _LoginPageState extends State<LoginPage>
                             fontFamily: "WorkSansBold"),
                       ),
                     ),
-                    onPressed: () =>
-                        showInSnackBar("SignUp button pressed", Colors.yellow)),
+                    onPressed: () {
+                      if (signupPasswordController.text != signupConfirmPasswordController.text){
+                          showInSnackBar("Las contraseñas no coinciden", Colors.yellow);
+                      }
+                      else{
+                        User post = User(
+                          user: signupLastNameController.text,
+                          password: signupPasswordController.text,
+                          first_name: signupNameController.text,
+                          email: signupEmailController.text
+                        );
+                        sign(post).then((response){
+                        
+                          final Color legit = Colors.blue.withOpacity(0.5);
+                          final Color fake = Colors.red.withOpacity(0.5);
+                            if(response.statusCode == 200){
+                              print(response.body);
+                              showInSnackBar("Se ha enviado un correo de confirmación", legit);
+                              //Navigator.of(context).pushReplacementNamed('/debug-main');
+                            }
+                             else{
+                              print(response.statusCode);
+                              showInSnackBar("La dirección de correo ya existe", fake);
+                             }
+                             
+                        }).catchError((error){
+                            print('error : $error');
+                      });
+                      }
+                        //print(post.user);
+                        //print(post.password);
+
+                        
+                    })
+                        
               ),
             ],
           ),

@@ -73,7 +73,6 @@ flutter:
     - assets/img/profile_default.jpg
     - assets/img/login_logo.png
     - assets/img/sell.png
-    - assets/api_token
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.io/assets-and-images/#resolution-aware.

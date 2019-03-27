@@ -3,12 +3,18 @@ import 'dart:async';
 import 'package:selit/util/user.dart';
 import 'dart:io';
 
-String url = 'https://reqres.in/api/login';
+String url = "http://35.234.77.87:8080";
 
-Future<List<Token>> getAllPosts() async {
-  final response = await http.get(url);
+Future<List<Token>> getAllUsers(String token) async {
+  final response = await http.get('$url/users',
+          headers: {
+        HttpHeaders.contentTypeHeader: 'application/json',
+        HttpHeaders.authorizationHeader : token
+          }
+          
+        );
   print(response.body);
-  return allPostsFromJson(response.body);
+  //return allPostsFromJson(response.body);
 }
 
 Future<Token> getPost() async{
@@ -16,15 +22,47 @@ Future<Token> getPost() async{
   return postFromJson(response.body);
 }
 
+
+
+/*
+Map<String, String> getheaders() => {
+  'Authorization': 'Bearer $apiToken',
+  'Content-Type': 'application/json',
+};
+*/
+var apiToken;
 Future<http.Response> auth(User chain) async{
-  final response = await http.post('$url',
+  final response = await http.post('$url/login',
       headers: {
         HttpHeaders.contentTypeHeader: 'application/json',
         HttpHeaders.authorizationHeader : ''
       },
       
       body: postToJson(chain)
-  );/*
+  );
+  apiToken = response.headers[HttpHeaders.authorizationHeader];
+  print(apiToken);
+  /*
+   if(response.statusCode == 200)
+      print(response.body);
+    else{
+      print(response.statusCode);
+    }
+    */
+  return response;
+}
+
+
+Future<http.Response> sign(User chain) async{
+  final response = await http.post('$url/users',
+      headers: {
+        HttpHeaders.contentTypeHeader: 'application/json',
+        HttpHeaders.authorizationHeader : ''
+      },
+      
+      body: postToJson(chain)
+  );
+  /*
    if(response.statusCode == 200)
       print(response.body);
     else{
