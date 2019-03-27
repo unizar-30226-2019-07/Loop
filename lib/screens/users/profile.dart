@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:selit/class/usuario_class.dart';
+import 'package:selit/class/item_class.dart';
 import 'package:selit/util/api/usuario_request.dart';
+import 'package:selit/util/api/item_request.dart';
+import 'package:selit/util/bubble_indication_painter.dart';
+import 'package:selit/widgets/items/item_tile.dart';
 import 'package:selit/widgets/star_rating.dart';
 import 'package:selit/widgets/profile_picture.dart';
-//import 'package:selit/widgets/items/items_list.dart';
 
 /// Perfil de usuario: muestra sus datos, foto de perfil y
 /// dos listas: una con los productos en venta y otra con los vendidos
@@ -22,23 +25,46 @@ class Profile extends StatefulWidget {
 class _ProfileState extends State<Profile> {
   // Estilos para los diferentes textos
   static final _styleNombre = const TextStyle(
-      fontWeight: FontWeight.bold, fontSize: 18.0, color: Colors.black);
+      fontWeight: FontWeight.bold, fontSize: 18.0, color: Colors.white);
   static final _styleSexoEdad = const TextStyle(
-      fontStyle: FontStyle.italic, fontSize: 15.0, color: Colors.black);
+      fontStyle: FontStyle.italic, fontSize: 15.0, color: Colors.white);
   static final _styleUbicacion =
-      const TextStyle(fontSize: 15.0, color: Colors.black);
+      const TextStyle(fontSize: 15.0, color: Colors.white);
   static final _styleReviews =
       const TextStyle(fontSize: 15.0, color: Colors.white);
+  static final _styleNothing =
+      const TextStyle(fontSize: 20.0, color: Colors.grey);
   static final _textAlignment = TextAlign.left;
 
-  static final _styleTabs =
-      const TextStyle(fontSize: 16.0, color: Colors.white);
+  /// Controlador tabs "en venta" y "vendido"
+  PageController _pageController = PageController(initialPage: 0);
+  /// Color de "en venta" (necesario alternarlo entre blanco-negro)
+  Color _tabColorLeft = Colors.black;
+  /// Color de "vendido" (necesario alternarlo entre blanco-negro)
+  Color _tabColorRight = Colors.white;
 
+  // Objetos en venta y vendidos
+  List<ItemClass> _itemsEnVenta = <ItemClass>[];
+  List<ItemClass> _itemsVendidos = <ItemClass>[];
+  
   /// Usuario a mostrar en el perfil (null = placeholder)
   static UsuarioClass _user;
 
   _ProfileState(int _userId) {
     _loadProfile(_userId);
+  }
+
+  // TODO solamente está aqui para cargar las cervezas de test
+  @override
+  void initState() {
+    super.initState();
+    listenForItems();
+  }
+  void listenForItems() async {
+    final Stream<ItemClass> stream = await ItemRequest.getItems();
+    stream.listen((ItemClass item) {
+      setState(() => _itemsEnVenta.add(item));
+    });
   }
 
   Future<void> _loadProfile(int _userId) async {
@@ -50,6 +76,40 @@ class _ProfileState extends State<Profile> {
         });
       });
     }
+  }
+
+  // Pulsación del boton "en venta"
+  void _onPressedEnVenta() {
+    _pageController.animateToPage(0,
+        duration: Duration(milliseconds: 300), curve: Curves.decelerate);
+    setState(() {
+      _tabColorLeft = Colors.black;
+      _tabColorRight = Colors.white;
+    });
+  }
+
+  // Pulsación del boton "vendidos"
+  void _onPressedVendidos() {
+    _pageController.animateToPage(1,
+        duration: Duration(milliseconds: 300), curve: Curves.decelerate);
+  }
+
+  /// Constructor para los botones "en venta" y "vendido"
+  Widget _buildTabButton(displayText, onPress, textColor) {
+    return Expanded(
+      child: FlatButton(
+        splashColor: Colors.transparent,
+        highlightColor: Colors.transparent,
+        onPressed: onPress,
+        child: Text(
+          displayText,
+          style: TextStyle(
+              color: textColor,
+              fontSize: 16.0,
+              fontFamily: "Nunito"),
+        ),
+      ),
+    );
   }
 
   /// Widget correspondiente al perfil del usuario _user
@@ -102,7 +162,7 @@ class _ProfileState extends State<Profile> {
             children: <Widget>[
               Container(
                   alignment: Alignment.topLeft,
-                  padding: EdgeInsets.only(top: 15),
+                  padding: EdgeInsets.only(top: 30),
                   child: Text(_user?.nombre ?? '---',
                       style: _styleNombre, textAlign: _textAlignment)),
               Container(
@@ -117,12 +177,12 @@ class _ProfileState extends State<Profile> {
                       style: _styleSexoEdad, textAlign: _textAlignment)),
               Container(
                 alignment: Alignment.topLeft,
-                margin: EdgeInsets.only(top: 15),
+                margin: EdgeInsets.only(top: 30),
                 child: Row(
                   children: <Widget>[
                     Container(
                       margin: EdgeInsets.all(2),
-                      child: Icon(Icons.location_on, color: Colors.black),
+                      child: Icon(Icons.location_on, color: Colors.white),
                     ),
                     Text(
                       _user?.ubicacionCiudad ?? '---',
@@ -134,7 +194,7 @@ class _ProfileState extends State<Profile> {
               ),
               Container(
                 alignment: Alignment.topLeft,
-                margin: EdgeInsets.only(top: 5, left: 15, bottom: 45),
+                margin: EdgeInsets.only(top: 5, left: 15, bottom: 15),
                 child: Text(
                   _user?.ubicacionResto ?? '---',
                   style: _styleUbicacion,
@@ -146,26 +206,10 @@ class _ProfileState extends State<Profile> {
     );
 
     Widget wUserData = Container(
-      // TODO seguro que hay alguna forma mejor de añadir un color de fondo
-      // que usar un gradiente de este modo, buscar informacion
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-            begin: Alignment.topRight,
-            end: Alignment.bottomLeft,
-            stops: [
-              0.62,
-              0.62
-            ],
-            colors: [
-              Colors.grey[100],
-              Theme.of(context).primaryColor,
-            ]),
-      ),
+      color: Theme.of(context).primaryColor,
       padding: EdgeInsets.only(top: 30),
       child: Row(children: <Widget>[wUserDataLeft, wUserDataRight]),
     );
-
-    print(_user);
 
     Widget wTopStack = Stack(children: <Widget>[
       wUserData,
@@ -173,7 +217,7 @@ class _ProfileState extends State<Profile> {
         right: _user != null ? 10 : -50,
         top: 40,
         child: IconButton(
-          icon: Icon(Icons.edit),
+          icon: Icon(Icons.edit, color: Colors.white),
           onPressed: () {
             Navigator.of(context).pushNamed('/edit-profile', arguments: _user);
           },
@@ -181,40 +225,102 @@ class _ProfileState extends State<Profile> {
       ),
     ]);
 
-    Widget wProductListSelling = ListView.builder(
-      padding: EdgeInsets.all(25),
-      //itemExtent: 20, <- cuanto mide cada item (?) dice que es más eficiente
-      itemBuilder: (BuildContext context, int index) {
-        return Text('Producto en venta nº $index'); // TODO
-      },
+    Widget wProductListSelling = _itemsEnVenta.isEmpty
+    ? Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Icon(Icons.not_interested, color: Colors.grey, size: 65.0),
+          Container(
+            padding: EdgeInsets.only(top: 10),
+            child: Text('Nada por aquí...', style: _styleNothing),
+          )
+        ],
+      )
+    : Container(
+      margin: EdgeInsets.only(top: 5),
+      child: ListView.builder(
+        padding: EdgeInsets.symmetric(horizontal: 15),
+        itemCount: _itemsEnVenta.length,
+        itemBuilder: (context, index) => ItemTile(_itemsEnVenta[index]),
+      ),
     );
 
-    Widget wProductListSold = ListView.builder(
-      padding: EdgeInsets.all(25),
-      //itemExtent: 20, <- cuanto mide cada item (?) dice que es más eficiente
-      itemBuilder: (BuildContext context, int index) {
-        return Text('Producto vendido nº $index'); // TODO
-      },
+    Widget wProductListSold = _itemsVendidos.isEmpty
+    ? Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Icon(Icons.not_interested, color: Colors.grey, size: 65.0),
+          Container(
+            padding: EdgeInsets.only(top: 10),
+            child: Text('Nada por aquí...', style: _styleNothing),
+          )
+        ],
+      )
+    : Container(
+      margin: EdgeInsets.only(top: 5),
+      child: ListView.builder(
+        padding: EdgeInsets.symmetric(horizontal: 15),
+        itemCount: _itemsVendidos.length,
+        itemBuilder: (context, index) => ItemTile(_itemsVendidos[index]),
+      ),
     );
 
     // NOTA: la 'sincronizacion rapida' de los cambios de Flutter no
     // suele funcionar con los cambios realizados a las listas,
     // mejor reiniciar del todo
-    Widget wProductList = DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        appBar: PreferredSize(
-            preferredSize: Size.fromHeight(50),
-            child: Container(
-                color: Theme.of(context).primaryColor,
-                child: TabBar(
-                  tabs: [Tab(text: 'En venta'), Tab(text: 'Vendidos')],
-                  indicatorColor: Colors.grey[200],
-                  labelStyle: _styleTabs,
-                ))),
-        body: TabBarView(
-            children: <Widget>[wProductListSelling, wProductListSold]),
+    Widget wProductList = Scaffold(
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(50.0),
+        child: Container(
+          color: Theme.of(context).primaryColor,
+          child: Container(
+            margin: EdgeInsets.symmetric(horizontal: (MediaQuery.of(context).size.width - 300) / 2),
+            decoration: BoxDecoration(
+              color: Color(0x552B2B2B),
+              borderRadius: BorderRadius.all(Radius.circular(25.0)),
+            ),
+            child: CustomPaint(
+              painter: TabIndicationPainter(pageController: _pageController),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  _buildTabButton("En venta", _onPressedEnVenta, _tabColorLeft),
+                  _buildTabButton("Vendidos", _onPressedVendidos, _tabColorRight),
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+              begin: Alignment(0.1, -1.0),
+              end: Alignment(-0.1, 1.0),
+              stops: [
+                0.15, 0.15
+              ],
+              colors: [
+                Theme.of(context).primaryColor,
+                Colors.grey[100],
+              ]),
+        ),
+        child: PageView(
+          controller: _pageController,
+          onPageChanged: (pageIndex) {
+            if (pageIndex == 0) { // en venta
+              setState(() {
+                _tabColorLeft = Colors.black;
+                _tabColorRight = Colors.white;
+              });
+            } else { // vendidos
+              setState(() {
+                _tabColorLeft = Colors.white;
+                _tabColorRight = Colors.black;
+              });
+            }
+          },
+          children: <Widget>[wProductListSelling, wProductListSold]),),
     );
 
     return Column(
@@ -222,7 +328,7 @@ class _ProfileState extends State<Profile> {
         wTopStack,
         Expanded(
           child: Container(
-            color: Colors.grey[200],
+            color: Theme.of(context).primaryColor,
             child: wProductList,
           ),
         ),
