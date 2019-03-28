@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:selit/screens/debug_main.dart';
+import 'package:selit/screens/principal.dart';
 import 'package:selit/screens/users/profile.dart';
 import 'package:selit/screens/users/edit_profile.dart';
 import 'package:selit/screens/login/login_page.dart';
@@ -33,7 +34,7 @@ class Routes {
       onGenerateRoute: _getRoute,
       initialRoute: '/',
       theme: ThemeData(primaryColor: Color(0xFFC0392B)),
-      home: new DebugMain(),
+      home: new Principal(),
     ));
   }
 }
