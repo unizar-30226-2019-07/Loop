@@ -27,22 +27,24 @@ class _Principal extends State<Principal> {
 	Widget build(BuildContext context) {
 		return Scaffold(
 			body: screenList[_currentPage], // Pantalla en curso
-      bottomNavigationBar: FancyBottomNavigation(
-        tabs: [
-            // Tabs que aparecen en la barra de navegación inferior
-            TabData(iconData: Icons.home, title: "Home"),
-            TabData(iconData: Icons.chat, title: "Chats"),
-            TabData(iconData: Icons.person, title: "Usuario"),
-            TabData(iconData: Icons.settings, title: "Ajustes")
-        ],
-        // Cambiar la pantalla
-        onTabChangedListener: (position) {
-          setState(() {
-            _currentPage = position;
-          });
-        },
-      ),     
-		);
+      bottomNavigationBar: SafeArea(
+        child: FancyBottomNavigation(
+          tabs: [
+              // Tabs que aparecen en la barra de navegación inferior
+              TabData(iconData: Icons.home, title: "Home"),
+              TabData(iconData: Icons.chat, title: "Chats"),
+              TabData(iconData: Icons.person, title: "Usuario"),
+              TabData(iconData: Icons.settings, title: "Ajustes")
+          ],
+          // Cambiar la pantalla
+          onTabChangedListener: (position) {
+            setState(() {
+              _currentPage = position;
+            });
+          },
+        ),     
+      ),
+    );
 	}
 
 }
