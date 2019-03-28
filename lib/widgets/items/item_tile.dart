@@ -38,7 +38,7 @@ class ItemTile extends StatelessWidget {
                     child: ListTile(
                       title: Text(_item.name),
                       trailing: Text(_item.price),
-                      subtitle: Text(_item.description),
+                      subtitle: Text(_item.description,overflow: TextOverflow.ellipsis,textAlign: TextAlign.justify,maxLines:5),
                       leading: Container(
                         margin: EdgeInsets.only(left: 6.0, bottom: 15.0),
                         child: Image.network(_item.imageUrl, width: 65.0, fit: BoxFit.contain,)
