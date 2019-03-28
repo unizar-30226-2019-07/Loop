@@ -25,18 +25,94 @@ class ItemTileVertical extends StatelessWidget {
                 //shape: shape,
                 child: InkWell(
                   onTap: () {
-                    print('Card was tapped'); //Acción asociada (ir a item details)
+                    print(
+                        'Card was tapped'); //Acción asociada (ir a item details)
                   },
                   // Generally, material cards use onSurface with 12% opacity for the pressed state.
-                  splashColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.12),
+                  splashColor:
+                      Theme.of(context).colorScheme.onSurface.withOpacity(0.12),
                   // Generally, material cards do not have a highlight overlay.
                   highlightColor: Colors.transparent,
-                  child:
-                  Container(
-                    margin: EdgeInsets.only(bottom: 6.0),
-                    child: Image.network(_item.imageUrl, width: 65.0, fit: BoxFit.contain,)
-                  ),
-                  
+                  child: Container(
+                      margin: EdgeInsets.only(bottom: 6.0),
+                      child: Column(children: <Widget>[
+                        Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                  top: 10,
+                                ),
+                                child: Container(
+                                  constraints: new BoxConstraints(
+                                      maxWidth:
+                                          MediaQuery.of(context).size.width -
+                                              255),
+                                  child: Image.network(
+                                    _item.imageUrl,
+                                    width: 65.0,
+                                    fit: BoxFit.contain,
+                                  ),
+                                ),
+                              ),
+                            ]),
+                        Row(children: [
+                          Padding(
+                            padding: const EdgeInsets.only(
+                              left: 10,
+                              top: 20,
+                            ),
+                            child: Container(
+                              constraints: new BoxConstraints(
+                                  maxWidth:
+                                      MediaQuery.of(context).size.width - 255),
+                              child: Text(_item.name,
+                              style: new TextStyle(
+                                fontSize: 16.0,
+                                ),),
+                            ),
+                          )
+                        ]),
+                        Row(children: [
+                          Padding(
+                            padding: const EdgeInsets.only(
+                              left: 10,
+                              top: 5,
+                            ),
+                            child: Container(
+                              constraints: new BoxConstraints(
+                                  maxWidth:
+                                      MediaQuery.of(context).size.width - 260),
+                              child: Text(
+                                _item.description,
+                                overflow: TextOverflow.ellipsis,
+                                textAlign: TextAlign.justify,
+                                maxLines: 7,
+                                style: new TextStyle(
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                            ),
+                          )
+                        ]),
+                        Row(children: [
+                          Padding(
+                            padding: const EdgeInsets.only(
+                              left: 10,
+                              top: 20,
+                            ),
+                            child: Container(
+                              child: Text(_item.price,
+                              style: new TextStyle(
+                                
+                                fontSize: 16.0,
+                                ),),
+                            ),
+                          )
+                        ]),
+                      ])),
+                      
                 ),
               ),
             ),
