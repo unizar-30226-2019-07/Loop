@@ -325,6 +325,7 @@ class _ProfileState extends State<Profile> {
     return Scaffold(
       body: Stack(
         children: <Widget>[
+          // Color de fondo
           SizedBox.expand(
             child: Container(
               decoration: BoxDecoration(
@@ -342,8 +343,15 @@ class _ProfileState extends State<Profile> {
               ),
             ),
           ),
+          // Contenido: perfil del usuario
           _buildProfile(),
         ],
+      ),
+      // Botón para añadir nuevos items
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => print('Botón pulsado'),
+        backgroundColor: Theme.of(context).primaryColor,
+        child: Icon(Icons.add, size: 30.0),
       ),
     );
   }
