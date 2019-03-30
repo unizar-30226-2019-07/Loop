@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:selit/screens/items/item_list_drawer.dart';
 import 'package:selit/widgets/items/item_tile.dart';
 import 'package:selit/widgets/items/item_tile_vertical.dart';
 import 'package:selit/util/api/item_request.dart';
@@ -12,13 +13,13 @@ import 'dart:async';
 /// Es posible colocar la vista en modo 1 columna o modo 2 columnas.
 class ItemList extends StatefulWidget {
   @override
-  _ItemList createState() => _ItemList();
+  _ItemListState createState() => _ItemListState();
 }
 
-class _ItemList extends State<ItemList> {
-
+class _ItemListState extends State<ItemList> {
   /// Lista de items a mostrar en la vista
   List<ItemClass> _items = <ItemClass>[];
+
   /// Número de columnas a mostrar en la vista
   int _selectedColumns = 1;
 
@@ -28,18 +29,29 @@ class _ItemList extends State<ItemList> {
     'Ubicación: 1-100km',
     'Ordenación: caro a barato'
   ];
-  final _styleFilters = TextStyle(fontSize: 14.0, color: Colors.white);
-  final _styleTitleProductos = TextStyle(fontSize: 22.0, color: Colors.white, fontWeight: FontWeight.bold);
+
+  /// Texto de los filtros (precio, ubicacion, ordenacion)
+  static final _styleFilters =
+      TextStyle(fontSize: 14.0, color: Colors.white, fontFamily: 'Nunito');
+
+  /// Titulos: 'Productos en venta'
+  static final _styleTitle = TextStyle(
+      fontSize: 22.0,
+      color: Colors.white,
+      fontWeight: FontWeight.bold,
+      fontFamily: 'Nunito');
+
+  /// Texto de 'Nada por aquí...'
   static final _styleNothing =
-      const TextStyle(fontSize: 20.0, color: Colors.grey);
+      const TextStyle(fontSize: 20.0, color: Colors.grey, fontFamily: 'Nunito');
+  static final _styleSearchBar = TextStyle(fontFamily: 'Nunito');
 
   /// Icono 'x'
   IconData _times = FontAwesomeIcons.times;
 
   // TODO temporal - Color rojo oscuro similar al empleado en los tabs (registro/perfil)
   // mover a temas o a otro lugar
-  final _blendColor = Color.alphaBlend(
-      Color(0x552B2B2B), Color(0xFFC0392B));
+  final _blendColor = Color.alphaBlend(Color(0x552B2B2B), Color(0xFFC0392B));
 
   /// Prueba para cargar fotos de cervezas
   @override
@@ -86,6 +98,7 @@ class _ItemList extends State<ItemList> {
                   filled: true,
                   fillColor: Colors.grey[100],
                   hintText: "Buscar un producto",
+                  hintStyle: _styleSearchBar,
                   prefixIcon: Icon(Icons.search, color: Colors.grey),
                   prefixStyle: TextStyle(color: Colors.grey),
                   enabledBorder: OutlineInputBorder(
@@ -129,7 +142,8 @@ class _ItemList extends State<ItemList> {
                     children: <Widget>[
                       GestureDetector(
                         onTap: () => _onFilterTapped(i),
-                        child: Icon(_times, size: 13.0, color: Colors.grey[300]),
+                        child:
+                            Icon(_times, size: 13.0, color: Colors.grey[300]),
                       ),
                       Container(
                         padding: EdgeInsets.only(left: 5.0),
@@ -151,33 +165,30 @@ class _ItemList extends State<ItemList> {
       padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 25.0),
       child: Row(
         children: <Widget>[
-          Expanded(child: Text('Productos en venta', style: _styleTitleProductos)),
+          Expanded(child: Text('Productos en venta', style: _styleTitle)),
           GestureDetector(
-            onTap: () => setState(() { _selectedColumns = 1; }),
+            onTap: () => setState(() {
+                  _selectedColumns = 1;
+                }),
             child: Container(
-              padding: EdgeInsets.all(5.0),
-              child: Icon(FontAwesomeIcons.thLarge, color: _selectedColumns == 1 ? Colors.grey[200] : Colors.grey[500])
-            ),
+                padding: EdgeInsets.all(5.0),
+                child: Icon(FontAwesomeIcons.thList,
+                    color: _selectedColumns == 1
+                        ? Colors.grey[200]
+                        : Colors.grey[500])),
           ),
           GestureDetector(
-            onTap: () => setState(() { _selectedColumns = 2; }),
+            onTap: () => setState(() {
+                  _selectedColumns = 2;
+                }),
             child: Container(
-              padding: EdgeInsets.all(5.0),
-              child: Icon(FontAwesomeIcons.thList, color: _selectedColumns == 2 ? Colors.grey[200] : Colors.grey[500])
-            ),
+                padding: EdgeInsets.all(5.0),
+                child: Icon(FontAwesomeIcons.thLarge,
+                    color: _selectedColumns == 2
+                        ? Colors.grey[200]
+                        : Colors.grey[500])),
           ),
         ],
-      ),
-    );
-  }
-
-  /// Menú izquierdo de filtros
-  Widget _buildFilterDrawer() {
-    return Drawer(
-      child: Container(
-        color: Theme.of(context).primaryColor,
-        child: SafeArea(child: Text('Filtros, ordenacion...') // TODO completar
-            ),
       ),
     );
   }
@@ -186,18 +197,18 @@ class _ItemList extends State<ItemList> {
   Widget _buildProductList(int numColumns) {
     if (_items.isEmpty) {
       // No hay items/productos para mostrar
-      return SizedBox.expand( // expandir horizontalmente
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Icon(Icons.not_interested, color: Colors.grey, size: 65.0),
-            Container(
-              padding: EdgeInsets.only(top: 10),
-              child: Text('Nada por aquí...', style: _styleNothing),
-            )
-          ],
-        )
-      );
+      return SizedBox.expand(
+          // expandir horizontalmente
+          child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Icon(Icons.not_interested, color: Colors.grey, size: 65.0),
+          Container(
+            padding: EdgeInsets.only(top: 10),
+            child: Text('Nada por aquí...', style: _styleNothing),
+          )
+        ],
+      ));
     } else {
       if (numColumns == 1) {
         // Vista de objetos en una columna
@@ -229,7 +240,8 @@ class _ItemList extends State<ItemList> {
               begin: Alignment(0.15, -1.0),
               end: Alignment(-0.15, 1.0),
               stops: [
-                0.4, 0.4
+                0.4,
+                0.4
               ],
               colors: [
                 Theme.of(context).primaryColor,
@@ -251,7 +263,7 @@ class _ItemList extends State<ItemList> {
           ),
         ),
       ),
-      drawer: _buildFilterDrawer(),
+      drawer: ItemListDrawer(),
     );
   }
 }
