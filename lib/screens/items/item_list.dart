@@ -148,7 +148,6 @@ class _ItemList extends State<ItemList> {
   /// Título de la lista (productos) + ordenación en una columna o dos
   Widget _buildBottomMenu() {
     return Container(
-      color: Theme.of(context).primaryColor,
       padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 25.0),
       child: Row(
         children: <Widget>[
@@ -225,7 +224,18 @@ class _ItemList extends State<ItemList> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: Container(
-        color: Theme.of(context).primaryColor,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+              begin: Alignment(0.15, -1.0),
+              end: Alignment(-0.15, 1.0),
+              stops: [
+                0.4, 0.4
+              ],
+              colors: [
+                Theme.of(context).primaryColor,
+                Colors.grey[100],
+              ]),
+        ),
         child: SafeArea(
           child: Column(
             children: <Widget>[
@@ -234,18 +244,6 @@ class _ItemList extends State<ItemList> {
               _buildBottomMenu(),
               Expanded(
                 child: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                        begin: Alignment(0.1, -1.0),
-                        end: Alignment(-0.1, 1.0),
-                        stops: [
-                          0.1, 0.1
-                        ],
-                        colors: [
-                          Theme.of(context).primaryColor,
-                          Colors.grey[100],
-                        ]),
-                  ),
                   child: _buildProductList(_selectedColumns),
                 ),
               ),

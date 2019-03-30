@@ -38,15 +38,17 @@ class _ProfileState extends State<Profile> {
 
   /// Controlador tabs "en venta" y "vendido"
   PageController _pageController = PageController(initialPage: 0);
+
   /// Color de "en venta" (necesario alternarlo entre blanco-negro)
   Color _tabColorLeft = Colors.black;
+
   /// Color de "vendido" (necesario alternarlo entre blanco-negro)
   Color _tabColorRight = Colors.white;
 
   // Objetos en venta y vendidos
   List<ItemClass> _itemsEnVenta = <ItemClass>[];
   List<ItemClass> _itemsVendidos = <ItemClass>[];
-  
+
   /// Usuario a mostrar en el perfil (null = placeholder)
   static UsuarioClass _user;
 
@@ -60,6 +62,7 @@ class _ProfileState extends State<Profile> {
     super.initState();
     listenForItems();
   }
+
   void listenForItems() async {
     final Stream<ItemClass> stream = await ItemRequest.getItems();
     stream.listen((ItemClass item) {
@@ -103,10 +106,8 @@ class _ProfileState extends State<Profile> {
         onPressed: onPress,
         child: Text(
           displayText,
-          style: TextStyle(
-              color: textColor,
-              fontSize: 16.0,
-              fontFamily: "Nunito"),
+          style:
+              TextStyle(color: textColor, fontSize: 16.0, fontFamily: "Nunito"),
         ),
       ),
     );
@@ -157,7 +158,6 @@ class _ProfileState extends State<Profile> {
       flex: 6,
       child: Container(
           margin: EdgeInsets.only(left: 25, right: 10),
-          //color: Colors.green, // util para ajustar margenes
           child: Column(
             children: <Widget>[
               Container(
@@ -206,7 +206,6 @@ class _ProfileState extends State<Profile> {
     );
 
     Widget wUserData = Container(
-      color: Theme.of(context).primaryColor,
       padding: EdgeInsets.only(top: 30),
       child: Row(children: <Widget>[wUserDataLeft, wUserDataRight]),
     );
@@ -226,111 +225,96 @@ class _ProfileState extends State<Profile> {
     ]);
 
     Widget wProductListSelling = _itemsEnVenta.isEmpty
-    ? Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Icon(Icons.not_interested, color: Colors.grey, size: 65.0),
-          Container(
-            padding: EdgeInsets.only(top: 10),
-            child: Text('Nada por aquí...', style: _styleNothing),
+        ? Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Icon(Icons.not_interested, color: Colors.grey, size: 65.0),
+              Container(
+                padding: EdgeInsets.only(top: 10),
+                child: Text('Nada por aquí...', style: _styleNothing),
+              )
+            ],
           )
-        ],
-      )
-    : Container(
-      margin: EdgeInsets.only(top: 5),
-      child: ListView.builder(
-        padding: EdgeInsets.symmetric(horizontal: 15),
-        itemCount: _itemsEnVenta.length,
-        itemBuilder: (context, index) => ItemTile(_itemsEnVenta[index]),
-      ),
-    );
+        : Container(
+            margin: EdgeInsets.only(top: 5),
+            child: ListView.builder(
+              padding: EdgeInsets.symmetric(horizontal: 15),
+              itemCount: _itemsEnVenta.length,
+              itemBuilder: (context, index) => ItemTile(_itemsEnVenta[index]),
+            ),
+          );
 
     Widget wProductListSold = _itemsVendidos.isEmpty
-    ? Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Icon(Icons.not_interested, color: Colors.grey, size: 65.0),
-          Container(
-            padding: EdgeInsets.only(top: 10),
-            child: Text('Nada por aquí...', style: _styleNothing),
+        ? Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Icon(Icons.not_interested, color: Colors.grey, size: 65.0),
+              Container(
+                padding: EdgeInsets.only(top: 10),
+                child: Text('Nada por aquí...', style: _styleNothing),
+              )
+            ],
           )
-        ],
-      )
-    : Container(
-      margin: EdgeInsets.only(top: 5),
-      child: ListView.builder(
-        padding: EdgeInsets.symmetric(horizontal: 15),
-        itemCount: _itemsVendidos.length,
-        itemBuilder: (context, index) => ItemTile(_itemsVendidos[index]),
-      ),
-    );
+        : Container(
+            margin: EdgeInsets.only(top: 5),
+            child: ListView.builder(
+              padding: EdgeInsets.symmetric(horizontal: 15),
+              itemCount: _itemsVendidos.length,
+              itemBuilder: (context, index) => ItemTile(_itemsVendidos[index]),
+            ),
+          );
 
     // NOTA: la 'sincronizacion rapida' de los cambios de Flutter no
     // suele funcionar con los cambios realizados a las listas,
     // mejor reiniciar del todo
     Widget wProductList = Scaffold(
+      backgroundColor: Colors.transparent,
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(50.0),
         child: Container(
-          color: Theme.of(context).primaryColor,
-          child: Container(
-            margin: EdgeInsets.symmetric(horizontal: (MediaQuery.of(context).size.width - 300) / 2),
-            decoration: BoxDecoration(
-              color: Color(0x552B2B2B),
-              borderRadius: BorderRadius.all(Radius.circular(25.0)),
-            ),
-            child: CustomPaint(
-              painter: TabIndicationPainter(pageController: _pageController),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  _buildTabButton("En venta", _onPressedEnVenta, _tabColorLeft),
-                  _buildTabButton("Vendidos", _onPressedVendidos, _tabColorRight),
-                ],
-              ),
+          margin: EdgeInsets.symmetric(
+              horizontal: (MediaQuery.of(context).size.width - 300) / 2),
+          decoration: BoxDecoration(
+            color: Color(0x552B2B2B),
+            borderRadius: BorderRadius.all(Radius.circular(25.0)),
+          ),
+          child: CustomPaint(
+            painter: TabIndicationPainter(pageController: _pageController),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                _buildTabButton("En venta", _onPressedEnVenta, _tabColorLeft),
+                _buildTabButton("Vendidos", _onPressedVendidos, _tabColorRight),
+              ],
             ),
           ),
         ),
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-              begin: Alignment(0.1, -1.0),
-              end: Alignment(-0.1, 1.0),
-              stops: [
-                0.15, 0.15
-              ],
-              colors: [
-                Theme.of(context).primaryColor,
-                Colors.grey[100],
-              ]),
-        ),
-        child: PageView(
+      body: PageView(
           controller: _pageController,
           onPageChanged: (pageIndex) {
-            if (pageIndex == 0) { // en venta
+            if (pageIndex == 0) {
+              // en venta
               setState(() {
                 _tabColorLeft = Colors.black;
                 _tabColorRight = Colors.white;
               });
-            } else { // vendidos
+            } else {
+              // vendidos
               setState(() {
                 _tabColorLeft = Colors.white;
                 _tabColorRight = Colors.black;
               });
             }
           },
-          children: <Widget>[wProductListSelling, wProductListSold]),),
+          children: <Widget>[wProductListSelling, wProductListSold]),
     );
 
     return Column(
       children: <Widget>[
         wTopStack,
         Expanded(
-          child: Container(
-            color: Theme.of(context).primaryColor,
-            child: wProductList,
-          ),
+          child: wProductList,
         ),
       ],
     );
@@ -338,6 +322,29 @@ class _ProfileState extends State<Profile> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: _buildProfile());
+    return Scaffold(
+      body: Stack(
+        children: <Widget>[
+          SizedBox.expand(
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                    begin: Alignment(0.15, -1.0),
+                    end: Alignment(-0.15, 1.0),
+                    stops: [
+                      0.6,
+                      0.6
+                    ],
+                    colors: [
+                      Theme.of(context).primaryColor,
+                      Colors.grey[100],
+                    ]),
+              ),
+            ),
+          ),
+          _buildProfile(),
+        ],
+      ),
+    );
   }
 }
