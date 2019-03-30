@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_range_slider/flutter_range_slider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
+/// Listado de filtros de la lista de items, diseñado para acompañar
+/// a [ItemList]. Permite seleccionar precio y distancia con sliders, y
+/// categoría, tipo de venta (venta, subasta o ambas) y ordenación con botones.
 class ItemListDrawer extends StatefulWidget {
   @override
   _ItemListDrawerState createState() => _ItemListDrawerState();
@@ -20,38 +23,150 @@ class _ItemListDrawerState extends State<ItemListDrawer> {
   static final _styleFilterButton =
       TextStyle(fontSize: 18.0, color: Colors.black, fontFamily: 'Nunito');
 
-  /// Títulos "¿Qué estás buscando?"
+  /// Títulos "¿Qué estás buscando?" (también para el alertdialog)
   static final _styleTitle = TextStyle(
       fontSize: 22.0,
       color: Colors.white,
       fontWeight: FontWeight.bold,
       fontFamily: 'Nunito');
 
+  /// Texto del título del alertdialog
+  static final _styleDialogTitle = TextStyle(
+      fontSize: 19.0,
+      color: Colors.white,
+      fontWeight: FontWeight.bold,
+      fontFamily: 'Nunito');
+
+  /// Texto de los botones del alertdialog, para cuando esta seleccionado y no
+  static final _styleDialogButtonsUnselected =
+      TextStyle(fontSize: 20.0, color: Colors.white, fontFamily: 'Nunito');
+  static final _styleDialogButtonsSelected =
+      TextStyle(fontSize: 20.0, color: Colors.black, fontFamily: 'Nunito');
+
   /// Valores mínimo y máximo para el precio
   final _sliderPriceMin = 0.0;
   final _sliderPriceMax = 100.0;
+
+  /// Valores mínimo y máximo para la localización
+  final _sliderLocationMin = 100.0;
+  final _sliderLocationMax = 100000.0;
+  // TODO convertir el slider a escala logaritmica o reducir el limite
 
   /// Valores mínimo y máximo para el precio (actuales)
   double _sliderPriceLower = 0.0;
   double _sliderPriceUpper = 100.0;
 
-  /// Valores mínimo y máximo para la localización
-  final _sliderLocationMin = 100.0;
-  final _sliderLocationMax =
-      100000.0; // TODO convertir el slider a escala logaritmica o reducir el limite
-
   /// Valores mínimo y máximo para la (actuales)
   double _sliderLocationLower = 100.0;
   double _sliderLocationUpper = 100000.0;
 
+  /// Categorías e indice de categoría seleccionado
+  final _listCategorias = ['Todas las categorías', 'Coches', 'Informática'];
+  int _selectedCategoria = 0;
+
+  /// Tipos de venta e indice seleccionado
+  final _listTipoVenta = ['Venta y subasta', 'Solo ventas', 'Solo subastas'];
+  int _selectedTipoVenta = 0;
+
+  /// Ordenaciones e indice seleccionado
+  final _listOrdenacion = [
+    'Distancia (asc)',
+    'Distancia (desc)',
+    'Precio (asc)',
+    'Precio (desc)'
+  ];
+  int _selectedOrdenacion = 0;
+
   /// Actualizar valores de precio
-  void _updatePrice(lowerRange, upperRange) {
+  void _updatePrice(double lowerRange, double upperRange) {
     print('Precio: $lowerRange $upperRange');
   }
 
   /// Actualizar valores de distancia
-  void _updateLocation(lowerRange, upperRange) {
-    print('Precio: $lowerRange $upperRange');
+  void _updateLocation(double lowerRange, double upperRange) {
+    print('Distancia (m): $lowerRange $upperRange');
+  }
+
+  /// Seleccionar nueva categoría
+  void _updateCategoria(int index) {
+    print('Categoria: $index');
+    setState(() {
+      // acciones para seleccionar categoria index
+      _selectedCategoria = index;
+    });
+  }
+
+  /// Seleccionar nuevo tipo: venta, subasta o ambas
+  void _updateTipoVenta(int index) {
+    print('Tipo: $index');
+    setState(() {
+      // acciones para seleccionar tipo de venta
+      _selectedTipoVenta = index;
+    });
+  }
+
+  /// Ordenacion por precio, localizacion...
+  void _updateOrdenacion(int index) {
+    print('Ordenacion: $index');
+    setState(() {
+      // acciones para seleccionar ordenacion
+      _selectedOrdenacion = index;
+    });
+  }
+
+  /// Botón para categorías, venta y subasta u ordenación. Botón que, al pulsarlo,
+  /// muestra un cuadro de diálogo con título [title] y opciones [items]. Al seleccionar
+  /// un item de la lista, llama a la función [callback] con el item seleccionado
+  Widget _buildRadioButton(
+      List<String> items, int selected, String title, Function callback) {
+
+    // Crear la lista con las opciones a elegir
+    List<Widget> buttonOptions = [];
+    for (var i = 0; i < items.length; i++) {
+      buttonOptions.add(SizedBox.fromSize(
+          size: Size(double.infinity, 50.0),
+          child: Container(
+              margin: EdgeInsets.all(2),
+              child: FlatButton(
+                color: selected == i ? Colors.grey[200] : _blendColor,
+                child: Text(items[i],
+                    style: selected == i
+                        ? _styleDialogButtonsSelected
+                        : _styleDialogButtonsUnselected),
+                onPressed: () {
+                  callback(i);
+                  Navigator.of(context).pop();
+                },
+              ))));
+    }
+
+    // Diálogo a mostrar cuando se pulsa el boton
+    AlertDialog dialog = AlertDialog(
+      backgroundColor: Theme.of(context).primaryColor,
+      shape: RoundedRectangleBorder(
+          side: BorderSide(color: _blendColor, width: 2.0),
+          borderRadius: BorderRadius.circular(10.0)),
+      title: Text(title, style: _styleDialogTitle),
+      content: Column(mainAxisSize: MainAxisSize.min, children: buttonOptions),
+    );
+
+    return RaisedButton(
+      child: Row(
+        children: <Widget>[
+          Expanded(
+            child: Text(items[selected], style: _styleFilterButton),
+          ),
+          Icon(FontAwesomeIcons.chevronRight, color: Colors.black, size: 16.0),
+        ],
+      ),
+      color: Colors.grey[200],
+      onPressed: () =>
+          showDialog(context: context, builder: (context) => dialog),
+      shape: RoundedRectangleBorder(
+        side: BorderSide(color: Colors.grey[50], width: 2.0),
+        borderRadius: BorderRadius.circular(5.0),
+      ),
+    );
   }
 
   /// Menú izquierdo de filtros
@@ -160,24 +275,10 @@ class _ItemListDrawerState extends State<ItemListDrawer> {
                     child: Text('¿Qué estás buscando?', style: _styleTitle),
                   ),
                   Divider(color: Colors.grey[300]),
-                  RaisedButton(
-                    child: Row(
-                      children: <Widget>[
-                        Expanded(
-                          child: Text('Todas las categorías',
-                              style: _styleFilterButton),
-                        ),
-                        Icon(FontAwesomeIcons.chevronRight,
-                            color: Colors.black, size: 16.0),
-                      ],
-                    ),
-                    color: Colors.grey[200],
-                    onPressed: () => print('ey'),
-                    shape: RoundedRectangleBorder(
-                      side: BorderSide(color: Colors.grey[50], width: 2.0),
-                      borderRadius: BorderRadius.circular(5.0),
-                    ),
-                  ),
+                  _buildRadioButton(_listCategorias, _selectedCategoria,
+                      'Selecciona una categoría', _updateCategoria),
+                  _buildRadioButton(_listTipoVenta, _selectedTipoVenta,
+                      'Selecciona el tipo', _updateTipoVenta),
                   Container(
                     margin: EdgeInsets.only(top: 15.0, bottom: 5.0),
                     child: Text('Precio', style: _styleTitle),
@@ -192,23 +293,8 @@ class _ItemListDrawerState extends State<ItemListDrawer> {
                     margin: EdgeInsets.only(top: 15.0, bottom: 5.0),
                     child: Text('Ordenar por', style: _styleTitle),
                   ),
-                  RaisedButton(
-                    child: Row(
-                      children: <Widget>[
-                        Expanded(
-                          child: Text('Distancia', style: _styleFilterButton),
-                        ),
-                        Icon(FontAwesomeIcons.chevronRight,
-                            color: Colors.black, size: 16.0),
-                      ],
-                    ),
-                    color: Colors.grey[200],
-                    onPressed: () => print('ey'),
-                    shape: RoundedRectangleBorder(
-                      side: BorderSide(color: Colors.grey[50], width: 2.0),
-                      borderRadius: BorderRadius.circular(5.0),
-                    ),
-                  ),
+                  _buildRadioButton(_listOrdenacion, _selectedOrdenacion,
+                      'Ordenar por', _updateOrdenacion),
                 ],
               ),
             ),
