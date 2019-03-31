@@ -390,7 +390,7 @@ class _LoginPageState extends State<LoginPage>
                                 Duration(seconds: splashDuration),
                                     () {
                                   SystemChannels.textInput.invokeMethod('TextInput.hide');
-                                  Navigator.of(context).pushNamed('/profile');
+                                  Navigator.of(context).pushNamed('/principal');
                                 }
                             );
                           }

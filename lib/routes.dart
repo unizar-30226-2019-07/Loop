@@ -15,6 +15,7 @@ class Routes {
         _buildRoute(settings, new EditProfile(user: settings.arguments)),
     '/login-page': (settings) => _buildRoute(settings, new LoginPage()),
     '/items-list': (settings) => _buildRoute(settings, new ItemList()),
+    '/principal': (settings) => _buildRoute(settings, new Principal()),
   };
 
   Route<dynamic> _getRoute(RouteSettings settings) {
