@@ -25,11 +25,6 @@ String allPostsToJson(List<Token> data) {
   return json.encode(dyn);
 }
 
-
-
-
-
-
 class Token {
  
   String token;
@@ -50,31 +45,31 @@ class Token {
 }
 class User {
  
-  String user;
+  String email;
   String password;
   String first_name;
-  String email;
+  String last_name;
 
   User({
-    this.user,
+    this.email,
     this.password,
     this.first_name,
-    this.email,
+    this.last_name,
   });
 
   factory User.fromJson(Map<String, dynamic> json) => new User(
-    user: json["user"],
-    password: json["password"],
-    first_name: json["name"],
     email: json["email"],
+    password: json["password"],
+    first_name: json["first_name"],
+    last_name: json["last_name"],
 
   );
 
   Map<String, dynamic> toJson() => {
-    "username": user,
+    "email": email,
     "password": password,
     "first_name": first_name,
-    "email": email,
+    "last_name": last_name,
  
   };
 }

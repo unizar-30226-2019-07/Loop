@@ -8,8 +8,11 @@ import 'package:selit/util/bubble_indication_painter.dart';
 import 'package:selit/util/seruser.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
 
 final int splashDuration = 2;
+
 
 class LoginPage extends StatefulWidget {
   LoginPage({Key key}) : super(key: key);
@@ -62,6 +65,8 @@ class _LoginPageState extends State<LoginPage>
 
   Color left = Colors.black;
   Color right = Colors.white;
+
+  
 
   @override
   Widget build(BuildContext context) {
@@ -374,8 +379,9 @@ class _LoginPageState extends State<LoginPage>
                       ),
                     ),
                     onPressed: () {
+
                         User post = User(
-                          user: loginEmailController.text,
+                          email: loginEmailController.text,
                           password: loginPasswordController.text,
                         );
                         auth(post).then((response){
@@ -652,24 +658,29 @@ class _LoginPageState extends State<LoginPage>
                       if (signupPasswordController.text != signupConfirmPasswordController.text){
                           showInSnackBar("Las contraseñas no coinciden", Colors.yellow);
                       }
+                      else if (signupLastNameController.text.length < 1 || signupNameController.text.length < 1 || !validateEmail(signupEmailController.text)){
+                        showInSnackBar("Rellena toodos los campos correctamente", Colors.yellow);
+                      }
                       else{
+                        print(signupLastNameController.text);
                         User post = User(
-                          user: signupLastNameController.text,
+                          email: signupEmailController.text,
                           password: signupPasswordController.text,
                           first_name: signupNameController.text,
-                          email: signupEmailController.text
+                          last_name: signupLastNameController.text
                         );
                         sign(post).then((response){
                         
                           final Color legit = Colors.blue.withOpacity(0.5);
                           final Color fake = Colors.red.withOpacity(0.5);
-                            if(response.statusCode == 200){
+                            if(response.statusCode == 201){
                               print(response.body);
                               showInSnackBar("Se ha enviado un correo de confirmación", legit);
                               //Navigator.of(context).pushReplacementNamed('/debug-main');
                             }
                              else{
                               print(response.statusCode);
+                              print(response.body);
                               showInSnackBar("La dirección de correo ya existe", fake);
                              }
                              
@@ -737,3 +748,12 @@ class _LoginPageState extends State<LoginPage>
     });
   }
 }
+bool validateEmail(String value) {
+    Pattern pattern =
+        r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+    RegExp regex = new RegExp(pattern);
+    if (!regex.hasMatch(value))
+      return false;
+    else
+      return true;
+  }

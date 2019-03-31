@@ -2,7 +2,9 @@ import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'package:selit/util/user.dart';
 import 'dart:io';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
+final storage = new FlutterSecureStorage();
 String url = "http://35.234.77.87:8080";
 
 Future<List<Token>> getAllUsers(String token) async {
@@ -41,7 +43,8 @@ Future<http.Response> auth(User chain) async{
       body: postToJson(chain)
   );
   apiToken = response.headers[HttpHeaders.authorizationHeader];
-  print(apiToken);
+  //print(apiToken);
+  await storage.write(key: "token", value: apiToken);
   /*
    if(response.statusCode == 200)
       print(response.body);

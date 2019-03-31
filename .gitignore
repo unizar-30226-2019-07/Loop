@@ -103,3 +103,4 @@ build/
 *.db
 *.lock
 *.pbxproj
+ios/Runner.xcodeproj/project.pbxproj

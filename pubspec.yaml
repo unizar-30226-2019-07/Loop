@@ -20,6 +20,7 @@ dependencies:
   http: ^0.12.0+1
   fancy_bottom_navigation: ^0.1.0
   font_awesome_flutter: ^8.4.0
+  flutter_secure_storage: ^3.2.0
   flutter_range_slider: "^1.1.0"
   flutter_tags: "^0.1.9"
   flutter_statusbarcolor: any
