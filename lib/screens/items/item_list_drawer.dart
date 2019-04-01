@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_range_slider/flutter_range_slider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:selit/screens/items/item_list.dart';
+import 'package:selit/class/items/filter_list_class.dart';
 
 /// Listado de filtros de la lista de items, diseñado para acompañar
 /// a [ItemList]. Permite seleccionar precio y distancia con sliders, y
 /// categoría, tipo de venta (venta, subasta o ambas) y ordenación con botones.
 class ItemListDrawer extends StatefulWidget {
+  final FilterListClass _filterManager;
+  ItemListDrawer(this._filterManager);
+
   @override
-  _ItemListDrawerState createState() => _ItemListDrawerState();
+  _ItemListDrawerState createState() => _ItemListDrawerState(_filterManager);
 }
 
 class _ItemListDrawerState extends State<ItemListDrawer> {
@@ -43,75 +48,41 @@ class _ItemListDrawerState extends State<ItemListDrawer> {
   static final _styleDialogButtonsSelected =
       TextStyle(fontSize: 20.0, color: Colors.black, fontFamily: 'Nunito');
 
-  /// Valores mínimo y máximo para el precio
-  final _sliderPriceMin = 0.0;
-  final _sliderPriceMax = 100.0;
+  FilterListClass _filterManager;
 
-  /// Valores mínimo y máximo para la localización
-  final _sliderLocationMin = 100.0;
-  final _sliderLocationMax = 100000.0;
-  // TODO convertir el slider a escala logaritmica o reducir el limite
-
-  /// Valores mínimo y máximo para el precio (actuales)
-  double _sliderPriceLower = 0.0;
-  double _sliderPriceUpper = 100.0;
-
-  /// Valores mínimo y máximo para la (actuales)
-  double _sliderLocationLower = 100.0;
-  double _sliderLocationUpper = 100000.0;
-
-  /// Categorías e indice de categoría seleccionado
-  final _listCategorias = ['Todas las categorías', 'Coches', 'Informática'];
-  int _selectedCategoria = 0;
-
-  /// Tipos de venta e indice seleccionado
-  final _listTipoVenta = ['Venta y subasta', 'Solo ventas', 'Solo subastas'];
-  int _selectedTipoVenta = 0;
-
-  /// Ordenaciones e indice seleccionado
-  final _listOrdenacion = [
-    'Distancia (asc)',
-    'Distancia (desc)',
-    'Precio (asc)',
-    'Precio (desc)'
-  ];
-  int _selectedOrdenacion = 0;
+  // Constructor
+  _ItemListDrawerState(this._filterManager);
 
   /// Actualizar valores de precio
-  void _updatePrice(double lowerRange, double upperRange) {
-    print('Precio: $lowerRange $upperRange');
+  void _updatePrice(double lower, double upper) {
+    print('Precio: $lower - $upper');
+    setState(
+        () => _filterManager.addFilter(newMinPrice: lower, newMaxPrice: upper));
   }
 
   /// Actualizar valores de distancia
-  void _updateLocation(double lowerRange, double upperRange) {
-    print('Distancia (m): $lowerRange $upperRange');
+  void _updateLocation(double lower, double upper) {
+    print('Distancia: $lower - $upper');
+    setState(() =>
+        _filterManager.addFilter(newMinDistance: lower, newMaxDistance: upper));
   }
 
   /// Seleccionar nueva categoría
   void _updateCategoria(int index) {
     print('Categoria: $index');
-    setState(() {
-      // acciones para seleccionar categoria index
-      _selectedCategoria = index;
-    });
+    setState(() => _filterManager.addFilter(newCategoryId: index));
   }
 
   /// Seleccionar nuevo tipo: venta, subasta o ambas
   void _updateTipoVenta(int index) {
     print('Tipo: $index');
-    setState(() {
-      // acciones para seleccionar tipo de venta
-      _selectedTipoVenta = index;
-    });
+    setState(() => _filterManager.addFilter(newTypeId: index));
   }
 
   /// Ordenacion por precio, localizacion...
   void _updateOrdenacion(int index) {
     print('Ordenacion: $index');
-    setState(() {
-      // acciones para seleccionar ordenacion
-      _selectedOrdenacion = index;
-    });
+    setState(() => _filterManager.addFilter(newOrderId: index));
   }
 
   /// Botón para categorías, venta y subasta u ordenación. Botón que, al pulsarlo,
@@ -119,7 +90,6 @@ class _ItemListDrawerState extends State<ItemListDrawer> {
   /// un item de la lista, llama a la función [callback] con el item seleccionado
   Widget _buildRadioButton(
       List<String> items, int selected, String title, Function callback) {
-
     // Crear la lista con las opciones a elegir
     List<Widget> buttonOptions = [];
     for (var i = 0; i < items.length; i++) {
@@ -196,17 +166,19 @@ class _ItemListDrawerState extends State<ItemListDrawer> {
         SliderTheme(
           data: _sliderThemeData,
           child: RangeSlider(
-            min: _sliderPriceMin,
-            max: _sliderPriceMax,
-            lowerValue: _sliderPriceLower,
-            upperValue: _sliderPriceUpper,
-            divisions: (_sliderPriceMax - _sliderPriceMin).toInt(),
+            min: _filterManager.getAbsMinPrice(),
+            max: _filterManager.getAbsMaxPrice(),
+            lowerValue: _filterManager.minPrice,
+            upperValue: _filterManager.maxPrice,
+            divisions: (_filterManager.getAbsMaxPrice() -
+                    _filterManager.getAbsMinPrice())
+                .toInt(),
             showValueIndicator: true,
             valueIndicatorFormatter: (i, value) => _formatPrecio(value),
             onChanged: (double newLowerValue, double newUpperValue) {
               setState(() {
-                _sliderPriceLower = newLowerValue;
-                _sliderPriceUpper = newUpperValue;
+                _filterManager.minPrice = newLowerValue;
+                _filterManager.maxPrice = newUpperValue;
               });
             },
             onChangeEnd: _updatePrice,
@@ -215,10 +187,10 @@ class _ItemListDrawerState extends State<ItemListDrawer> {
         Row(
           children: <Widget>[
             Expanded(
-                child: Text(_formatPrecio(_sliderPriceLower),
+                child: Text(_formatPrecio(_filterManager.minPrice),
                     style: _styleTextSliders, textAlign: TextAlign.left)),
             Expanded(
-                child: Text(_formatPrecio(_sliderPriceUpper),
+                child: Text(_formatPrecio(_filterManager.maxPrice),
                     style: _styleTextSliders, textAlign: TextAlign.end)),
           ],
         ),
@@ -230,18 +202,19 @@ class _ItemListDrawerState extends State<ItemListDrawer> {
         SliderTheme(
           data: _sliderThemeData,
           child: RangeSlider(
-            min: _sliderLocationMin,
-            max: _sliderLocationMax,
-            lowerValue: _sliderLocationLower,
-            upperValue: _sliderLocationUpper,
-            divisions: (_sliderLocationMax - _sliderLocationMin) ~/
+            min: _filterManager.getAbsMinDistance(),
+            max: _filterManager.getAbsMaxDistance(),
+            lowerValue: _filterManager.minDistance,
+            upperValue: _filterManager.maxDistance,
+            divisions: (_filterManager.getAbsMaxDistance() -
+                    _filterManager.getAbsMinDistance()) ~/
                 100, // Incrementar la distancia cada 100 metros
             showValueIndicator: true,
             valueIndicatorFormatter: (i, value) => _formatDistancia(value),
             onChanged: (double newLowerValue, double newUpperValue) {
               setState(() {
-                _sliderLocationLower = newLowerValue;
-                _sliderLocationUpper = newUpperValue;
+                _filterManager.minDistance = newLowerValue;
+                _filterManager.maxDistance = newUpperValue;
               });
             },
             onChangeEnd: _updateLocation,
@@ -250,10 +223,10 @@ class _ItemListDrawerState extends State<ItemListDrawer> {
         Row(
           children: <Widget>[
             Expanded(
-                child: Text(_formatDistancia(_sliderLocationLower),
+                child: Text(_formatDistancia(_filterManager.minDistance),
                     style: _styleTextSliders, textAlign: TextAlign.left)),
             Expanded(
-                child: Text(_formatDistancia(_sliderLocationUpper),
+                child: Text(_formatDistancia(_filterManager.maxDistance),
                     style: _styleTextSliders, textAlign: TextAlign.end)),
           ],
         ),
@@ -275,10 +248,16 @@ class _ItemListDrawerState extends State<ItemListDrawer> {
                     child: Text('¿Qué estás buscando?', style: _styleTitle),
                   ),
                   Divider(color: Colors.grey[300]),
-                  _buildRadioButton(_listCategorias, _selectedCategoria,
-                      'Selecciona una categoría', _updateCategoria),
-                  _buildRadioButton(_listTipoVenta, _selectedTipoVenta,
-                      'Selecciona el tipo', _updateTipoVenta),
+                  _buildRadioButton(
+                      _filterManager.getCategoryNames(),
+                      _filterManager.categoryId,
+                      'Selecciona una categoría',
+                      _updateCategoria),
+                  _buildRadioButton(
+                      _filterManager.getTypeNames(),
+                      _filterManager.typeId,
+                      'Selecciona el tipo',
+                      _updateTipoVenta),
                   Container(
                     margin: EdgeInsets.only(top: 15.0, bottom: 5.0),
                     child: Text('Precio', style: _styleTitle),
@@ -293,8 +272,8 @@ class _ItemListDrawerState extends State<ItemListDrawer> {
                     margin: EdgeInsets.only(top: 15.0, bottom: 5.0),
                     child: Text('Ordenar por', style: _styleTitle),
                   ),
-                  _buildRadioButton(_listOrdenacion, _selectedOrdenacion,
-                      'Ordenar por', _updateOrdenacion),
+                  _buildRadioButton(_filterManager.getOrderNames(),
+                      _filterManager.orderId, 'Ordenar por', _updateOrdenacion),
                 ],
               ),
             ),

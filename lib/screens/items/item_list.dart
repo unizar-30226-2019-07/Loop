@@ -6,6 +6,7 @@ import 'package:selit/widgets/items/item_tile.dart';
 import 'package:selit/widgets/items/item_tile_vertical.dart';
 import 'package:selit/util/api/item_request.dart';
 import 'package:selit/class/item_class.dart';
+import 'package:selit/class/items/filter_list_class.dart';
 import 'dart:async';
 
 /// Listado de productos en venta, junto con una barra de búsqueda y una pantalla
@@ -23,13 +24,6 @@ class _ItemListState extends State<ItemList> {
   /// Número de columnas a mostrar en la vista
   int _selectedColumns = 1;
 
-  /// Lista con la descripción de los filtros que se están aplicando
-  List<String> _filters = [
-    'Precio: 50-100€',
-    'Ubicación: 1-100km',
-    'Ordenación: caro a barato'
-  ];
-
   /// Texto de los filtros (precio, ubicacion, ordenacion)
   static final _styleFilters =
       TextStyle(fontSize: 14.0, color: Colors.white, fontFamily: 'Nunito');
@@ -46,28 +40,77 @@ class _ItemListState extends State<ItemList> {
       const TextStyle(fontSize: 20.0, color: Colors.grey, fontFamily: 'Nunito');
   static final _styleSearchBar = TextStyle(fontFamily: 'Nunito');
 
-  /// Icono 'x'
+  /// TODO quitar? Icono 'x'
   IconData _times = FontAwesomeIcons.times;
 
   // TODO temporal - Color rojo oscuro similar al empleado en los tabs (registro/perfil)
   // mover a temas o a otro lugar
   final _blendColor = Color.alphaBlend(Color(0x552B2B2B), Color(0xFFC0392B));
 
-  /// Prueba para cargar fotos de cervezas
+  /// Controlador de filtros, medio de comunicación entre ItemList e ItemListDrawer
+  /// Para mas información, ver [FilterListClass]
+  FilterListClass _filterManager;
+
+  /// Lista de filtros (burbujas) para la parte superior de la pantalla
+  Widget _filterList;
+
+  /// Actualizar lista de filtros [_filterList] (función callback para FilterListClass)
+  void _updateFilters() {
+    List<Map<String, dynamic>> _filters = _filterManager.getFiltersList();
+
+    setState(() {
+      _filterList = Container(
+          margin: EdgeInsets.symmetric(vertical: 7.0),
+          height: _filters.length > 0 ? 35.0 : 0.0,
+          child: ListView.builder(
+              padding: EdgeInsets.symmetric(horizontal: 15.0),
+              scrollDirection: Axis.horizontal,
+              itemCount: _filters.length,
+              itemBuilder: (BuildContext context, int i) {
+                return Container(
+                  margin:
+                      EdgeInsets.only(right: 10.0), // margen con otros filtros
+                  child: ClipRRect(
+                    borderRadius: new BorderRadius.circular(12.0),
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 10.0,
+                          vertical: 9.0), // padding dentro del filtro
+                      height: 35.0,
+                      color: _blendColor,
+                      child: Row(
+                        children: <Widget>[
+                          GestureDetector(
+                            onTap: _filters[i]['callback'],
+                            child: Icon(_times,
+                                size: 13.0, color: Colors.grey[300]),
+                          ),
+                          Container(
+                            padding: EdgeInsets.only(left: 5.0),
+                            child: Text(_filters[i]['name'],
+                                style: _styleFilters,
+                                textAlign: TextAlign.center),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              }));
+    });
+  }
+
   @override
   void initState() {
     super.initState();
+    _filterManager = new FilterListClass(_updateFilters);
     listenForItems();
   }
 
+  /// TODO Prueba para cargar fotos de cervezas
   void listenForItems() async {
     final Stream<ItemClass> stream = await ItemRequest.getItems();
     stream.listen((ItemClass item) => setState(() => _items.add(item)));
-  }
-
-  /// Llamado al pulsar en la 'x' de un filtro
-  void _onFilterTapped(int filterIndex) {
-    print('Tapeado en el filtro $filterIndex');
   }
 
   /// Menú superior: barra de búsquerda y botón para abrir el menú izquierdo de filtros
@@ -89,10 +132,9 @@ class _ItemListState extends State<ItemList> {
           Expanded(
             child: Container(
               padding: EdgeInsets.only(right: 10.0),
-              child: TextField(
-                onSubmitted: (value) {
-                  print(value);
-                },
+              child: TextField( // TODO cambiar onSubmitted por onChanged? (igual son muchas peticiones)
+                onSubmitted: (value) =>
+                    _filterManager.addFilter(newSearchQuery: value),
                 decoration: InputDecoration(
                   isDense: true,
                   filled: true,
@@ -119,44 +161,8 @@ class _ItemListState extends State<ItemList> {
 
   /// Lista horizontal de filtros + modo de ordenación
   Widget _buildFilters() {
-    final _filterVerticalSize = 35.0; // pixeles de altura de un tag
-    return Container(
-      margin: EdgeInsets.symmetric(vertical: 7.0),
-      height: _filterVerticalSize,
-      child: ListView.builder(
-          padding: EdgeInsets.symmetric(horizontal: 15.0),
-          scrollDirection: Axis.horizontal,
-          itemCount: _filters.length,
-          itemBuilder: (BuildContext context, int i) {
-            return Container(
-              margin: EdgeInsets.only(right: 10.0), // margen con otros filtros
-              child: ClipRRect(
-                borderRadius: new BorderRadius.circular(12.0),
-                child: Container(
-                  padding: EdgeInsets.symmetric(
-                      horizontal: 10.0,
-                      vertical: 9.0), // padding dentro del filtro
-                  height: _filterVerticalSize,
-                  color: _blendColor,
-                  child: Row(
-                    children: <Widget>[
-                      GestureDetector(
-                        onTap: () => _onFilterTapped(i),
-                        child:
-                            Icon(_times, size: 13.0, color: Colors.grey[300]),
-                      ),
-                      Container(
-                        padding: EdgeInsets.only(left: 5.0),
-                        child: Text(_filters[i],
-                            style: _styleFilters, textAlign: TextAlign.center),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          }),
-    );
+    _updateFilters();
+    return _filterList;
   }
 
   /// Título de la lista (productos) + ordenación en una columna o dos
@@ -263,7 +269,7 @@ class _ItemListState extends State<ItemList> {
           ),
         ),
       ),
-      drawer: ItemListDrawer(),
+      drawer: ItemListDrawer(_filterManager),
     );
   }
 }
