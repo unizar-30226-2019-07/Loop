@@ -38,6 +38,13 @@ class DebugMain extends StatelessWidget {
 								},
                 
 							),
+              RaisedButton(
+								child: const Text('Pr'),
+								onPressed: () {
+									Navigator.of(context).pushNamed('/hola-hola');
+								},
+                
+							),
 						],
 					),
 				),

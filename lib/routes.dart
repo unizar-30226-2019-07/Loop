@@ -5,6 +5,8 @@ import 'package:selit/screens/users/profile.dart';
 import 'package:selit/screens/users/edit_profile.dart';
 import 'package:selit/screens/login/login_page.dart';
 import 'package:selit/screens/items/item_list.dart';
+import 'package:selit/screens/items/new_item.dart';
+import 'package:selit/screens/items/new_item_2.dart';
 
 class Routes {
   final routes = <String, dynamic>{
@@ -15,6 +17,8 @@ class Routes {
         _buildRoute(settings, new EditProfile(user: settings.arguments)),
     '/login-page': (settings) => _buildRoute(settings, new LoginPage()),
     '/items-list': (settings) => _buildRoute(settings, new ItemList()),
+    '/new-item': (settings) => _buildRoute(settings, new NewItem()),
+    '/new-item2': (settings) => _buildRoute(settings, new NewItem2()),
     '/principal': (settings) => _buildRoute(settings, new Principal()),
   };
 
