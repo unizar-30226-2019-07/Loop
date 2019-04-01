@@ -29,20 +29,14 @@ class Routes {
     );
   }
 
-  Routes(bool virgin) {
-    var screen;
-    if (virgin){
-      screen = new LoginPage();
-    }
-    else{
-      screen = new Principal();
-    }
+  Routes(bool newUser) {
     runApp(new MaterialApp(
       title: 'Selit!',
       onGenerateRoute: _getRoute,
       initialRoute: '/',
       theme: ThemeData(primaryColor: Color(0xFFC0392B)),
-      home: screen,
+      home: newUser ? LoginPage() : Principal(),
     ));
   }
+
 }

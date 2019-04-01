@@ -1,27 +1,5 @@
-import 'package:selit/util/seruser.dart';
 import 'routes.dart';
 
-String token;
-Future<bool> readToken() async {
-    token = await storage.read(key: "token");
-    if (token != null){
-      return false;
-    }
-    else{
-      return true;
-    }
-  }
+import 'package:selit/util/seruser.dart'; // TODO evitar usar la variable global storage (juntar con UsuarioRequest?)
 
-Future main() async {
-    bool virgin = await readToken();
-
-    if (virgin){
-      print("Nuevo usuario detectado");
-      new Routes(true);
-    }
-    else{
-      print(token);
-      new Routes(false);
-    }
-    
-}
+Future<void> main() async => new Routes(await storage.read(key: 'token') == null); 
