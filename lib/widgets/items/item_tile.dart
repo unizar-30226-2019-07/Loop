@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:selit/class/item_class.dart';
+import 'package:selit/screens/items/item_details.dart';
 
 /// Tile de objeto para la visualizacion en 1 columna
 class ItemTile extends StatelessWidget {
@@ -27,6 +28,7 @@ class ItemTile extends StatelessWidget {
                 child: InkWell(
                   onTap: () {
                     print('Card was tapped'); //Acción asociada (ir a item details)
+                    Navigator.push(context, MaterialPageRoute(builder: (context)=> ItemDetails(_item)));
                   },
                   // Generally, material cards use onSurface with 12% opacity for the pressed state.
                   splashColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.12),

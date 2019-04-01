@@ -25,6 +25,7 @@ dependencies:
   flutter_tags: "^0.1.9"
   flutter_statusbarcolor: any
   flutter_staggered_grid_view: ^0.2.7
+  carousel_pro: ^0.0.13
   flutter:
     sdk: flutter
     
