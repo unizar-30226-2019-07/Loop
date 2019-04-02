@@ -1,13 +1,9 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:selit/class/usuario_class.dart';
-import 'package:selit/widgets/profile_picture.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:percent_indicator/percent_indicator.dart';
 
-/// Página de edición de perfil (formulario con los campos
-/// necesarios para modificar los atributos del usuario)
-/// Recibe el UsuarioClass del usuario a editar y, una vez terminado
-/// de editar, realiza una petición para actualizar dichos cambios
+/// Segunda pantalla del formulario de subida de un nuevo producto
+/// Incluye selección de precio fijo o subasta  sus características
 class NewItem2 extends StatefulWidget {
   @override
   _NewItemState2 createState() => new _NewItemState2();
@@ -16,12 +12,11 @@ class NewItem2 extends StatefulWidget {
 class _NewItemState2 extends State<NewItem2> {
   final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
 
+  ///Controladores de campos del formulario
   final TextEditingController _priceController = new TextEditingController();
   final TextEditingController _limitController = new TextEditingController();
 
-  /// Usuario a mostrar en el perfil
-
-  //Fichero de galería
+  //Ficheros de galería
   File _galleryFile1;
   File _galleryFile2;
 
@@ -34,11 +29,12 @@ class _NewItemState2 extends State<NewItem2> {
   String _tipoPrecio = 'Precio Fijo';
 
   /// Constructor:
-  _NewItemState() {
+  _NewItemState2() {
     _galleryFile1 = null;
     _galleryFile2 = null;
   }
 
+  /// Titulos
   static final _styleTitle = TextStyle(
       fontSize: 22.0,
       color: Colors.white,
@@ -57,6 +53,23 @@ class _NewItemState2 extends State<NewItem2> {
       fontWeight: FontWeight.normal,
       fontFamily: 'Nunito');
 
+
+  ///Selector de fecha
+  DateTime selectedDate = DateTime.now();
+
+  Future<Null> _selectDate(BuildContext context) async {
+    final DateTime picked = await showDatePicker(
+        context: context,
+        initialDate: selectedDate,
+        firstDate: DateTime(2018, 8),
+        lastDate: DateTime(2101));
+    if (picked != null && picked != selectedDate)
+      setState(() {
+        selectedDate = picked;
+      });
+  }
+
+  ///Títulos iniciales
   Widget _buildBottomMenu() {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 25.0, horizontal: 25.0),
@@ -70,12 +83,26 @@ class _NewItemState2 extends State<NewItem2> {
               ]),
               Padding(
                 padding: EdgeInsets.only(
-                  left: 5,
-                  top: 8,
+                  left: 6,
+                  top: 15,
                 ),
                 child: Row(children: <Widget>[
                   Text('1) Producto ', style: _styleSubTitleB),
-                  Text('> 2)  Precio ', style: _styleSubTitle)
+                  Text('   2) Precio ', style: _styleSubTitle)
+                ]),
+              ),
+              Padding(
+                padding: EdgeInsets.only(
+                  top: 3,
+                ),
+                child: Row(children: <Widget>[
+                  new LinearPercentIndicator(
+                    width: 195.0,
+                    lineHeight: 4.0,
+                    percent: 1,
+                    backgroundColor: Colors.grey,
+                    progressColor: Colors.white,
+                  ),
                 ]),
               ),
             ],
@@ -85,50 +112,15 @@ class _NewItemState2 extends State<NewItem2> {
     );
   }
 
-  /// Widget correspondiente a la edición del perfil del usuario _user
-  /// Si un campo de _user es nulo, se muestran los campos por defecto
+  /// Formulario de inserción de un nuevo producto
   Widget _buildForm() {
-    // wDataTop
-    // wLocation
-    // wPassword
-    // wSex
-    // wAge
 
-    //Selección de foto de galería
-    imageSelectorGallery1() async {
-      _galleryFile1 = await ImagePicker.pickImage(
-        source: ImageSource.gallery,
-      );
-      setState(() {});
-    }
-
-    imageSelectorGallery2() async {
-      _galleryFile2 = await ImagePicker.pickImage(
-        source: ImageSource.gallery,
-      );
-      setState(() {});
-    }
-
-    DateTime selectedDate = DateTime.now();
-
-    Future<Null> _selectDate(BuildContext context) async {
-      final DateTime picked = await showDatePicker(
-          context: context,
-          initialDate: selectedDate,
-          firstDate: DateTime(2018, 8),
-          lastDate: DateTime(2101));
-      if (picked != null && picked != selectedDate)
-        setState(() {
-          selectedDate = picked;
-        });
-    }
-
+    /// Resumen del producto y selección del tipo de producto: precio fijo o subasta
     Widget wTipoPrecio = Row(
       children: <Widget>[
         Expanded(
           child: Container(
-              margin: EdgeInsets.only(left: 25, bottom: 26, right: 10, top: 40),
-              //color: Colors.red, // util para ajustar margenes
+              margin: EdgeInsets.only(left: 10, bottom: 26, right: 10, top: 45),
               child: Column(children: <Widget>[
                 new Container(
                   width: 350.0,
@@ -214,12 +206,13 @@ class _NewItemState2 extends State<NewItem2> {
       ],
     );
 
+    ///Precio del producto y divisa
     Widget wPrecio = Row(
       children: <Widget>[
         Expanded(
           flex: 7,
           child: Container(
-              margin: EdgeInsets.only(left: 25, right: 10, bottom: 20),
+              margin: EdgeInsets.only(left: 10, right: 10, bottom: 20),
               //color: Colors.red, // util para ajustar margenes
               child: Column(
                 children: <Widget>[
@@ -272,70 +265,13 @@ class _NewItemState2 extends State<NewItem2> {
       ],
     );
 
-    Widget wSubasta = Row(
-      children: <Widget>[
-        Expanded(
-          flex: 7,
-          child: Container(
-              margin: EdgeInsets.only(left: 25, right: 10, bottom: 20),
-              //color: Colors.red, // util para ajustar margenes
-              child: Column(
-                children: <Widget>[
-                  new TextFormField(
-                    decoration: const InputDecoration(
-                      labelText: 'Precio',
-                    ),
-                    controller: _priceController,
-                    keyboardType: TextInputType.emailAddress,
-                  ),
-                ],
-              )),
-        ),
-        Expanded(
-          flex: 3,
-          child: Container(
-              margin: EdgeInsets.only(left: 25, bottom: 26, right: 10),
-              //color: Colors.red, // util para ajustar margenes
-              child: Column(children: <Widget>[
-                new FormField(
-                  builder: (FormFieldState state) {
-                    return InputDecorator(
-                      decoration: InputDecoration(
-                        labelText: 'Divisa',
-                      ),
-                      isEmpty: _divisa == '',
-                      child: new DropdownButtonHideUnderline(
-                        child: new DropdownButton(
-                          value: _divisa,
-                          isDense: true,
-                          onChanged: (String newValue) {
-                            setState(() {
-                              _divisa = newValue;
-                              state.didChange(newValue);
-                            });
-                          },
-                          items: _divisas.map((String value) {
-                            return new DropdownMenuItem(
-                              value: value,
-                              child: new Text(value),
-                            );
-                          }).toList(),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ])),
-        )
-      ],
-    );
-
-    Widget wSubasta2 = Row(
+    ///Límite en subasta
+    Widget wLimite = Row(
       children: <Widget>[
         Expanded(
           flex: 8,
           child: Container(
-              margin: EdgeInsets.only(left: 25, right: 10, bottom: 20),
+              margin: EdgeInsets.only(left: 10, right: 10, bottom: 20),
               //color: Colors.red, // util para ajustar margenes
               child: Column(
                 children: <Widget>[
@@ -397,12 +333,12 @@ class _NewItemState2 extends State<NewItem2> {
                     children: <Widget>[
                       wTipoPrecio,
                       Divider(),
-                      wSubasta,
+                      wPrecio,
                       Divider(),
-                      wSubasta2,
+                      wLimite,
                       Divider(),
                       new Container(
-                          padding: const EdgeInsets.only(left: 10.0, top: 20.0),
+                          padding: const EdgeInsets.only(left: 10.0, top: 20.0, right: 10),
                           child: new RaisedButton(
                             color: Color(0xffc0392b),
                             child: const Text('Subir producto',
@@ -420,7 +356,7 @@ class _NewItemState2 extends State<NewItem2> {
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-              begin: Alignment(0.15, -1.75),
+              begin: Alignment(0.15, -1.65),
               end: Alignment(-0.15, 1.0),
               stops: [
                 0.4,

@@ -1,13 +1,10 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:selit/class/usuario_class.dart';
-import 'package:selit/widgets/profile_picture.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:percent_indicator/percent_indicator.dart';
 
-/// Página de edición de perfil (formulario con los campos
-/// necesarios para modificar los atributos del usuario)
-/// Recibe el UsuarioClass del usuario a editar y, una vez terminado
-/// de editar, realiza una petición para actualizar dichos cambios
+/// Primera pantalla del formulario de subida de un nuevo producto
+/// Incluye tiítulo, descripción, categoría y fotos
 class NewItem extends StatefulWidget {
   @override
   _NewItemState createState() => new _NewItemState();
@@ -16,19 +13,16 @@ class NewItem extends StatefulWidget {
 class _NewItemState extends State<NewItem> {
   final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
 
-  final TextEditingController _nameController = new TextEditingController();
-  final TextEditingController _surnameController = new TextEditingController();
-  final TextEditingController _locationController = new TextEditingController();
-  final TextEditingController _sexController = new TextEditingController();
-  final TextEditingController _yearController = new TextEditingController();
+  ///Controladores de campos del formulario
+  final TextEditingController _titleController = new TextEditingController();
+  final TextEditingController _descriptionController =
+      new TextEditingController();
 
-  /// Usuario a mostrar en el perfil
-
-  //Fichero de galería
+  ///Ficheros de galería
   File _galleryFile1;
   File _galleryFile2;
 
-  //Lista opciones categoria
+  ///Lista opciones categoria
   List<String> _categorias = <String>['', 'Coches', 'Ropa', 'Tecnología'];
   String _categoria = '';
 
@@ -38,7 +32,7 @@ class _NewItemState extends State<NewItem> {
     _galleryFile2 = null;
   }
 
-  /// Titulos: 'Añadir producto'
+  /// Titulos
   static final _styleTitle = TextStyle(
       fontSize: 22.0,
       color: Colors.white,
@@ -57,6 +51,23 @@ class _NewItemState extends State<NewItem> {
       fontWeight: FontWeight.normal,
       fontFamily: 'Nunito');
 
+  ///Selección de foto 1 de galería
+  imageSelectorGallery1() async {
+    _galleryFile1 = await ImagePicker.pickImage(
+      source: ImageSource.gallery,
+    );
+    setState(() {});
+  }
+
+  ///Selección de foto 2 de galería
+  imageSelectorGallery2() async {
+    _galleryFile2 = await ImagePicker.pickImage(
+      source: ImageSource.gallery,
+    );
+    setState(() {});
+  }
+
+  ///Títulos iniciales
   Widget _buildBottomMenu() {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 25.0, horizontal: 25.0),
@@ -70,14 +81,29 @@ class _NewItemState extends State<NewItem> {
               ]),
               Padding(
                 padding: EdgeInsets.only(
-                  left: 5,
-                  top: 8,
+                  left: 6,
+                  top: 15,
                 ),
                 child: Row(children: <Widget>[
                   Text('1) Producto ', style: _styleSubTitleB),
-                  Text('> 2)  Precio ', style: _styleSubTitle)
+                  Text('   2) Precio ', style: _styleSubTitle)
                 ]),
               ),
+              Padding(
+                padding: EdgeInsets.only(
+                  top: 3,
+                ),
+                child: Row(children: <Widget>[
+                  new LinearPercentIndicator(
+                    width: 195.0,
+                    lineHeight: 4.0,
+                    percent: 0.5,
+                    backgroundColor: Colors.grey,
+                    progressColor: Colors.white,
+                  ),
+                ]),
+              ),
+              
             ],
           )),
         ],
@@ -85,35 +111,14 @@ class _NewItemState extends State<NewItem> {
     );
   }
 
-  /// Widget correspondiente a la edición del perfil del usuario _user
-  /// Si un campo de _user es nulo, se muestran los campos por defecto
+  /// Formulario de inserción de un nuevo producto
   Widget _buildForm() {
-    // wDataTop
-    // wLocation
-    // wPassword
-    // wSex
-    // wAge
-
-    //Selección de foto de galería
-    imageSelectorGallery1() async {
-      _galleryFile1 = await ImagePicker.pickImage(
-        source: ImageSource.gallery,
-      );
-      setState(() {});
-    }
-
-    imageSelectorGallery2() async {
-      _galleryFile2 = await ImagePicker.pickImage(
-        source: ImageSource.gallery,
-      );
-      setState(() {});
-    }
-
+    /// Título y descipción del producto
     Widget wDataTop = Row(
       children: <Widget>[
         Expanded(
           child: Container(
-              margin: EdgeInsets.only(left: 25, right: 10, bottom: 35, top: 20),
+              margin: EdgeInsets.only(left: 10, right: 10, bottom: 35, top: 20),
               //color: Colors.red, // util para ajustar margenes
               child: Column(
                 children: <Widget>[
@@ -121,7 +126,7 @@ class _NewItemState extends State<NewItem> {
                     decoration: const InputDecoration(
                       labelText: 'Título',
                     ),
-                    controller: _nameController,
+                    controller: _titleController,
                   ),
                   Container(
                     margin: EdgeInsets.only(top: 15),
@@ -129,7 +134,7 @@ class _NewItemState extends State<NewItem> {
                       decoration: const InputDecoration(
                         labelText: 'Descripción',
                       ),
-                      controller: _surnameController,
+                      controller: _descriptionController,
                       keyboardType: TextInputType.multiline,
                       maxLines: 3,
                     ),
@@ -140,11 +145,12 @@ class _NewItemState extends State<NewItem> {
       ],
     );
 
+    /// Categoría del producto
     Widget wCategoria = Row(
       children: <Widget>[
         Expanded(
           child: Container(
-              margin: EdgeInsets.only(left: 25, bottom: 26, right: 10),
+              margin: EdgeInsets.only(left: 10, bottom: 26, right: 10),
               //color: Colors.red, // util para ajustar margenes
               child: Column(children: <Widget>[
                 new FormField(
@@ -180,6 +186,7 @@ class _NewItemState extends State<NewItem> {
       ],
     );
 
+    /// Imágnenes del producto del producto
     Widget wImg = new Container(
         margin: EdgeInsets.symmetric(vertical: 20.0),
         height: 150.0,
@@ -282,7 +289,8 @@ class _NewItemState extends State<NewItem> {
                 wImg,
                 Divider(),
                 new Container(
-                    padding: const EdgeInsets.only(left: 10.0, top: 20.0),
+                    padding:
+                        const EdgeInsets.only(left: 10.0, top: 20.0, right: 10),
                     child: new RaisedButton(
                       color: Color(0xffc0392b),
                       child: const Text('Siguiente',
@@ -302,7 +310,7 @@ class _NewItemState extends State<NewItem> {
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-              begin: Alignment(0.15, -1.75),
+              begin: Alignment(0.15, -1.65),
               end: Alignment(-0.15, 1.0),
               stops: [
                 0.4,
