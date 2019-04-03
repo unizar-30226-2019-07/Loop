@@ -97,6 +97,8 @@ class _NewItemState2 extends State<NewItem2> {
                 ),
                 child: Row(children: <Widget>[
                   new LinearPercentIndicator(
+                    animation: true,
+                    animationDuration: 500,
                     width: 195.0,
                     lineHeight: 4.0,
                     percent: 1,
@@ -319,7 +321,7 @@ class _NewItemState2 extends State<NewItem2> {
                       wPrecio,
                       Divider(),
                       new Container(
-                          padding: const EdgeInsets.only(left: 10.0, top: 20.0),
+                          padding: const EdgeInsets.only(left: 10.0, top: 20.0, right: 10),
                           child: new RaisedButton(
                             color: Color(0xffc0392b),
                             child: const Text('Subir producto',

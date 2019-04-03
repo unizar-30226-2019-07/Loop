@@ -19,18 +19,15 @@ class _NewItemState extends State<NewItem> {
       new TextEditingController();
 
   ///Ficheros de galería
-  File _galleryFile1;
-  File _galleryFile2;
+  List<File> _images = <File>[null, null, null, null, null];
+  int _imagen = 0;
 
   ///Lista opciones categoria
   List<String> _categorias = <String>['', 'Coches', 'Ropa', 'Tecnología'];
   String _categoria = '';
 
   /// Constructor:
-  _NewItemState() {
-    _galleryFile1 = null;
-    _galleryFile2 = null;
-  }
+  _NewItemState() {}
 
   /// Titulos
   static final _styleTitle = TextStyle(
@@ -52,16 +49,8 @@ class _NewItemState extends State<NewItem> {
       fontFamily: 'Nunito');
 
   ///Selección de foto 1 de galería
-  imageSelectorGallery1() async {
-    _galleryFile1 = await ImagePicker.pickImage(
-      source: ImageSource.gallery,
-    );
-    setState(() {});
-  }
-
-  ///Selección de foto 2 de galería
-  imageSelectorGallery2() async {
-    _galleryFile2 = await ImagePicker.pickImage(
+  imageSelectorGallery() async {
+    _images[_imagen] = await ImagePicker.pickImage(
       source: ImageSource.gallery,
     );
     setState(() {});
@@ -95,6 +84,8 @@ class _NewItemState extends State<NewItem> {
                 ),
                 child: Row(children: <Widget>[
                   new LinearPercentIndicator(
+                    animation: true,
+                    animationDuration: 500,
                     width: 195.0,
                     lineHeight: 4.0,
                     percent: 0.5,
@@ -103,7 +94,6 @@ class _NewItemState extends State<NewItem> {
                   ),
                 ]),
               ),
-              
             ],
           )),
         ],
@@ -186,76 +176,55 @@ class _NewItemState extends State<NewItem> {
       ],
     );
 
+    Widget wImgTitle = Padding(
+        padding: EdgeInsets.only(
+          left: 10,
+          top: 17,
+        ),
+        child: Text(
+          'Imágenes',
+          style: new TextStyle(
+            fontSize: 16.8,
+            color: Colors.grey[600],
+          ),
+        ));
+
     /// Imágnenes del producto del producto
     Widget wImg = new Container(
         margin: EdgeInsets.symmetric(vertical: 20.0),
-        height: 150.0,
-        child: new ListView(
+        height: 100.0,
+        child: new ListView.builder(
+          itemCount: _images.length,
           scrollDirection: Axis.horizontal,
-          children: <Widget>[
-            Container(
-              height: 125.0,
-              width: 200.0,
-              child: _galleryFile1 == null
-                  ? new Container(
-                      margin: const EdgeInsets.all(7.0),
-                      padding: const EdgeInsets.all(3.0),
-                      decoration: new BoxDecoration(
-                          borderRadius: BorderRadius.circular(15.0),
-                          border: new Border.all(color: Colors.grey[600])),
-                      child: new FlatButton(
-                          onPressed: imageSelectorGallery1,
-                          shape: new RoundedRectangleBorder(
-                              borderRadius: new BorderRadius.circular(30.0)),
-                          child: Row(
-                            children: <Widget>[
-                              Icon(Icons.add_a_photo),
-                              Padding(
-                                padding: EdgeInsets.only(
-                                  left: 20,
-                                  top: 2,
-                                ),
-                                child: Text("Añadir foto"),
-                              ),
-                            ],
-                          )),
-                    )
-                  : new Container(
-                      margin: const EdgeInsets.all(7.0),
-                      padding: const EdgeInsets.all(3.0),
-                      decoration: new BoxDecoration(
-                          image: new DecorationImage(
-                            image: new AssetImage(_galleryFile1.path),
-                            fit: BoxFit.cover,
-                          ),
-                          borderRadius: BorderRadius.circular(15.0),
-                          border: new Border.all(color: Colors.grey[600])),
-                    ),
-            ),
-            Container(
+          itemBuilder: (context, index) => Container(
                 height: 125.0,
-                width: 200.0,
-                child: _galleryFile2 == null
+                width: 150.0,
+                child: _images[index] == null
                     ? new Container(
                         margin: const EdgeInsets.all(7.0),
                         padding: const EdgeInsets.all(3.0),
                         decoration: new BoxDecoration(
                             borderRadius: BorderRadius.circular(15.0),
-                            border: new Border.all(color: Colors.grey[600])),
+                            border: new Border.all(color: Colors.grey[600]),
+                            
+                            ),
                         child: new FlatButton(
-                            onPressed: imageSelectorGallery2,
+                            onPressed: () {
+                              _imagen = index;
+                              imageSelectorGallery();
+                            },
                             shape: new RoundedRectangleBorder(
                                 borderRadius: new BorderRadius.circular(30.0)),
                             child: Row(
                               children: <Widget>[
-                                Icon(Icons.add_a_photo),
                                 Padding(
                                   padding: EdgeInsets.only(
-                                    left: 20,
-                                    top: 2,
+                                    left: 35,
+                                    top: 0,
                                   ),
-                                  child: Text("Añadir foto"),
-                                )
+                                  child: Icon(Icons.add_a_photo),
+                                ),
+                                
                               ],
                             )),
                       )
@@ -264,13 +233,13 @@ class _NewItemState extends State<NewItem> {
                         padding: const EdgeInsets.all(3.0),
                         decoration: new BoxDecoration(
                             image: new DecorationImage(
-                              image: new AssetImage(_galleryFile2.path),
+                              image: new AssetImage(_images[index].path),
                               fit: BoxFit.cover,
                             ),
                             borderRadius: BorderRadius.circular(15.0),
                             border: new Border.all(color: Colors.grey[600])),
-                      ))
-          ],
+                      ),
+              ),
         ));
 
     return SafeArea(
@@ -286,6 +255,7 @@ class _NewItemState extends State<NewItem> {
                 Divider(),
                 wCategoria,
                 Divider(),
+                wImgTitle,
                 wImg,
                 Divider(),
                 new Container(
