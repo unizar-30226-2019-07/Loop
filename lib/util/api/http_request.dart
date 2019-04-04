@@ -6,8 +6,7 @@ import 'package:http/http.dart';
 /// Su uso principal es abstraer la [_ip] del request a realizar.
 class HttpRequest {
 
-  static final _ip = "http://35.234.77.87:8080/"; // TODO ip del servidor API
-  
+  static final _ip = "http://selit.naval.cat:8080/";
   /// Petición GET
   /// Concatena la [url] con la IP del servidor, asi que debe
   /// tener formato '/users' para obtener la lista de usuarios, por ejemplo

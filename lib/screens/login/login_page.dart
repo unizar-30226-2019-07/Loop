@@ -8,7 +8,6 @@ import 'package:selit/util/bubble_indication_painter.dart';
 import 'package:selit/util/seruser.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 
 final int splashDuration = 2;
