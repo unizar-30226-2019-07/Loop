@@ -34,7 +34,7 @@ class _EditProfileState extends State<EditProfile> {
   File _galleryFile;
 
   //Lista opciones sexo
-  List<String> _sexos = <String>['', 'Hombre', 'Mujer', 'Otro'];
+  List<String> _sexos = <String>['', 'hombre', 'mujer', 'Otro'];
   String _sexo = '';
 
   /// Constructor: mostrar el usuario _user

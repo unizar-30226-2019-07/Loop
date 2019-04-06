@@ -18,7 +18,7 @@ class Routes {
     '/login-page': (settings) => _buildRoute(settings, new LoginPage()),
     '/items-list': (settings) => _buildRoute(settings, new ItemList()),
     '/new-item': (settings) => _buildRoute(settings, new NewItem()),
-    '/new-item2': (settings) => _buildRoute(settings, new NewItem2()),
+    '/new-item2': (settings) => _buildRoute(settings, new NewItem2(item: settings.arguments)),
     '/principal': (settings) => _buildRoute(settings, new Principal()),
   };
 

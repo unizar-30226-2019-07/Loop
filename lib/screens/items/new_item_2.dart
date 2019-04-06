@@ -2,12 +2,18 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
+import 'package:selit/util/item.dart';
 
 /// Segunda pantalla del formulario de subida de un nuevo producto
 /// Incluye selección de precio fijo o subasta  sus características
 class NewItem2 extends StatefulWidget {
+  final Item item;
+
+  /// UsuarioClass del usuario a editar
+  NewItem2({@required this.item});
+
   @override
-  _NewItemState2 createState() => new _NewItemState2();
+  _NewItemState2 createState() => new _NewItemState2(item);
 }
 
 class _NewItemState2 extends State<NewItem2> {
@@ -22,15 +28,18 @@ class _NewItemState2 extends State<NewItem2> {
   File _galleryFile2;
 
   //Lista opciones divisa
-  List<String> _divisas = <String>['', 'EUR', 'Otro'];
+  List<String> _divisas = <String>['', 'EUR', 'USD'];
   String _divisa = '';
 
   //Lista opciones categoria
   List<String> _tiposPrecio = <String>['Precio Fijo', 'Subasta'];
   String _tipoPrecio = 'Precio Fijo';
 
+  Item _item;
+
   /// Constructor:
-  _NewItemState2() {
+  _NewItemState2(Item _item) {
+    this._item = _item;
     _galleryFile1 = null;
     _galleryFile2 = null;
   }
@@ -53,7 +62,6 @@ class _NewItemState2 extends State<NewItem2> {
       color: Colors.white,
       fontWeight: FontWeight.normal,
       fontFamily: 'Nunito');
-
 
   ///Selector de fecha
   DateTime selectedDate = DateTime.now();
@@ -117,7 +125,6 @@ class _NewItemState2 extends State<NewItem2> {
 
   /// Formulario de inserción de un nuevo producto
   Widget _buildForm() {
-
     /// Resumen del producto y selección del tipo de producto: precio fijo o subasta
     Widget wTipoPrecio = Row(
       children: <Widget>[
@@ -139,7 +146,7 @@ class _NewItemState2 extends State<NewItem2> {
                             left: 11,
                             top: 25,
                           ),
-                          child: Text("Título",
+                          child: Text(_item.title,
                               style: new TextStyle(
                                   fontSize: 22.0,
                                   fontWeight: FontWeight.bold,
@@ -157,7 +164,7 @@ class _NewItemState2 extends State<NewItem2> {
                                   maxWidth:
                                       MediaQuery.of(context).size.width - 95),
                               child: Text(
-                                'Descripción: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean scelerisque varius mauris, eget pulvinar velit tincidunt nec. Nam dignissim gravida nunc, in pulvinar odio ullamcorper in. Vivamus sed massa egestas tellus commodo. ',
+                                _item.description,
                                 overflow: TextOverflow.ellipsis,
                                 textAlign: TextAlign.justify,
                                 maxLines: 7,
@@ -322,7 +329,8 @@ class _NewItemState2 extends State<NewItem2> {
                       wPrecio,
                       Divider(),
                       new Container(
-                          padding: const EdgeInsets.only(left: 10.0, top: 20.0, right: 10),
+                          padding: const EdgeInsets.only(
+                              left: 10.0, top: 20.0, right: 10),
                           child: new RaisedButton(
                             color: Color(0xffc0392b),
                             child: const Text('Subir producto',
@@ -341,12 +349,24 @@ class _NewItemState2 extends State<NewItem2> {
                       wLimite,
                       Divider(),
                       new Container(
-                          padding: const EdgeInsets.only(left: 10.0, top: 20.0, right: 10),
+                          padding: const EdgeInsets.only(
+                              left: 10.0, top: 20.0, right: 10),
                           child: new RaisedButton(
                             color: Color(0xffc0392b),
                             child: const Text('Subir producto',
                                 style: TextStyle(color: Colors.white)),
-                            onPressed: () {},
+                            onPressed: () {
+                              Item item = Item(
+                                  title: _item.title,
+                                  owner_id: _item.owner_id,
+                                  description: _item.description,
+                                  category: _item.category,
+                                  type: "sale",
+                                  price: double.parse(_priceController.text),
+                                  currency: _divisa);
+
+                              ///TODO post
+                            },
                           )),
                     ],
                   )));

@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:selit/util/item.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
@@ -26,6 +27,8 @@ class _NewItemState extends State<NewItem> {
   ///Lista opciones categoria
   List<String> _categorias = <String>['', 'Coches', 'Ropa', 'Tecnología'];
   String _categoria = '';
+
+  static Item _item;
 
   /// Constructor:
   _NewItemState() {}
@@ -205,10 +208,9 @@ class _NewItemState extends State<NewItem> {
                         margin: const EdgeInsets.all(7.0),
                         padding: const EdgeInsets.all(3.0),
                         decoration: new BoxDecoration(
-                            borderRadius: BorderRadius.circular(15.0),
-                            border: new Border.all(color: Colors.grey[600]),
-                            
-                            ),
+                          borderRadius: BorderRadius.circular(15.0),
+                          border: new Border.all(color: Colors.grey[600]),
+                        ),
                         child: new FlatButton(
                             onPressed: () {
                               _imagen = index;
@@ -225,7 +227,6 @@ class _NewItemState extends State<NewItem> {
                                   ),
                                   child: Icon(Icons.add_a_photo),
                                 ),
-                                
                               ],
                             )),
                       )
@@ -267,7 +268,14 @@ class _NewItemState extends State<NewItem> {
                       child: const Text('Siguiente',
                           style: TextStyle(color: Colors.white)),
                       onPressed: () {
-                        Navigator.of(context).pushNamed('/new-item2');
+                        _item = Item(
+                            title: _titleController.text,
+                            owner_id: 0,
+                            description: _descriptionController.text,
+                            category: _categoria);
+
+                        Navigator.of(context)
+                            .pushNamed('/new-item2', arguments: _item);
                       },
                     )),
               ],
