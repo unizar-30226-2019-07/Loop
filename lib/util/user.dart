@@ -7,7 +7,12 @@ Token postFromJson(String str) {
 
 String postToJson(User data) {
   final dyn = data.toJson();
-  //print(json.encode(dyn));
+  print(dyn);
+  return json.encode(dyn);
+}
+String postToJsonL(User data) {
+  final dyn = data.toJsonL();
+  print(dyn);
   return json.encode(dyn);
 }
 
@@ -101,6 +106,11 @@ class User {
     "location": location.toJson(),
 
  
+  };
+
+  Map<String, dynamic> toJsonL() => {
+    "email": email,
+    "password": password, 
   };
 }
 

@@ -21,8 +21,10 @@ Future<http.Response> auth(User chain) async{
         HttpHeaders.authorizationHeader : ''
       },
       
-      body: postToJson(chain)
+      body: postToJsonL(chain)
   );
+  print(response.body);
+  print(response.statusCode);
   apiToken = response.headers[HttpHeaders.authorizationHeader];
   print(apiToken);
   await storage.write(key: "token", value: apiToken);
