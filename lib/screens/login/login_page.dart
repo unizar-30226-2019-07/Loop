@@ -8,7 +8,7 @@ import 'package:selit/util/bubble_indication_painter.dart';
 import 'package:selit/util/seruser.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
-
+import 'package:location/location.dart';
 
 final int splashDuration = 2;
 
@@ -378,7 +378,6 @@ class _LoginPageState extends State<LoginPage>
                       ),
                     ),
                     onPressed: () {
-
                         User post = User(
                           email: loginEmailController.text,
                           password: loginPasswordController.text,
@@ -653,7 +652,7 @@ class _LoginPageState extends State<LoginPage>
                             fontFamily: "WorkSansBold"),
                       ),
                     ),
-                    onPressed: () {
+                    onPressed: () async {
                       if (signupPasswordController.text != signupConfirmPasswordController.text){
                           showInSnackBar("Las contraseñas no coinciden", Colors.yellow);
                       }
@@ -661,12 +660,26 @@ class _LoginPageState extends State<LoginPage>
                         showInSnackBar("Rellena toodos los campos correctamente", Colors.yellow);
                       }
                       else{
-                        print(signupLastNameController.text);
+                        LocationData currentLocation;
+                        var locatione = new Location();
+
+                        // Platform messages may fail, so we use a try/catch PlatformException.
+                        try {
+                          currentLocation = await locatione.getLocation();
+                        } on PlatformException catch (e) {
+                          if (e.code == 'PERMISSION_DENIED') {
+                            showInSnackBar("Es necesaria la localización", Colors.red);
+                          } 
+                          currentLocation = null;
+                        }
+
+                        LocationU loc = LocationU(lat: currentLocation.latitude  , lon: currentLocation.longitude);
                         User post = User(
                           email: signupEmailController.text,
                           password: signupPasswordController.text,
                           first_name: signupNameController.text,
-                          last_name: signupLastNameController.text
+                          last_name: signupLastNameController.text,
+                          location: loc
                         );
                         sign(post).then((response){
                         
@@ -675,7 +688,7 @@ class _LoginPageState extends State<LoginPage>
                             if(response.statusCode == 201){
                               print(response.body);
                               showInSnackBar("Se ha enviado un correo de confirmación", legit);
-                              //Navigator.of(context).pushReplacementNamed('/debug-main');
+                              
                             }
                              else{
                               print(response.statusCode);
@@ -686,11 +699,7 @@ class _LoginPageState extends State<LoginPage>
                         }).catchError((error){
                             print('error : $error');
                       });
-                      }
-                        //print(post.user);
-                        //print(post.password);
-
-                        
+                      }                        
                     })
                         
               ),

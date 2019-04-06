@@ -40,25 +40,56 @@ class Token {
  
   };
 }
+
+class LocationU{
+  double lat;
+  double lon;
+
+  LocationU({
+    this.lat,
+    this.lon
+});
+
+factory LocationU.fromJson(Map<String, dynamic> json){
+    return LocationU(
+      lat: json['lat'],
+      lon: json['lng']
+    );
+  }
+  Map<String, dynamic> toJson() => {
+    "lat": lat,
+    "lng": lon,
+  };
+
+
+}
+
+
+
 class User {
  
   String email;
   String password;
   String first_name;
   String last_name;
+  LocationU location;
 
   User({
     this.email,
     this.password,
     this.first_name,
     this.last_name,
+    this.location
   });
+
+
 
   factory User.fromJson(Map<String, dynamic> json) => new User(
     email: json["email"],
     password: json["password"],
     first_name: json["first_name"],
     last_name: json["last_name"],
+    location: LocationU.fromJson(json["location"])
 
   );
 
@@ -67,6 +98,8 @@ class User {
     "password": password,
     "first_name": first_name,
     "last_name": last_name,
+    "location": location.toJson(),
+
  
   };
 }

@@ -18,7 +18,7 @@ class _Principal extends State<Principal> {
 
   // Página actual (al principio es 0 -> home)
   static int _currentPage = 0;
-  static int _userId = 1; // Valor de prueba (usuario 1)
+  static int _userId = 0; //Valor 0 usuario interno
 
   // Lista de pantallas (en orden según aparecen en la barra de navegación)
   List<Widget> screenList = [ItemList(), LoginPage(), Profile(userId: _userId), DebugMain()];
