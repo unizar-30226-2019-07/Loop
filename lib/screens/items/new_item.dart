@@ -14,6 +14,7 @@ class NewItem extends StatefulWidget {
 
 class _NewItemState extends State<NewItem> {
   final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   ///Controladores de campos del formulario
   final TextEditingController _titleController = new TextEditingController();
@@ -59,6 +60,25 @@ class _NewItemState extends State<NewItem> {
     );
     setState(() {});
   }
+
+  void showInSnackBar(String value, Color alfa) {
+    
+    FocusScope.of(context).requestFocus(new FocusNode());
+    _scaffoldKey.currentState?.removeCurrentSnackBar();
+    _scaffoldKey.currentState.showSnackBar(new SnackBar(
+      content: new Text(
+        value,
+        textAlign: TextAlign.center,
+        style: TextStyle(
+            color: Colors.white,
+            fontSize: 16.0,
+            fontFamily: "Nunito"),
+      ),
+      backgroundColor: alfa,
+      duration: Duration(seconds: 3),
+    ));
+  }
+
 
   ///Títulos iniciales
   Widget _buildBottomMenu() {
@@ -268,14 +288,24 @@ class _NewItemState extends State<NewItem> {
                       child: const Text('Siguiente',
                           style: TextStyle(color: Colors.white)),
                       onPressed: () {
-                        _item = Item(
+                        if (_titleController.text.length < 1 ||
+                            _descriptionController.text.length < 1 ||
+                            _categoria == '') {
+                          showInSnackBar(
+                              "Rellena toodos los campos correctamente",
+                              Colors.yellow);
+                        } else {
+                          _item = Item(
                             title: _titleController.text,
-                            owner_id: 0,
+                            owner_id: 0, ///TODO establecer id del usuario 
                             description: _descriptionController.text,
                             category: _categoria);
 
                         Navigator.of(context)
                             .pushNamed('/new-item2', arguments: _item);
+                        }
+
+                        
                       },
                     )),
               ],
@@ -286,6 +316,7 @@ class _NewItemState extends State<NewItem> {
   Widget build(BuildContext context) {
     FlutterStatusbarcolor.setStatusBarColor(Theme.of(context).primaryColor);
     return Scaffold(
+      key: _scaffoldKey,
       resizeToAvoidBottomInset: false,
       body: Container(
         decoration: BoxDecoration(

@@ -18,6 +18,7 @@ class NewItem2 extends StatefulWidget {
 
 class _NewItemState2 extends State<NewItem2> {
   final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   ///Controladores de campos del formulario
   final TextEditingController _priceController = new TextEditingController();
@@ -76,6 +77,24 @@ class _NewItemState2 extends State<NewItem2> {
       setState(() {
         selectedDate = picked;
       });
+  }
+
+  void showInSnackBar(String value, Color alfa) {
+    
+    FocusScope.of(context).requestFocus(new FocusNode());
+    _scaffoldKey.currentState?.removeCurrentSnackBar();
+    _scaffoldKey.currentState.showSnackBar(new SnackBar(
+      content: new Text(
+        value,
+        textAlign: TextAlign.center,
+        style: TextStyle(
+            color: Colors.white,
+            fontSize: 16.0,
+            fontFamily: "Nunito"),
+      ),
+      backgroundColor: alfa,
+      duration: Duration(seconds: 3),
+    ));
   }
 
   ///Títulos iniciales
@@ -356,14 +375,22 @@ class _NewItemState2 extends State<NewItem2> {
                             child: const Text('Subir producto',
                                 style: TextStyle(color: Colors.white)),
                             onPressed: () {
-                              Item item = Item(
-                                  title: _item.title,
-                                  owner_id: _item.owner_id,
-                                  description: _item.description,
-                                  category: _item.category,
-                                  type: "sale",
-                                  price: double.parse(_priceController.text),
-                                  currency: _divisa);
+                              if (_priceController.text.length < 1 ||
+                                  _tipoPrecio == '' ||
+                                  _divisa == '') {
+                                showInSnackBar(
+                                    "Rellena toodos los campos correctamente",
+                                    Colors.yellow);
+                              } else {
+                                Item item = Item(
+                                    title: _item.title,
+                                    owner_id: _item.owner_id,
+                                    description: _item.description,
+                                    category: _item.category,
+                                    type: "sale",
+                                    price: double.parse(_priceController.text),
+                                    currency: _divisa);
+                              }
 
                               ///TODO post
                             },
@@ -376,6 +403,7 @@ class _NewItemState2 extends State<NewItem2> {
   Widget build(BuildContext context) {
     FlutterStatusbarcolor.setStatusBarColor(Theme.of(context).primaryColor);
     return Scaffold(
+      key: _scaffoldKey,
       resizeToAvoidBottomInset: false,
       body: Container(
         decoration: BoxDecoration(
