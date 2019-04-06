@@ -3,7 +3,6 @@ import 'package:selit/class/token_class.dart';
 import 'package:selit/util/api/api_config.dart';
 import 'package:selit/util/api/http_request.dart';
 import 'package:http/http.dart' as http;
-import 'package:selit/util/perfil.dart';
 import 'dart:convert' as json;
 import 'dart:io';
 import 'package:selit/util/seruser.dart';

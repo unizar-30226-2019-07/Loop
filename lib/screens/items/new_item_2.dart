@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/percent_indicator.dart';
+import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 
 /// Segunda pantalla del formulario de subida de un nuevo producto
 /// Incluye selección de precio fijo o subasta  sus características
@@ -353,6 +354,7 @@ class _NewItemState2 extends State<NewItem2> {
 
   @override
   Widget build(BuildContext context) {
+    FlutterStatusbarcolor.setStatusBarColor(Theme.of(context).primaryColor);
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: Container(
