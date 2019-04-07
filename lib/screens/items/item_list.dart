@@ -37,13 +37,9 @@ class _ItemListState extends State<ItemList> {
   /// Texto de 'Nada por aquí...'
   static final _styleNothing =
       const TextStyle(fontSize: 20.0, color: Colors.grey);
-  static final _styleSearchBar = TextStyle(); // TODO
+  static final _styleSearchBar = TextStyle(fontSize: 16.0);
 
-  /// TODO quitar? Icono 'x'
-  IconData _times = FontAwesomeIcons.times;
-
-  // TODO temporal - Color rojo oscuro similar al empleado en los tabs (registro/perfil)
-  // mover a temas o a otro lugar
+  /// Color más oscuro que el rojo principal
   final _blendColor = Color.alphaBlend(Color(0x552B2B2B), Color(0xFFC0392B));
 
   /// Controlador de filtros, medio de comunicación entre ItemList e ItemListDrawer
@@ -81,7 +77,7 @@ class _ItemListState extends State<ItemList> {
                         children: <Widget>[
                           GestureDetector(
                             onTap: _filters[i]['callback'],
-                            child: Icon(_times,
+                            child: Icon(FontAwesomeIcons.times,
                                 size: 13.0, color: Colors.grey[300]),
                           ),
                           Container(
@@ -134,6 +130,7 @@ class _ItemListState extends State<ItemList> {
               child: TextField( // TODO cambiar onSubmitted por onChanged? (igual son muchas peticiones)
                 onSubmitted: (value) =>
                     _filterManager.addFilter(newSearchQuery: value),
+                cursorColor: Theme.of(context).primaryColor,
                 decoration: InputDecoration(
                   isDense: true,
                   filled: true,

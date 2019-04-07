@@ -16,8 +16,8 @@ class ItemListDrawer extends StatefulWidget {
 }
 
 class _ItemListDrawerState extends State<ItemListDrawer> {
-  // TODO temporal - Color rojo oscuro similar al empleado en los tabs (registro/perfil)
-  // mover a temas o a otro lugar
+
+  /// Color más oscuro que el rojo principal
   final _blendColor = Color.alphaBlend(Color(0x552B2B2B), Color(0xFFC0392B));
 
   /// Texto que acompaña a los sliders de busqueda

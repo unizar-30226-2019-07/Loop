@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:selit/class/item_class.dart';
 
 /// Tile de objeto para la visualizacion en 2 columnas
-/// TODO sin terminar, por ahora solo muestra la imagen
 class ItemTileVertical extends StatelessWidget {
   final ItemClass _item;
   ItemTileVertical(this._item);
