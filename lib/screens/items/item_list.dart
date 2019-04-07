@@ -119,7 +119,7 @@ class _ItemListState extends State<ItemList> {
       _getItemsData(pageNum);
     }
   }
-  
+
   /// Petición de items desde [pageNum * ITEMS_PER_PAGE] hasta [(pageNum + 1) * ITEMS_PER_PAGE - 1]
   /// Es decir, la página [pageNum]
   /// Ejemplo: página 0 -> items del 0 al 9 (10 items en total)
@@ -229,18 +229,31 @@ class _ItemListState extends State<ItemList> {
   Widget _buildProductList(int numColumns) {
     if (_items.isEmpty) {
       // No hay items/productos para mostrar
-      return SizedBox.expand(
-          // expandir horizontalmente
-          child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Icon(Icons.not_interested, color: Colors.grey, size: 65.0),
-          Container(
-            padding: EdgeInsets.only(top: 10),
-            child: Text('Nada por aquí...', style: _styleNothing),
-          )
-        ],
-      ));
+      if (lastPetitionPage > 0) {
+        return SizedBox.expand(
+            // expandir horizontalmente
+            child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Icon(Icons.not_interested, color: Colors.grey, size: 65.0),
+            Container(
+              padding: EdgeInsets.only(top: 10),
+              child: Text('Nada por aquí...', style: _styleNothing),
+            )
+          ],
+        ));
+      } else {
+        return SizedBox.expand(
+            // expandir horizontalmente
+            child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            CircularProgressIndicator(
+                strokeWidth: 5.0,
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.grey[600])),
+          ],
+        ));
+      }
     } else {
       if (numColumns == 1) {
         // Vista de objetos en una columna
@@ -248,7 +261,8 @@ class _ItemListState extends State<ItemList> {
           padding: EdgeInsets.symmetric(horizontal: 15.0),
           itemCount: _items.length,
           itemBuilder: (context, index) {
-            _loadItems(index ~/ ITEMS_PER_PAGE); // número de página que está viendo el usuario
+            _loadItems(index ~/
+                ITEMS_PER_PAGE); // número de página que está viendo el usuario
             return ItemTile(_items[index]);
           },
         );
@@ -259,7 +273,8 @@ class _ItemListState extends State<ItemList> {
           padding: EdgeInsets.symmetric(horizontal: 15.0),
           itemCount: _items.length,
           itemBuilder: (context, index) {
-            _loadItems(index ~/ ITEMS_PER_PAGE); // número de página que está viendo el usuario
+            _loadItems(index ~/
+                ITEMS_PER_PAGE); // número de página que está viendo el usuario
             return ItemTileVertical(_items[index]);
           },
           staggeredTileBuilder: (index) => StaggeredTile.fit(1),
