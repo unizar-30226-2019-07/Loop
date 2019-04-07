@@ -27,6 +27,7 @@ class _Principal extends State<Principal> {
 	Widget build(BuildContext context) {
 		return Scaffold(
 			body: screenList[_currentPage], // Pantalla en curso
+      resizeToAvoidBottomInset: false,
       bottomNavigationBar: SafeArea(
         child: FancyBottomNavigation(
           tabs: [
