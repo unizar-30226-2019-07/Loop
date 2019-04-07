@@ -248,7 +248,7 @@ class _ItemListState extends State<ItemList> {
           padding: EdgeInsets.symmetric(horizontal: 15.0),
           itemCount: _items.length,
           itemBuilder: (context, index) {
-            _loadItems(index ~/ ITEMS_PER_PAGE);
+            _loadItems(index ~/ ITEMS_PER_PAGE); // número de página que está viendo el usuario
             return ItemTile(_items[index]);
           },
         );
@@ -258,7 +258,10 @@ class _ItemListState extends State<ItemList> {
           crossAxisCount: 2,
           padding: EdgeInsets.symmetric(horizontal: 15.0),
           itemCount: _items.length,
-          itemBuilder: (context, index) => ItemTileVertical(_items[index]),
+          itemBuilder: (context, index) {
+            _loadItems(index ~/ ITEMS_PER_PAGE); // número de página que está viendo el usuario
+            return ItemTileVertical(_items[index]);
+          },
           staggeredTileBuilder: (index) => StaggeredTile.fit(1),
         );
       }
