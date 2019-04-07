@@ -5,6 +5,7 @@ import 'package:selit/screens/users/profile.dart';
 import 'package:selit/screens/users/edit_profile.dart';
 import 'package:selit/screens/login/login_page.dart';
 import 'package:selit/screens/items/item_list.dart';
+import 'package:selit/screens/items/item_details.dart';
 import 'package:selit/screens/items/new_item.dart';
 import 'package:selit/screens/items/new_item_2.dart';
 
@@ -17,8 +18,11 @@ class Routes {
         _buildRoute(settings, new EditProfile(user: settings.arguments)),
     '/login-page': (settings) => _buildRoute(settings, new LoginPage()),
     '/items-list': (settings) => _buildRoute(settings, new ItemList()),
+    '/item-details': (settings) =>
+        _buildRoute(settings, new ItemDetails(item: settings.arguments)),
     '/new-item': (settings) => _buildRoute(settings, new NewItem()),
-    '/new-item2': (settings) => _buildRoute(settings, new NewItem2(item: settings.arguments)),
+    '/new-item2': (settings) =>
+        _buildRoute(settings, new NewItem2(item: settings.arguments)),
     '/principal': (settings) => _buildRoute(settings, new Principal()),
   };
 
@@ -45,5 +49,4 @@ class Routes {
       home: newUser ? LoginPage() : Principal(),
     ));
   }
-
 }

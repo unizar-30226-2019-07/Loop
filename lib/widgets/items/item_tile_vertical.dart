@@ -23,10 +23,7 @@ class ItemTileVertical extends StatelessWidget {
                 clipBehavior: Clip.antiAlias,
                 //shape: shape,
                 child: InkWell(
-                  onTap: () {
-                    print(
-                        'Card was tapped'); //Acción asociada (ir a item details)
-                  },
+                  onTap: () => Navigator.of(context).pushNamed('/item-details', arguments: _item),
                   // Generally, material cards use onSurface with 12% opacity for the pressed state.
                   splashColor:
                       Theme.of(context).colorScheme.onSurface.withOpacity(0.12),

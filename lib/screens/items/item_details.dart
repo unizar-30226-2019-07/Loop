@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:selit/class/item_class.dart';
 import 'package:carousel_pro/carousel_pro.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
+/// Detalles de un item/producto en venta: título, descripción, precio,
+/// imágenes, etc.
+/// TODO completar
 class ItemDetails extends StatefulWidget {
-  final ItemClass _item;
-  ItemDetails(this._item);
+  final ItemClass item;
+  ItemDetails({this.item});
   @override
-  State<StatefulWidget> createState() => _ItemDetails(_item);
+  State<StatefulWidget> createState() => _ItemDetails(item);
 }
 
 class _ItemDetails extends State<ItemDetails> {
