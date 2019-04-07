@@ -49,20 +49,17 @@ class _NewItemState2 extends State<NewItem2> {
   static final _styleTitle = TextStyle(
       fontSize: 22.0,
       color: Colors.white,
-      fontWeight: FontWeight.bold,
-      fontFamily: 'Nunito');
+      fontWeight: FontWeight.bold);
 
   static final _styleSubTitleB = TextStyle(
       fontSize: 17.0,
       color: Colors.white,
-      fontWeight: FontWeight.bold,
-      fontFamily: 'Nunito');
+      fontWeight: FontWeight.bold);
 
   static final _styleSubTitle = TextStyle(
       fontSize: 17.0,
       color: Colors.white,
-      fontWeight: FontWeight.normal,
-      fontFamily: 'Nunito');
+      fontWeight: FontWeight.normal);
 
   ///Selector de fecha
   DateTime selectedDate = DateTime.now();
@@ -89,8 +86,7 @@ class _NewItemState2 extends State<NewItem2> {
         textAlign: TextAlign.center,
         style: TextStyle(
             color: Colors.white,
-            fontSize: 16.0,
-            fontFamily: "Nunito"),
+            fontSize: 16.0),
       ),
       backgroundColor: alfa,
       duration: Duration(seconds: 3),
@@ -168,8 +164,7 @@ class _NewItemState2 extends State<NewItem2> {
                           child: Text(_item.title,
                               style: new TextStyle(
                                   fontSize: 22.0,
-                                  fontWeight: FontWeight.bold,
-                                  fontFamily: 'Nunito')),
+                                  fontWeight: FontWeight.bold)),
                         )
                       ]),
                       Row(children: <Widget>[

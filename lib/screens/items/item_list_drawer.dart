@@ -22,31 +22,29 @@ class _ItemListDrawerState extends State<ItemListDrawer> {
 
   /// Texto que acompaña a los sliders de busqueda
   static final _styleTextSliders =
-      TextStyle(fontSize: 17.0, color: Colors.grey[200], fontFamily: 'Nunito');
+      TextStyle(fontSize: 17.0, color: Colors.grey[200]);
 
   /// Botones para seleccionar categoría y ordenaciónc
   static final _styleFilterButton =
-      TextStyle(fontSize: 18.0, color: Colors.black, fontFamily: 'Nunito');
+      TextStyle(fontSize: 18.0, color: Colors.black);
 
   /// Títulos "¿Qué estás buscando?" (también para el alertdialog)
   static final _styleTitle = TextStyle(
       fontSize: 22.0,
       color: Colors.white,
-      fontWeight: FontWeight.bold,
-      fontFamily: 'Nunito');
+      fontWeight: FontWeight.bold);
 
   /// Texto del título del alertdialog
   static final _styleDialogTitle = TextStyle(
       fontSize: 19.0,
       color: Colors.white,
-      fontWeight: FontWeight.bold,
-      fontFamily: 'Nunito');
+      fontWeight: FontWeight.bold);
 
   /// Texto de los botones del alertdialog, para cuando esta seleccionado y no
   static final _styleDialogButtonsUnselected =
-      TextStyle(fontSize: 20.0, color: Colors.white, fontFamily: 'Nunito');
+      TextStyle(fontSize: 20.0, color: Colors.white);
   static final _styleDialogButtonsSelected =
-      TextStyle(fontSize: 20.0, color: Colors.black, fontFamily: 'Nunito');
+      TextStyle(fontSize: 20.0, color: Colors.black);
 
   FilterListClass _filterManager;
 
@@ -150,7 +148,7 @@ class _ItemListDrawerState extends State<ItemListDrawer> {
       overlayColor: Colors.white54, // al pulsar un boton
       valueIndicatorColor: Colors.grey[50], // indicador de xx €
       valueIndicatorTextStyle:
-          TextStyle(color: Colors.black, fontFamily: 'Nunito'),
+          TextStyle(color: Colors.black),
       activeTickMarkColor: Colors.transparent,
     );
 

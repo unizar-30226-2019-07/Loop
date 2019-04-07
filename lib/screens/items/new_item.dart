@@ -38,20 +38,17 @@ class _NewItemState extends State<NewItem> {
   static final _styleTitle = TextStyle(
       fontSize: 22.0,
       color: Colors.white,
-      fontWeight: FontWeight.bold,
-      fontFamily: 'Nunito');
+      fontWeight: FontWeight.bold);
 
   static final _styleSubTitleB = TextStyle(
       fontSize: 17.0,
       color: Colors.white,
-      fontWeight: FontWeight.bold,
-      fontFamily: 'Nunito');
+      fontWeight: FontWeight.bold);
 
   static final _styleSubTitle = TextStyle(
       fontSize: 17.0,
       color: Colors.white,
-      fontWeight: FontWeight.normal,
-      fontFamily: 'Nunito');
+      fontWeight: FontWeight.normal);
 
   ///Selección de foto 1 de galería
   imageSelectorGallery() async {
@@ -71,8 +68,7 @@ class _NewItemState extends State<NewItem> {
         textAlign: TextAlign.center,
         style: TextStyle(
             color: Colors.white,
-            fontSize: 16.0,
-            fontFamily: "Nunito"),
+            fontSize: 16.0),
       ),
       backgroundColor: alfa,
       duration: Duration(seconds: 3),

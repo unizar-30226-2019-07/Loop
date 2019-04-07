@@ -195,8 +195,7 @@ class _LoginPageState extends State<LoginPage>
         textAlign: TextAlign.center,
         style: TextStyle(
             color: Colors.white,
-            fontSize: 16.0,
-            fontFamily: "Nunito"),
+            fontSize: 16.0),
       ),
       backgroundColor: alfa,
       duration: Duration(seconds: 3),
@@ -225,8 +224,7 @@ class _LoginPageState extends State<LoginPage>
                   "Iniciar sesión",
                   style: TextStyle(
                       color: left,
-                      fontSize: 16.0,
-                      fontFamily: "Nunito"),
+                      fontSize: 16.0),
                 ),
               ),
             ),
@@ -240,8 +238,7 @@ class _LoginPageState extends State<LoginPage>
                   "Crear cuenta",
                   style: TextStyle(
                       color: right,
-                      fontSize: 16.0,
-                      fontFamily: "Nunito"),
+                      fontSize: 16.0),
                 ),
               ),
             ),
@@ -279,7 +276,6 @@ class _LoginPageState extends State<LoginPage>
                           controller: loginEmailController,
                           keyboardType: TextInputType.emailAddress,
                           style: TextStyle(
-                              fontFamily: "Nunito",
                               fontSize: 16.0,
                               color: Colors.black),
                           decoration: InputDecoration(
@@ -290,8 +286,7 @@ class _LoginPageState extends State<LoginPage>
                               size: 22.0,
                             ),
                             hintText: "Correo electrónico",
-                            hintStyle: TextStyle(
-                                fontFamily: "Nunito", fontSize: 17.0),
+                            hintStyle: TextStyle(fontSize: 17.0),
                           ),
                         ),
                       ),
@@ -308,7 +303,6 @@ class _LoginPageState extends State<LoginPage>
                           controller: loginPasswordController,
                           obscureText: _obscureTextLogin,
                           style: TextStyle(
-                              fontFamily: "Nunito",
                               fontSize: 16.0,
                               color: Colors.black),
                           decoration: InputDecoration(
@@ -319,8 +313,7 @@ class _LoginPageState extends State<LoginPage>
                               color: Colors.black,
                             ),
                             hintText: "Contraseña",
-                            hintStyle: TextStyle(
-                                fontFamily: "Nunito", fontSize: 17.0),
+                            hintStyle: TextStyle(fontSize: 17.0),
                             suffixIcon: GestureDetector(
                               onTap: _toggleLogin,
                               child: Icon(
@@ -464,7 +457,6 @@ class _LoginPageState extends State<LoginPage>
                           keyboardType: TextInputType.text,
                           textCapitalization: TextCapitalization.words,
                           style: TextStyle(
-                              fontFamily: "Nunito",
                               fontSize: 16.0,
                               color: Colors.black),
                           decoration: InputDecoration(
@@ -474,8 +466,7 @@ class _LoginPageState extends State<LoginPage>
                               color: Colors.black,
                             ),
                             hintText: "Nombre",
-                            hintStyle: TextStyle(
-                                fontFamily: "Nunito", fontSize: 16.0),
+                            hintStyle: TextStyle(fontSize: 16.0),
                           ),
                         ),
                       ),
@@ -493,7 +484,6 @@ class _LoginPageState extends State<LoginPage>
                           keyboardType: TextInputType.text,
                           textCapitalization: TextCapitalization.words,
                           style: TextStyle(
-                              fontFamily: "Nunito",
                               fontSize: 16.0,
                               color: Colors.black),
                           decoration: InputDecoration(
@@ -503,8 +493,7 @@ class _LoginPageState extends State<LoginPage>
                               color: Colors.black,
                             ),
                             hintText: "Apellidos",
-                            hintStyle: TextStyle(
-                                fontFamily: "Nunito", fontSize: 16.0),
+                            hintStyle: TextStyle(fontSize: 16.0),
                           ),
                         ),
                       ),
@@ -521,7 +510,6 @@ class _LoginPageState extends State<LoginPage>
                           controller: signupEmailController,
                           keyboardType: TextInputType.emailAddress,
                           style: TextStyle(
-                              fontFamily: "Nunito",
                               fontSize: 16.0,
                               color: Colors.black),
                           decoration: InputDecoration(
@@ -531,8 +519,7 @@ class _LoginPageState extends State<LoginPage>
                               color: Colors.black,
                             ),
                             hintText: "Correo electrónico",
-                            hintStyle: TextStyle(
-                                fontFamily: "Nunito", fontSize: 16.0),
+                            hintStyle: TextStyle(fontSize: 16.0),
                           ),
                         ),
                       ),
@@ -549,7 +536,6 @@ class _LoginPageState extends State<LoginPage>
                           controller: signupPasswordController,
                           obscureText: _obscureTextSignup,
                           style: TextStyle(
-                              fontFamily: "Nunito",
                               fontSize: 16.0,
                               color: Colors.black),
                           decoration: InputDecoration(
@@ -559,8 +545,7 @@ class _LoginPageState extends State<LoginPage>
                               color: Colors.black,
                             ),
                             hintText: "Contraseña",
-                            hintStyle: TextStyle(
-                                fontFamily: "Nunito", fontSize: 16.0),
+                            hintStyle: TextStyle(fontSize: 16.0),
                             suffixIcon: GestureDetector(
                               onTap: _toggleSignup,
                               child: Icon(
@@ -584,7 +569,6 @@ class _LoginPageState extends State<LoginPage>
                           controller: signupConfirmPasswordController,
                           obscureText: _obscureTextSignupConfirm,
                           style: TextStyle(
-                              fontFamily: "Nunito",
                               fontSize: 16.0,
                               color: Colors.black),
                           decoration: InputDecoration(
@@ -594,8 +578,7 @@ class _LoginPageState extends State<LoginPage>
                               color: Colors.black,
                             ),
                             hintText: "Confirmar contraseña",
-                            hintStyle: TextStyle(
-                                fontFamily: "Nunito", fontSize: 16.0),
+                            hintStyle: TextStyle(fontSize: 16.0),
                             suffixIcon: GestureDetector(
                               onTap: _toggleSignupConfirm,
                               child: Icon(

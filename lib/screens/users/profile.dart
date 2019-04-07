@@ -107,7 +107,7 @@ class _ProfileState extends State<Profile> {
         child: Text(
           displayText,
           style:
-              TextStyle(color: textColor, fontSize: 16.0, fontFamily: "Nunito"),
+              TextStyle(color: textColor, fontSize: 16.0),
         ),
       ),
     );

@@ -38,7 +38,10 @@ class Routes {
       title: 'Selit!',
       onGenerateRoute: _getRoute,
       initialRoute: '/',
-      theme: ThemeData(primaryColor: Color(0xFFC0392B)),
+      theme: ThemeData(
+        primaryColor: Color(0xFFC0392B),
+        fontFamily: 'Nunito',
+      ),
       home: newUser ? LoginPage() : Principal(),
     ));
   }

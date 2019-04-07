@@ -21,20 +21,17 @@ class _ItemDetails extends State<ItemDetails> {
   static final _styleTitle = TextStyle(
       fontSize: 20.0,
       color: Colors.black,
-      fontWeight: FontWeight.bold,
-      fontFamily: 'Nunito');
+      fontWeight: FontWeight.bold);
 
   static final styleTagWhite = TextStyle(
       fontSize: 18.0,
       color: Colors.white,
-      fontWeight: FontWeight.bold,
-      fontFamily: 'Nunito');
+      fontWeight: FontWeight.bold);
 
   static final styleTagBlack = TextStyle(
       fontSize: 22.0,
       color: Colors.black,
-      fontWeight: FontWeight.bold,
-      fontFamily: 'Nunito');
+      fontWeight: FontWeight.bold);
 
   static IconData _filledFavorite = Icons.favorite;
   static IconData _emptyFavorite = Icons.favorite_border;

@@ -26,19 +26,18 @@ class _ItemListState extends State<ItemList> {
 
   /// Texto de los filtros (precio, ubicacion, ordenacion)
   static final _styleFilters =
-      TextStyle(fontSize: 14.0, color: Colors.white, fontFamily: 'Nunito');
+      TextStyle(fontSize: 14.0, color: Colors.white);
 
   /// Titulos: 'Productos en venta'
   static final _styleTitle = TextStyle(
       fontSize: 22.0,
       color: Colors.white,
-      fontWeight: FontWeight.bold,
-      fontFamily: 'Nunito');
+      fontWeight: FontWeight.bold);
 
   /// Texto de 'Nada por aquí...'
   static final _styleNothing =
-      const TextStyle(fontSize: 20.0, color: Colors.grey, fontFamily: 'Nunito');
-  static final _styleSearchBar = TextStyle(fontFamily: 'Nunito');
+      const TextStyle(fontSize: 20.0, color: Colors.grey);
+  static final _styleSearchBar = TextStyle(); // TODO
 
   /// TODO quitar? Icono 'x'
   IconData _times = FontAwesomeIcons.times;
