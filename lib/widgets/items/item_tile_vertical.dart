@@ -49,7 +49,7 @@ class ItemTileVertical extends StatelessWidget {
                                           MediaQuery.of(context).size.width -
                                               255),
                                   child: Image.network(
-                                    _item.imageUrl,
+                                    'https://i.imgur.com/rqSvE0T.png', // TODO sustituir por .images
                                     width: 65.0,
                                     fit: BoxFit.contain,
                                   ),
@@ -66,7 +66,7 @@ class ItemTileVertical extends StatelessWidget {
                               constraints: new BoxConstraints(
                                   maxWidth:
                                       MediaQuery.of(context).size.width - 255),
-                              child: Text(_item.name,
+                              child: Text(_item?.title ?? '---',
                               style: new TextStyle(
                                 fontSize: 16.0,
                                 ),),
@@ -84,7 +84,7 @@ class ItemTileVertical extends StatelessWidget {
                                   maxWidth:
                                       MediaQuery.of(context).size.width - 260),
                               child: Text(
-                                _item.description,
+                                _item?.description ?? '---',
                                 overflow: TextOverflow.ellipsis,
                                 textAlign: TextAlign.justify,
                                 maxLines: 7,
@@ -102,7 +102,7 @@ class ItemTileVertical extends StatelessWidget {
                               top: 20,
                             ),
                             child: Container(
-                              child: Text(_item.price,
+                              child: Text('${_item?.price} ${_item?.currency}',
                               style: new TextStyle(
                                 
                                 fontSize: 16.0,

@@ -153,7 +153,7 @@ class _ItemDetails extends State<ItemDetails> {
                     padding: const EdgeInsets.fromLTRB(16.0, 10.0, 10.0, 0.0),
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      _item.name,
+                      _item?.title ?? '---',
                       style: descriptionStyle.copyWith(
                           fontSize: 23.0,
                           fontWeight: FontWeight.bold,
@@ -182,7 +182,7 @@ class _ItemDetails extends State<ItemDetails> {
                                   padding: const EdgeInsets.only(
                                       bottom: 8.0, left: 8.0),
                                   child: Text(
-                                    _item.price,
+                                    '${_item?.price} ${_item?.currency}',
                                     style: styleTagBlack,
                                   ),
                                 ),
@@ -206,7 +206,7 @@ class _ItemDetails extends State<ItemDetails> {
 
                 Container(
                     padding: const EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 15.0),
-                    child: Text(_item.description,
+                    child: Text(_item?.description ?? '---',
                         style:
                             TextStyle(fontSize: 15.0, color: Colors.black))),
                 Container(

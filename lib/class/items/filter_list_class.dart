@@ -5,7 +5,7 @@ class FilterListClass {
   // Nombres mostrar en el menú del drawer y burbujas de filtros
   static final List<String> categoryNames = [
     'Todas las categorías',
-    'Coches',
+    'Automoción',
     'Informática'
   ];
   static final List<String> typeNames = [
@@ -25,9 +25,9 @@ class FilterListClass {
 
   // Valores mínimo y máximo absoluto para los sliders de precio/distancia
   static final double absMinPrice = 0.0;
-  static final double absMaxPrice = 100.0;
+  static final double absMaxPrice = 10000.0;
   static final double absMinDistance = 0.0;
-  static final double absMaxDistance = 10000.0;
+  static final double absMaxDistance = 100000.0;
   double getAbsMinPrice() => absMinPrice;
   double getAbsMaxPrice() => absMaxPrice;
   double getAbsMinDistance() => absMinDistance;
@@ -47,6 +47,7 @@ class FilterListClass {
   String searchQuery = "";
   double minPrice = absMinPrice;
   double maxPrice = absMaxPrice;
+  // TODO no incluir distancia minima
   double minDistance = absMinDistance;
   double maxDistance = absMaxDistance;
   int categoryId = 0;
@@ -85,7 +86,7 @@ class FilterListClass {
     drawCallback();
   }
 
-  /// Añadir un filtro
+  /// Añadir un filtro (cualquier parámetro no null se añade a los filtros)
   void addFilter(
       {String newSearchQuery,
       double newMinPrice,
@@ -121,6 +122,8 @@ class FilterListClass {
     drawCallback();
   }
 
+  /// Obtener los filtros como una lista, empleado para las "burbujas"
+  /// de la parte superior de [ItemList]
   List<Map<String, dynamic>> getFiltersList() {
     List<Map<String, dynamic>> filters = new List<Map<String, dynamic>>();
     if (categoryId != 0) {
@@ -156,4 +159,26 @@ class FilterListClass {
     }
     return filters;
   }
+
+  /// Obtener los filtros como un mapa, empleado para las requests en [ItemRequest].
+  Map<String, String> getFiltersMap() {
+    Map<String, String> map = new Map<String, String>();
+    // SearchQuery
+    if (searchQuery != null && searchQuery.isNotEmpty) map.putIfAbsent("search", () => searchQuery);
+    // Tipos: venta o subasta
+    if (typeId == 1) map.putIfAbsent("type", () => "sale");
+    if (typeId == 2) map.putIfAbsent("type", () => "auction");
+    // Precio
+    map.putIfAbsent("priceFrom", () => minPrice.toString());
+    map.putIfAbsent("priceTo", () => maxPrice.toString());
+    // Distancia
+    map.putIfAbsent("distance", () => maxDistance.toString());
+    // Categoria, TODO obtener el nombre de la categoria de otra lista que no sea [categoryNames]
+    if (categoryId != 0) map.putIfAbsent("category", () => categoryNames[categoryId]);
+    // Ordenación
+    final _sortList = ['distance ASC', 'distance DESC', 'price ASC', 'price DESC'];
+    map.putIfAbsent("sort", () => _sortList[orderId]);
+    return map;
+  }
+
 }

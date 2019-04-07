@@ -32,8 +32,13 @@ class UsuarioClass {
             'Un usuario debe tener un número de estrellas entre 1 y 5');
 
   UsuarioClass.fromJson(Map<String, dynamic> json)
-      : this(nombre: json['first_name'], apellidos: json['last_name'], edad: 18, reviews: 30, numeroEstrellas: json ['rating'], sexo: json["gender"]);
-
+      : this(
+            nombre: json['first_name'],
+            apellidos: json['last_name'],
+            edad: 18,
+            reviews: 30,
+            numeroEstrellas: json['rating'],
+            sexo: json["gender"]);
 }
 
 /*

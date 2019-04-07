@@ -7,17 +7,26 @@ import 'package:selit/widgets/items/item_tile_vertical.dart';
 import 'package:selit/util/api/item_request.dart';
 import 'package:selit/class/item_class.dart';
 import 'package:selit/class/items/filter_list_class.dart';
-import 'dart:async';
 
 /// Listado de productos en venta, junto con una barra de búsqueda y una pantalla
-/// de filtros para seleccionar qué productos ver/cómo ordenarlos.
-/// Es posible colocar la vista en modo 1 columna o modo 2 columnas.
+/// de filtros para seleccionar qué productos ver/cómo ordenarlos ([ItemListDrawer] y [FilterListClass]).
+/// Es posible colocar la vista en modo 1 columna ([ItemTile]) o modo 2 columnas ([ItemTileVertical]).
+/// La carga de los productos se realiza de la siguiente forma:
+/// - Hay un parámetro [ITEMS_PER_PAGE] que indica cuantos items se piden a la API cada vez.
+/// - Al iniciar la vista, se pide la primera página de items (página 0), ver [_loadItems()]
+/// - Cuando ha cargado la primera página, se ve reflejado en la lista de la aplicación
+/// - Mientras se muestra al usuario una página, se intenta cargar la página siguiente
+/// - Para evitar repetir peticiones sobre la misma página, se almacena la última página
+///   cargada en [lastPetitionPage].
 class ItemList extends StatefulWidget {
   @override
   _ItemListState createState() => _ItemListState();
 }
 
 class _ItemListState extends State<ItemList> {
+  /// Número de items que se cargan cada vez en la lista
+  static const int ITEMS_PER_PAGE = 10;
+
   /// Lista de items a mostrar en la vista
   List<ItemClass> _items = <ItemClass>[];
 
@@ -25,14 +34,11 @@ class _ItemListState extends State<ItemList> {
   int _selectedColumns = 1;
 
   /// Texto de los filtros (precio, ubicacion, ordenacion)
-  static final _styleFilters =
-      TextStyle(fontSize: 14.0, color: Colors.white);
+  static final _styleFilters = TextStyle(fontSize: 14.0, color: Colors.white);
 
   /// Titulos: 'Productos en venta'
   static final _styleTitle = TextStyle(
-      fontSize: 22.0,
-      color: Colors.white,
-      fontWeight: FontWeight.bold);
+      fontSize: 22.0, color: Colors.white, fontWeight: FontWeight.bold);
 
   /// Texto de 'Nada por aquí...'
   static final _styleNothing =
@@ -99,13 +105,36 @@ class _ItemListState extends State<ItemList> {
   void initState() {
     super.initState();
     _filterManager = new FilterListClass(_updateFilters);
-    listenForItems();
+    _loadItems(0); // Cargar los primeros ITEMS_PER_PAGE objetos
   }
 
-  /// TODO Prueba para cargar fotos de cervezas
-  void listenForItems() async {
-    final Stream<ItemClass> stream = await ItemRequest.getItems();
-    stream.listen((ItemClass item) => setState(() => _items.add(item)));
+  // Última página de items que se ha pedido (para evitar repetir)
+  int lastPetitionPage = -1;
+
+  /// Ver si es necesario cargar los objetos de la página [pageNum] y, si es necesario, hacerlo
+  /// NOTA: llamar a esta función y no a [_getItemsData] para evitar peticiones erróneas
+  void _loadItems(int pageNum) {
+    if (pageNum > lastPetitionPage) {
+      lastPetitionPage = pageNum;
+      _getItemsData(pageNum);
+    }
+  }
+  
+  /// Petición de items desde [pageNum * ITEMS_PER_PAGE] hasta [(pageNum + 1) * ITEMS_PER_PAGE - 1]
+  /// Es decir, la página [pageNum]
+  /// Ejemplo: página 0 -> items del 0 al 9 (10 items en total)
+  void _getItemsData(int pageNum) async {
+    // Petición de items
+    List<ItemClass> receivedItems = await ItemRequest.getItems(
+        lat: 0.0,
+        lng: 0.0,
+        filters: _filterManager,
+        size: ITEMS_PER_PAGE,
+        page: pageNum);
+    // Evitar mostrar más items si se ha llegado al fin de la lista
+    if (receivedItems.length < ITEMS_PER_PAGE) lastPetitionPage++;
+    // Mostrar los items en la lista
+    setState(() => _items.addAll(receivedItems));
   }
 
   /// Menú superior: barra de búsquerda y botón para abrir el menú izquierdo de filtros
@@ -127,7 +156,8 @@ class _ItemListState extends State<ItemList> {
           Expanded(
             child: Container(
               padding: EdgeInsets.only(right: 10.0),
-              child: TextField( // TODO cambiar onSubmitted por onChanged? (igual son muchas peticiones)
+              child: TextField(
+                // TODO cambiar onSubmitted por onChanged? (igual son muchas peticiones)
                 onSubmitted: (value) =>
                     _filterManager.addFilter(newSearchQuery: value),
                 cursorColor: Theme.of(context).primaryColor,
@@ -217,7 +247,10 @@ class _ItemListState extends State<ItemList> {
         return ListView.builder(
           padding: EdgeInsets.symmetric(horizontal: 15.0),
           itemCount: _items.length,
-          itemBuilder: (context, index) => ItemTile(_items[index]),
+          itemBuilder: (context, index) {
+            _loadItems(index ~/ ITEMS_PER_PAGE);
+            return ItemTile(_items[index]);
+          },
         );
       } else {
         // Vista de objetos en dos columnas (StaggeredGridView, importado)

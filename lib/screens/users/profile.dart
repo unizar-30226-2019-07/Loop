@@ -60,15 +60,16 @@ class _ProfileState extends State<Profile> {
   @override
   void initState() {
     super.initState();
-    listenForItems();
   }
 
+/*
   void listenForItems() async {
     final Stream<ItemClass> stream = await ItemRequest.getItems();
     stream.listen((ItemClass item) {
       setState(() => _itemsEnVenta.add(item));
     });
   }
+*/
 
   Future<void> _loadProfile(int _userId) async {
     // Mostrar usuario placeholder mientras carga el real
