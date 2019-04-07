@@ -8,23 +8,28 @@ class UsuarioClass {
   String nombre;
   String apellidos;
   String sexo;
+  String email;
   int edad;
   String ubicacionCiudad; // Ej: Zaragoza
   String ubicacionResto; // Ej: Aragon, España
   double numeroEstrellas;
   int reviews;
   String urlPerfil;
+  int user_id;
 
   UsuarioClass(
-      {this.nombre,
+      {
+      this.nombre,
       this.apellidos,
       this.sexo,
+      this.email,
       this.edad,
       this.ubicacionCiudad,
       this.ubicacionResto,
       this.numeroEstrellas,
       this.reviews,
-      this.urlPerfil})
+      this.urlPerfil,
+      this.user_id})
       : assert(edad > 0, 'Un usuario no puede tener edad negativa'),
         assert(reviews > 0,
             'Un usuario no puede tener número de reviews negativo'),
@@ -33,12 +38,27 @@ class UsuarioClass {
 
   UsuarioClass.fromJson(Map<String, dynamic> json)
       : this(
+            user_id: json['id'],
             nombre: json['first_name'],
             apellidos: json['last_name'],
             edad: 18,
             reviews: 30,
             numeroEstrellas: json['rating'],
-            sexo: json["gender"]);
+            sexo: json["gender"],
+            email: json["email"]);
+
+  void update(String _nombre, String _apellidos, String _sexo){
+    this.nombre=_nombre;
+    this.apellidos=_apellidos;
+    this.sexo=_sexo;
+  }
+
+  Map<String, dynamic> toJsonEdit() => {
+    "email": email,
+    "first_name": nombre,
+    "last_name": apellidos,
+    "gender": sexo,
+  };
 }
 
 /*

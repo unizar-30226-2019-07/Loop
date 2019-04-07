@@ -369,7 +369,7 @@ class _NewItemState2 extends State<NewItem2> {
                             color: Color(0xffc0392b),
                             child: const Text('Subir producto',
                                 style: TextStyle(color: Colors.white)),
-                            onPressed: () {
+                            onPressed: () async{
                               if (_priceController.text.length < 1 ||
                                   _tipoPrecio == '' ||
                                   _divisa == '') {
