@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:selit/class/usuario_class.dart';
 import 'package:selit/widgets/profile_picture.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:selit/util/useredit.dart';
 
 /// Página de edición de perfil (formulario con los campos
 /// necesarios para modificar los atributos del usuario)
@@ -27,6 +28,8 @@ class _EditProfileState extends State<EditProfile> {
   final TextEditingController _sexController = new TextEditingController();
   final TextEditingController _yearController = new TextEditingController();
 
+   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+
   /// Usuario a mostrar en el perfil
   UsuarioClass _user;
 
@@ -47,6 +50,23 @@ class _EditProfileState extends State<EditProfile> {
     _yearController.text = _user.edad.toString();
     _galleryFile = null;
     _sexo = _user.sexo;
+  }
+
+    void showInSnackBar(String value, Color alfa) {
+    
+    FocusScope.of(context).requestFocus(new FocusNode());
+    _scaffoldKey.currentState?.removeCurrentSnackBar();
+    _scaffoldKey.currentState.showSnackBar(new SnackBar(
+      content: new Text(
+        value,
+        textAlign: TextAlign.center,
+        style: TextStyle(
+            color: Colors.white,
+            fontSize: 16.0),
+      ),
+      backgroundColor: alfa,
+      duration: Duration(seconds: 3),
+    ));
   }
 
   /// Widget correspondiente a la edición del perfil del usuario _user
@@ -306,7 +326,57 @@ class _EditProfileState extends State<EditProfile> {
                     child: new RaisedButton(
                       color: Color(0xffc0392b),
                       child: const Text('Guardar cambios', style: TextStyle( color: Colors.white)),
-                      onPressed: () {},
+                      onPressed: ()async {
+                        
+                         
+                      if (_nameController.text.length < 1 || _surnameController.text.length < 1){
+                        showInSnackBar("Rellena toodos los campos correctamente", Colors.yellow);
+                      }
+
+                      
+                      else{
+                        print('LLEGA');
+                        UsuarioClass _user2=_user;
+                        _user2.update(_nameController.text, _surnameController.text, _sexo);
+
+                        print('LLEGA2');
+
+                        /*
+                        edit(_user2).then((response){
+                        
+                          final Color legit = Colors.blue.withOpacity(0.5);
+                          final Color fake = Colors.red.withOpacity(0.5);
+                            if(response.statusCode == 200){
+                              print(response.body);
+                              showInSnackBar("Datos actualizados correctamente", legit);
+                              
+                            }
+                            else if(response.statusCode == 401){
+                              print(response.statusCode);
+                              print(response.body);
+                              showInSnackBar("No autorizado", fake);
+                            }
+                            else if(response.statusCode == 402){
+                              print(response.statusCode);
+                              print(response.body);
+                              showInSnackBar("Prohibido", fake);
+                            }
+                             else{
+                              print(response.statusCode);
+                              print(response.body);
+                              showInSnackBar("No encontrado", fake);
+                             }
+                             
+                        }
+                        
+                        ).catchError((error){
+                            print('error : $error');
+                      }
+                      
+                        );
+                      
+                      */}                       
+                    },
                     )),
               ],
             )));
@@ -314,6 +384,8 @@ class _EditProfileState extends State<EditProfile> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: _buildForm());
+    return Scaffold(
+      key: _scaffoldKey,
+      body: _buildForm());
   }
 }
