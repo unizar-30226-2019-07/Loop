@@ -38,7 +38,7 @@ class UsuarioClass {
 
   UsuarioClass.fromJson(Map<String, dynamic> json)
       : this(
-            user_id: json['id'],
+            user_id: json['idUsuario'],
             nombre: json['first_name'],
             apellidos: json['last_name'],
             edad: 18,

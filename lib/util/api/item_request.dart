@@ -8,13 +8,14 @@ import 'dart:io';
 
 /// Interacciones con la API relacionadas con items (productos, objetos)
 class ItemRequest {
+
+  /// Obtener lista de items (para la pantalla principal)
   static Future<List<ItemClass>> getItems(
       {@required double lat,
       @required double lng,
       int size,
       int page,
       @required FilterListClass filters}) async {
-
     // Mapa empleado para generar los parámetros de la request
     Map<String, String> _params = filters
         .getFiltersMap(); // search, priceFrom/To, distance, category, types, sort
@@ -42,8 +43,41 @@ class ItemRequest {
         return products;
         break;
       default:
-        return List<
-            ItemClass>(); // TODO solo existe el codigo 200, no hay casos de error?
+        return List<ItemClass>(); // TODO solo existe el codigo 200, no hay casos de error?
     }
   }
+
+  /// Obtener listado de objetos en venta/vendidos por un usuario
+  /// Por ahora se piden todos los items del usuario a la vez,
+  /// sin cargar por páginas
+  static Future<List<ItemClass>> getItemsFromUser(
+      {@required int userId, @required String status}) async {
+    
+    // TODO workaround para ignorar la distancia de los objetos
+    String _paramsString = '?lat=0.0&lng=0.0&distance=99999999.9';
+    // Si status no es ni "en venta" ni "vendido", default a "en venta"
+    String _statusParam = status == "vendido" ? status : "en venta";
+    _paramsString += "&owner=$userId&status=$_statusParam";
+
+    // Esperar la respuesta de la petición
+    http.Response response = await http
+        .get('${APIConfig.BASE_URL}/products$_paramsString', headers: {
+      HttpHeaders.contentTypeHeader: ContentType.json.toString(),
+      HttpHeaders.authorizationHeader: await APIConfig.getToken()
+    });
+
+    // Crear la lista de items a partir de la respuesta y devovlerla
+    switch (response.statusCode) {
+      case 200:
+        List<ItemClass> products = new List<ItemClass>();
+        (json.jsonDecode(response.body) as List<dynamic>).forEach((userJson) {
+          products.add(ItemClass.fromJson(userJson));
+        });
+        return products;
+        break;
+      default:
+        return List<ItemClass>(); // TODO solo existe el codigo 200, no hay casos de error?
+    }
+  }
+  
 }

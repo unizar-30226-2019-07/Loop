@@ -47,13 +47,15 @@ class _ProfileState extends State<Profile> {
 
   // Objetos en venta y vendidos
   List<ItemClass> _itemsEnVenta = <ItemClass>[];
+  bool _itemsEnVentaEmpty = false; // diferenciar entre cargando y no hay
   List<ItemClass> _itemsVendidos = <ItemClass>[];
+  bool _itemsVendidosEmpty = false; // diferenciar entre cargando y no hay
 
   /// Usuario a mostrar en el perfil (null = placeholder)
   static UsuarioClass _user;
 
   _ProfileState(int _userId) {
-    _loadProfile(_userId);
+    _loadProfile(_userId).then((_) => _loadProfileItems());
   }
 
   // TODO solamente está aqui para cargar las cervezas de test
@@ -74,11 +76,39 @@ class _ProfileState extends State<Profile> {
   Future<void> _loadProfile(int _userId) async {
     // Mostrar usuario placeholder mientras carga el real
     if (_user == null) {
-      UsuarioRequest.getUserById(_userId).then((realUser) {
+      await UsuarioRequest.getUserById(_userId).then((realUser) {
         setState(() {
           _user = realUser;
         });
       });
+    }
+  }
+
+  void _loadProfileItems() {
+    if (_user?.user_id == null) {
+      print('ERROR: Intentando cargar objetos de un usuario sin ID');
+    } else {
+      // Cargar los objetos en venta y vendidos para el usuario
+      ItemRequest.getItemsFromUser(userId: _user.user_id, status: "en venta")
+          .then((itemsVenta) {
+            setState(() {
+              if (itemsVenta.isEmpty) {
+                _itemsEnVentaEmpty = true;
+              } else {
+                _itemsEnVenta = itemsVenta;
+              }
+            });
+          });
+      ItemRequest.getItemsFromUser(userId: _user.user_id, status: "vendido")
+          .then((itemsVendidos) {
+            setState(() {
+              if (itemsVendidos.isEmpty) {
+                _itemsVendidosEmpty = true;
+              } else {
+                _itemsVendidos = itemsVendidos;
+              }
+            });
+          });
     }
   }
 
@@ -107,8 +137,7 @@ class _ProfileState extends State<Profile> {
         onPressed: onPress,
         child: Text(
           displayText,
-          style:
-              TextStyle(color: textColor, fontSize: 16.0),
+          style: TextStyle(color: textColor, fontSize: 16.0),
         ),
       ),
     );
@@ -225,45 +254,73 @@ class _ProfileState extends State<Profile> {
       ),
     ]);
 
-    Widget wProductListSelling = _itemsEnVenta.isEmpty
-        ? Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Icon(Icons.not_interested, color: Colors.grey, size: 65.0),
-              Container(
-                padding: EdgeInsets.only(top: 10),
-                child: Text('Nada por aquí...', style: _styleNothing),
-              )
-            ],
-          )
-        : Container(
-            margin: EdgeInsets.only(top: 5),
-            child: ListView.builder(
-              padding: EdgeInsets.symmetric(horizontal: 15),
-              itemCount: _itemsEnVenta.length,
-              itemBuilder: (context, index) => ItemTile(_itemsEnVenta[index]),
-            ),
-          );
+    Widget wProductListSelling;
+    if (_itemsEnVenta.isEmpty) {
+      if (_itemsEnVentaEmpty) {  // Efectivamente esta vacio, no esta cargando
+        wProductListSelling = Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Icon(Icons.not_interested, color: Colors.grey, size: 65.0),
+            Container(
+              padding: EdgeInsets.only(top: 10),
+              child: Text('Nada por aquí...', style: _styleNothing),
+            )
+          ],
+        );
+      } else { // Todavia esta cargando
+        wProductListSelling = Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            CircularProgressIndicator(
+                strokeWidth: 5.0,
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.grey[600])),
+          ],
+        );
+      }
+    } else {
+      wProductListSelling = Container(
+        margin: EdgeInsets.only(top: 5),
+        child: ListView.builder(
+          padding: EdgeInsets.symmetric(horizontal: 15),
+          itemCount: _itemsEnVenta.length,
+          itemBuilder: (context, index) => ItemTile(_itemsEnVenta[index]),
+        ),
+      );
+    }
 
-    Widget wProductListSold = _itemsVendidos.isEmpty
-        ? Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Icon(Icons.not_interested, color: Colors.grey, size: 65.0),
-              Container(
-                padding: EdgeInsets.only(top: 10),
-                child: Text('Nada por aquí...', style: _styleNothing),
-              )
-            ],
-          )
-        : Container(
-            margin: EdgeInsets.only(top: 5),
-            child: ListView.builder(
-              padding: EdgeInsets.symmetric(horizontal: 15),
-              itemCount: _itemsVendidos.length,
-              itemBuilder: (context, index) => ItemTile(_itemsVendidos[index]),
-            ),
-          );
+    Widget wProductListSold;
+    if (_itemsVendidos.isEmpty) {
+      if (_itemsVendidosEmpty) { // Efectivamente esta vacio, no esta cargando
+        wProductListSold = Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Icon(Icons.not_interested, color: Colors.grey, size: 65.0),
+            Container(
+              padding: EdgeInsets.only(top: 10),
+              child: Text('Nada por aquí...', style: _styleNothing),
+            )
+          ],
+        );
+      } else { // Todavia esta cargando
+        wProductListSold = Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            CircularProgressIndicator(
+                strokeWidth: 5.0,
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.grey[600])),
+          ],
+        );
+      }
+    } else {
+      wProductListSold = Container(
+        margin: EdgeInsets.only(top: 5),
+        child: ListView.builder(
+          padding: EdgeInsets.symmetric(horizontal: 15),
+          itemCount: _itemsVendidos.length,
+          itemBuilder: (context, index) => ItemTile(_itemsVendidos[index]),
+        ),
+      );
+    }
 
     // NOTA: la 'sincronizacion rapida' de los cambios de Flutter no
     // suele funcionar con los cambios realizados a las listas,
@@ -351,8 +408,8 @@ class _ProfileState extends State<Profile> {
       // Botón para añadir nuevos items
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-            Navigator.of(context).pushNamed('/new-item');
-          },
+          Navigator.of(context).pushNamed('/new-item');
+        },
         backgroundColor: Theme.of(context).primaryColor,
         child: Icon(Icons.add, size: 30.0),
       ),
