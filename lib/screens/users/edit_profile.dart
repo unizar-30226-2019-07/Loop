@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:selit/class/usuario_class.dart';
 import 'package:selit/widgets/profile_picture.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:selit/util/useredit.dart';
+import 'package:selit/util/api/usuario_edit.dart';
 
 /// Página de edición de perfil (formulario con los campos
 /// necesarios para modificar los atributos del usuario)
@@ -327,22 +327,13 @@ class _EditProfileState extends State<EditProfile> {
                       color: Color(0xffc0392b),
                       child: const Text('Guardar cambios', style: TextStyle( color: Colors.white)),
                       onPressed: ()async {
-                        
-                         
+   
                       if (_nameController.text.length < 1 || _surnameController.text.length < 1){
                         showInSnackBar("Rellena toodos los campos correctamente", Colors.yellow);
                       }
-
-                      
                       else{
-                        print('LLEGA');
-                        UsuarioClass _user2=_user;
-                        _user2.update(_nameController.text, _surnameController.text, _sexo);
-
-                        print('LLEGA2');
-
-                        /*
-                        edit(_user2).then((response){
+                        _user.update(_nameController.text, _surnameController.text, _sexo);
+                        edit(_user).then((response){
                         
                           final Color legit = Colors.blue.withOpacity(0.5);
                           final Color fake = Colors.red.withOpacity(0.5);
@@ -365,17 +356,15 @@ class _EditProfileState extends State<EditProfile> {
                               print(response.statusCode);
                               print(response.body);
                               showInSnackBar("No encontrado", fake);
-                             }
-                             
+                             }   
                         }
-                        
                         ).catchError((error){
                             print('error : $error');
                       }
                       
                         );
                       
-                      */}                       
+                      }                       
                     },
                     )),
               ],
