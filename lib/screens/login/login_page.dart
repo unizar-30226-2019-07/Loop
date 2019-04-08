@@ -141,6 +141,8 @@ class _LoginPageState extends State<LoginPage>
         } else {
           showInSnackBar("La dirección de correo ya existe", _colorStatusBarBad);
         }
+      }).catchError((error) {
+        showInSnackBar("No hay conexión a internet", _colorStatusBarBad);
       });
   }
 

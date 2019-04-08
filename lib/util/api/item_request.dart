@@ -81,23 +81,25 @@ class ItemRequest {
     }
   }
 
-  // TODO borrar
-  static String postToJson(ItemClass data) {
-    final dyn = data.toJsonCreate();
-    print(dyn);
-    return json.jsonEncode(dyn);
-  }
-    
   /// Subir producto
-  static Future<http.Response> create(ItemClass chain) async {
+  static Future<void> create(ItemClass item) async {
     final response = await http.post('${APIConfig.BASE_URL}/products',
         headers: {
         HttpHeaders.contentTypeHeader: ContentType.json.toString(),
         HttpHeaders.authorizationHeader: await Storage.loadToken(),
         },
-        body: postToJson(chain),
+        body: json.jsonEncode(item.toJsonCreate()),
     );
-    return response;
+
+    // Crear la lista de items a partir de la respuesta y devovlerla
+    switch (response.statusCode) {
+      case 201: // Item creado, todo OK
+        break;
+      case 401:
+        throw("No autorizado");
+      case 402:
+        throw("Prohibido");
+    }
   }
   
 }

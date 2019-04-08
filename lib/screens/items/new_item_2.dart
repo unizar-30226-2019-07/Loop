@@ -46,6 +46,9 @@ class _NewItemState2 extends State<NewItem2> {
     _galleryFile2 = null;
   }
 
+  final Color _colorStatusBarGood = Colors.blue.withOpacity(0.5);
+  final Color _colorStatusBarBad = Colors.red.withOpacity(0.5);
+
   /// Titulos
   static final _styleTitle = TextStyle(
       fontSize: 22.0, color: Colors.white, fontWeight: FontWeight.bold);
@@ -89,36 +92,21 @@ class _NewItemState2 extends State<NewItem2> {
     if (_priceController.text.length < 1 ||
         _tipoPrecio == '' ||
         _divisa == '') {
-      showInSnackBar("Rellena toodos los campos correctamente", Colors.yellow);
+      showInSnackBar("Rellena todos los campos correctamente", Colors.yellow);
     } else {
       ///TODO cambiar sale por __tipoPrecio cuando estén implementadas las subastas
       _item.update("sale", double.parse(_priceController.text), _divisa);
 
-      ItemRequest.create(_item).then((response) {
-        final Color legit = Colors.blue.withOpacity(0.5);
-        final Color fake = Colors.red.withOpacity(0.5);
-        if (response.statusCode == 201) {
-          print(response.body);
-          showInSnackBar("Datos actualizados correctamente", legit);
+      ItemRequest.create(_item).then((_) {
+          showInSnackBar("Datos actualizados correctamente", _colorStatusBarGood);
           Navigator.of(context).pop();
           Navigator.of(context).pop();
-
-        } else if (response.statusCode == 401) {
-          print(response.statusCode);
-          print(response.body);
-          showInSnackBar("No autorizado", fake);
-        } else if (response.statusCode == 402) {
-          print(response.statusCode);
-          print(response.body);
-          showInSnackBar(
-              "Prohibido (sin permisos para asociar al propietario)", fake);
-        } else {
-          print(response.statusCode);
-          print(response.body);
-          showInSnackBar("Error", fake);
-        }
       }).catchError((error) {
-        print('error : $error');
+        if (error == "No autorizado" || error == "Prohibido") {
+          showInSnackBar("Acción no autorizada", _colorStatusBarBad);
+        } else {
+          showInSnackBar("No hay conexión a internet", _colorStatusBarBad);
+        }
       });
     }
   }

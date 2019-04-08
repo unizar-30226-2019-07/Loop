@@ -69,20 +69,20 @@ class UsuarioClass {
     "first_name": nombre,
     "last_name": apellidos,
     "gender": sexo,
-    "location":{
-          "lat": locationLat,
-          "lng": locationLng,
-        },
+    "location": {
+      "lat": locationLat,
+      "lng": locationLng,
+    },
   };
 
   Map<String, dynamic> toJsonForSignUp() => {
     "email": email,
     "first_name": nombre,
     "last_name": apellidos,
-    "location":{
-          "lat": locationLat,
-          "lng": locationLng,
-        },
+    "location": {
+      "lat": locationLat,
+      "lng": locationLng,
+    },
   };
 }
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:selit/class/usuario_class.dart';
 import 'package:selit/util/storage.dart';
 import 'package:selit/util/api/usuario_request.dart';
 
@@ -11,7 +12,7 @@ class LoadingScreen extends StatefulWidget {
 }
 
 class _LoadingScreenState extends State<LoadingScreen> {
-  static const TIMEOUT = const Duration(seconds: 5);
+  static const TIMEOUT = const Duration(seconds: 7);
 
   final _styleLoading = TextStyle(color: Colors.white, fontSize: 18.0);
 
@@ -20,23 +21,31 @@ class _LoadingScreenState extends State<LoadingScreen> {
   /// TODO quitar los print cuando se vea necesario
   Future<bool> _checkForLoggedUser(BuildContext context) async {
     bool legitUser = false;
-    await Storage.loadToken().then((token) async {
-      if (token == null) {
-        print('LOADING: No hay token');
+    String token = await Storage.loadToken();
+    if (token == null) {
+      print('LOADING: No hay token');
+    } else {
+      UsuarioClass receivedUser = await UsuarioRequest.getUserById(0);
+      if (receivedUser == null) {
+        print('LOADING: Había token pero no era válido');
+        Storage.deleteToken();
       } else {
-        await UsuarioRequest.getUserById(0).then((receivedUser) {
-          if (receivedUser == null) {
-            print('LOADING: Había token pero no era válido');
-            Storage.deleteToken();
-          } else {
-            print('LOADING: Usuario registrado');
-            legitUser = true;
-          }
-        });
+        print('LOADING: Usuario registrado');
+        legitUser = true;
       }
-    });
+    }
     return legitUser;
   }
+
+  void _showErrorDialog(BuildContext context) {
+    // TODO comprobar si el usuario tiene internet
+    AlertDialog dialogo = AlertDialog(
+      title: Text('Error al iniciar sesión'),
+      content: Text('No se ha podido conectar al servidor'),
+    );
+    showDialog(context: context, builder: (context) => dialogo);
+  }
+
 
   /// Intentar comprobar si hay un usuario logueado,
   /// si no se puede comprobar tras [TIMEOUT] mostrar un mensaje
@@ -55,14 +64,11 @@ class _LoadingScreenState extends State<LoadingScreen> {
         Navigator.of(context).pushNamed('/login-page');
       }
     }).timeout(TIMEOUT, onTimeout: () {
-      // TODO diferenciar internet de usuario o de la app
-      print('timeout');
-      AlertDialog dialogo = AlertDialog(
-        title: Text('Error al iniciar sesión'),
-        content: Text('No se ha podido conectar al servidor'),
-      );
-      showDialog(context: context, builder: (context) => dialogo);
+      _showErrorDialog(context);
+    }).catchError((_) {
+      _showErrorDialog(context);
     });
+
   }
 
   @override
