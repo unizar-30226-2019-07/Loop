@@ -75,7 +75,8 @@ class _LoginPageState extends State<LoginPage>
 
   /// Intenta hacer login de un usuario con email y contraseña
   /// según lo escrito en los campos de texto
-  /// Si se loguea correctamente, TODO...
+  /// Si se loguea correctamente, se almacena el token, se informa al usuario
+  /// y se redirige a la pantalla [Principal]
   /// Si no se loguea correctamente, muestra un aviso al usuario de que
   /// no se ha podido iniciar sesión correctamente
   void _tryLogin() async {
@@ -95,7 +96,8 @@ class _LoginPageState extends State<LoginPage>
   }
 
   /// Hacer registro de usuario con los campos del formulario
-  /// Si el registro es correcto, TODO...
+  /// Si el registro es correcto, se realiza una petición con los datos
+  /// introducidos en el formulario y se informa al usuario del resultado
   /// Si el registro no es correcto, se muestra al usuario el
   /// error cometido (contraseñas no coinciden, etc.)
   void _trySignUp() async {

@@ -42,6 +42,10 @@ class _LoadingScreenState extends State<LoadingScreen> {
     AlertDialog dialogo = AlertDialog(
       title: Text('Error al iniciar sesión'),
       content: Text('No se ha podido conectar al servidor'),
+      actions: <Widget> [
+        // TODO borrar al terminar el debug
+        FlatButton(child: Text('Entrar igualmente'), onPressed: () { Navigator.of(context).pushNamed('/principal'); })
+      ],
     );
     showDialog(context: context, builder: (context) => dialogo);
   }

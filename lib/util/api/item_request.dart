@@ -44,7 +44,7 @@ class ItemRequest {
         return products;
         break;
       default:
-        return List<ItemClass>(); // TODO solo existe el codigo 200, no hay casos de error?
+        return List<ItemClass>(); // TODO casos de error + throw
     }
   }
 
@@ -77,7 +77,7 @@ class ItemRequest {
         return products;
         break;
       default:
-        return List<ItemClass>(); // TODO solo existe el codigo 200, no hay casos de error?
+        return List<ItemClass>(); // TODO casos de error + throw
     }
   }
 
