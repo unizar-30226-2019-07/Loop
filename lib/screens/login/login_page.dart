@@ -82,7 +82,7 @@ class _LoginPageState extends State<LoginPage>
     UsuarioRequest.login(
             loginEmailController.text, loginPasswordController.text)
         .then((loginToken) {
-      if (loginToken == null) {
+      if (loginToken != null) {
         // login incorrecto
         showInSnackBar("Logueado satisfactoriamente", _colorStatusBarGood);
         _delayPrincipal();

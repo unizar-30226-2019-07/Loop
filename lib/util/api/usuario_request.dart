@@ -21,7 +21,7 @@ class UsuarioRequest {
     switch (response.statusCode) {
       case 200: // Login OK
         TokenClass receivedToken =
-            TokenClass(token: response.headers[HttpHeaders.authorizationHeader]);
+            TokenClass(response.headers[HttpHeaders.authorizationHeader]);
         Storage.saveToken(receivedToken.token);
         return receivedToken;
         break;
@@ -49,11 +49,13 @@ class UsuarioRequest {
   static Future<UsuarioClass> getUserById(int userId) async {
     http.Response response;
     if (userId == 0) {
-      response = await http.get('${APIConfig.BASE_URL}/me', headers: {
+      print('GET /users/me');
+      response = await http.get('${APIConfig.BASE_URL}/users/me', headers: {
           HttpHeaders.contentTypeHeader: ContentType.json.toString(),
           HttpHeaders.authorizationHeader: await Storage.loadToken(),
       });
     } else {
+      print('GET /users/$userId');
       response = await http.get('${APIConfig.BASE_URL}/users/$userId', headers: {
           HttpHeaders.contentTypeHeader: ContentType.json.toString(),
           HttpHeaders.authorizationHeader: await Storage.loadToken(),

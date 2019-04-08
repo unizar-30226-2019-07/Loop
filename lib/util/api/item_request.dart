@@ -81,6 +81,7 @@ class ItemRequest {
     }
   }
 
+  // TODO borrar
   static String postToJson(ItemClass data) {
     final dyn = data.toJsonCreate();
     print(dyn);

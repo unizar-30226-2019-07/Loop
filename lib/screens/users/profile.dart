@@ -89,6 +89,7 @@ class _ProfileState extends State<Profile> {
       print('ERROR: Intentando cargar objetos de un usuario sin ID');
     } else {
       // Cargar los objetos en venta y vendidos para el usuario
+      // TODO excepción al terminar de cargar los objetos cuando se ha cambiado de pantalla
       ItemRequest.getItemsFromUser(userId: _user.user_id, status: "en venta")
           .then((itemsVenta) {
             setState(() {
