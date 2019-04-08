@@ -68,7 +68,7 @@ class ItemClass {
             status: json['status'],
             numViews: json['nvis'],
             numLikes: json['nfav'],
-            owner: UsuarioClass(), //UsuarioClass.fromJson(json['owner']), TODO ubicacion
+            owner: UsuarioClass.fromJson(json['owner']),
             images: List<ImageClass>() /* TODO */);
 
   void update(String _type, double _price, String _currency) {
@@ -81,7 +81,7 @@ class ItemClass {
   Map<String, dynamic> toJsonCreate() => {
         "type": type,
         "title": title,
-        "owner_id": 88,
+        "owner_id": owner.user_id,
         "description": description,
         "location": {
           "lat": locationLat,

@@ -85,21 +85,12 @@ class _NewItemState extends State<NewItem> {
     } else {
       _item = ItemClass(
           itemId: 0,
-          type: null,
           title: _titleController.text,
           description: _descriptionController.text,
-          published: null,
           locationLat: _user.locationLat,
           locationLng: _user.locationLng,
-          distance: null,
           category: _categoria,
-          price: null,
-          currency: null,
-          status: null,
-          numViews: null,
-          numLikes: null,
-          owner: _user,
-          images: null);
+          owner: _user);
 
       Navigator.of(context).pushNamed('/new-item2', arguments: _item);
     }
