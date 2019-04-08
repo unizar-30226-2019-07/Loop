@@ -77,6 +77,34 @@ class _NewItemState extends State<NewItem> {
     ));
   }
 
+  void createItem() {
+    if (_titleController.text.length < 1 ||
+        _descriptionController.text.length < 1 ||
+        _categoria == '') {
+      showInSnackBar("Rellena toodos los campos correctamente", Colors.yellow);
+    } else {
+      _item = ItemClass(
+          itemId: 0,
+          type: null,
+          title: _titleController.text,
+          description: _descriptionController.text,
+          published: null,
+          locationLat: _user.locationLat,
+          locationLng: _user.locationLng,
+          distance: null,
+          category: _categoria,
+          price: null,
+          currency: null,
+          status: null,
+          numViews: null,
+          numLikes: null,
+          owner: _user,
+          images: null);
+
+      Navigator.of(context).pushNamed('/new-item2', arguments: _item);
+    }
+  }
+
   ///Títulos iniciales
   Widget _buildBottomMenu() {
     return Container(
@@ -285,34 +313,7 @@ class _NewItemState extends State<NewItem> {
                       child: const Text('Siguiente',
                           style: TextStyle(color: Colors.white)),
                       onPressed: () {
-                        if (_titleController.text.length < 1 ||
-                            _descriptionController.text.length < 1 ||
-                            _categoria == '') {
-                          showInSnackBar(
-                              "Rellena toodos los campos correctamente",
-                              Colors.yellow);
-                        } else {
-                          _item = ItemClass(
-                              itemId: 0,
-                              type: null,
-                              title: _titleController.text,
-                              description: _descriptionController.text,
-                              published: null,
-                              locationLat: _user.locationLat,
-                              locationLng: _user.locationLng,
-                              distance: null,
-                              category: _categoria,
-                              price: null,
-                              currency: null,
-                              status: null,
-                              numViews: null,
-                              numLikes: null,
-                              owner: _user,
-                              images: null);
-
-                          Navigator.of(context)
-                              .pushNamed('/new-item2', arguments: _item);
-                        }
+                        createItem();
                       },
                     )),
               ],

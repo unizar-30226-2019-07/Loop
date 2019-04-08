@@ -85,6 +85,44 @@ class _NewItemState2 extends State<NewItem2> {
     ));
   }
 
+  void createItem() {
+    if (_priceController.text.length < 1 ||
+        _tipoPrecio == '' ||
+        _divisa == '') {
+      showInSnackBar("Rellena toodos los campos correctamente", Colors.yellow);
+    } else {
+      ///TODO cambiar sale por __tipoPrecio cuando estén implementadas las subastas
+      _item.update("sale", double.parse(_priceController.text), _divisa);
+
+      create(_item).then((response) {
+        final Color legit = Colors.blue.withOpacity(0.5);
+        final Color fake = Colors.red.withOpacity(0.5);
+        if (response.statusCode == 201) {
+          print(response.body);
+          showInSnackBar("Datos actualizados correctamente", legit);
+          Navigator.of(context).pop();
+          Navigator.of(context).pop();
+
+        } else if (response.statusCode == 401) {
+          print(response.statusCode);
+          print(response.body);
+          showInSnackBar("No autorizado", fake);
+        } else if (response.statusCode == 402) {
+          print(response.statusCode);
+          print(response.body);
+          showInSnackBar(
+              "Prohibido (sin permisos para asociar al propietario)", fake);
+        } else {
+          print(response.statusCode);
+          print(response.body);
+          showInSnackBar("Error", fake);
+        }
+      }).catchError((error) {
+        print('error : $error');
+      });
+    }
+  }
+
   ///Títulos iniciales
   Widget _buildBottomMenu() {
     return Container(
@@ -341,47 +379,7 @@ class _NewItemState2 extends State<NewItem2> {
                             child: const Text('Subir producto',
                                 style: TextStyle(color: Colors.white)),
                             onPressed: () async {
-                              if (_priceController.text.length < 1 ||
-                                  _tipoPrecio == '' ||
-                                  _divisa == '') {
-                                showInSnackBar(
-                                    "Rellena toodos los campos correctamente",
-                                    Colors.yellow);
-                              } else {
-                                ///TODO cambiar sale por __tipoPrecio cuando estén implementadas las subastas
-                                _item.update(
-                                    "sale",
-                                    double.parse(_priceController.text),
-                                    _divisa);
-
-                                create(_item).then((response) {
-                                  final Color legit =
-                                      Colors.blue.withOpacity(0.5);
-                                  final Color fake =
-                                      Colors.red.withOpacity(0.5);
-                                  if (response.statusCode == 201) {
-                                    print(response.body);
-                                    showInSnackBar(
-                                        "Datos actualizados correctamente",
-                                        legit);
-                                  } else if (response.statusCode == 401) {
-                                    print(response.statusCode);
-                                    print(response.body);
-                                    showInSnackBar("No autorizado", fake);
-                                  } else if (response.statusCode == 402) {
-                                    print(response.statusCode);
-                                    print(response.body);
-                                    showInSnackBar("Prohibido (sin permisos para asociar al propietario)", fake);
-                                  }
-                                  else{
-                                    print(response.statusCode);
-                                    print(response.body);
-                                    showInSnackBar("Error", fake);
-                                  }
-                                }).catchError((error) {
-                                  print('error : $error');
-                                });
-                              }
+                              createItem();
                             },
                           )),
                     ],
@@ -403,42 +401,7 @@ class _NewItemState2 extends State<NewItem2> {
                             child: const Text('Subir producto',
                                 style: TextStyle(color: Colors.white)),
                             onPressed: () async {
-                              if (_priceController.text.length < 1 ||
-                                  _tipoPrecio == '' ||
-                                  _divisa == '') {
-                                showInSnackBar(
-                                    "Rellena toodos los campos correctamente",
-                                    Colors.yellow);
-                              } else {
-                                ///TODO cambiar sale por __tipoPrecio cuando estén implementadas las subastas
-                                _item.update(
-                                    "sale",
-                                    double.parse(_priceController.text),
-                                    _divisa);
-
-                                create(_item).then((response) {
-                                  final Color legit =
-                                      Colors.blue.withOpacity(0.5);
-                                  final Color fake =
-                                      Colors.red.withOpacity(0.5);
-                                  if (response.statusCode == 200) {
-                                    print(response.body);
-                                    showInSnackBar(
-                                        "Datos actualizados correctamente",
-                                        legit);
-                                  } else if (response.statusCode == 401) {
-                                    print(response.statusCode);
-                                    print(response.body);
-                                    showInSnackBar("No autorizado", fake);
-                                  } else if (response.statusCode == 402) {
-                                    print(response.statusCode);
-                                    print(response.body);
-                                    showInSnackBar("Prohibido (sin permisos para asociar al propietario)", fake);
-                                  }
-                                }).catchError((error) {
-                                  print('error : $error');
-                                });
-                              }
+                              createItem();
                             },
                           )),
                     ],

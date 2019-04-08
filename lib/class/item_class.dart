@@ -19,7 +19,6 @@ class ItemClass {
   String status; // TODO enum?
   int numViews;
   int numLikes;
-
   UsuarioClass owner; // vendedor del item
   List<ImageClass> images; // lista de 0+ imágenes
 
@@ -40,6 +39,7 @@ class ItemClass {
       this.numViews,
       this.numLikes,
       this.owner,
+
       this.images})
       : assert(type == null || type == "sale" || type == "auction",
             'Tipo inválido para un item (venta/subasta)'),
@@ -81,7 +81,7 @@ class ItemClass {
   Map<String, dynamic> toJsonCreate() => {
         "type": type,
         "title": title,
-        "owner_id": null,
+        "owner_id": 88,
         "description": description,
         "location": {
           "lat": locationLat,
