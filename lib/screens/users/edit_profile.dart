@@ -66,6 +66,36 @@ class _EditProfileState extends State<EditProfile> {
     ));
   }
 
+  void updateUser() {
+    if (_nameController.text.length < 1 || _surnameController.text.length < 1) {
+      showInSnackBar("Rellena toodos los campos correctamente", Colors.yellow);
+    } else {
+      _user.update(_nameController.text, _surnameController.text, _sexo, 3, 3);
+      edit(_user).then((response) {
+        final Color legit = Colors.blue.withOpacity(0.5);
+        final Color fake = Colors.red.withOpacity(0.5);
+        if (response.statusCode == 200) {
+          print(response.body);
+          showInSnackBar("Datos actualizados correctamente", legit);
+        } else if (response.statusCode == 401) {
+          print(response.statusCode);
+          print(response.body);
+          showInSnackBar("No autorizado", fake);
+        } else if (response.statusCode == 402) {
+          print(response.statusCode);
+          print(response.body);
+          showInSnackBar("Prohibido", fake);
+        } else {
+          print(response.statusCode);
+          print(response.body);
+          showInSnackBar("No encontrado", fake);
+        }
+      }).catchError((error) {
+        print('error : $error');
+      });
+    }
+  }
+
   /// Widget correspondiente a la edición del perfil del usuario _user
   /// Si un campo de _user es nulo, se muestran los campos por defecto
   Widget _buildForm() {
@@ -322,38 +352,7 @@ class _EditProfileState extends State<EditProfile> {
                       child: const Text('Guardar cambios',
                           style: TextStyle(color: Colors.white)),
                       onPressed: () async {
-                        if (_nameController.text.length < 1 ||
-                            _surnameController.text.length < 1) {
-                          showInSnackBar(
-                              "Rellena toodos los campos correctamente",
-                              Colors.yellow);
-                        } else {
-                          _user.update(_nameController.text,
-                              _surnameController.text, _sexo, 3, 3);
-                          edit(_user).then((response) {
-                            final Color legit = Colors.blue.withOpacity(0.5);
-                            final Color fake = Colors.red.withOpacity(0.5);
-                            if (response.statusCode == 200) {
-                              print(response.body);
-                              showInSnackBar(
-                                  "Datos actualizados correctamente", legit);
-                            } else if (response.statusCode == 401) {
-                              print(response.statusCode);
-                              print(response.body);
-                              showInSnackBar("No autorizado", fake);
-                            } else if (response.statusCode == 402) {
-                              print(response.statusCode);
-                              print(response.body);
-                              showInSnackBar("Prohibido", fake);
-                            } else {
-                              print(response.statusCode);
-                              print(response.body);
-                              showInSnackBar("No encontrado", fake);
-                            }
-                          }).catchError((error) {
-                            print('error : $error');
-                          });
-                        }
+                        updateUser();
                       },
                     )),
               ],
