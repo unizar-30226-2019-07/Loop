@@ -89,6 +89,8 @@ class _LoginPageState extends State<LoginPage>
       } else {
         showInSnackBar("Usuario o contraseña incorrectos", _colorStatusBarBad);
       }
+    }).catchError((error) {
+      showInSnackBar("No hay conexión a internet", _colorStatusBarBad);
     });
   }
 
