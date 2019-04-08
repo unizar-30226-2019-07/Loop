@@ -1,10 +1,8 @@
+/* TODO borrar si va bien el login
 import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'package:selit/util/user.dart';
 import 'dart:io';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-
-final storage = new FlutterSecureStorage();
 String url = "http://selit.naval.cat:8080";
 
 /*
@@ -57,3 +55,4 @@ Future<http.Response> sign(User chain) async{
     */
   return response;
 }
+*/

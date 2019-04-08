@@ -1,3 +1,4 @@
+/* TODO borrar si funciona
 import 'dart:convert';
 
 Token postFromJson(String str) {
@@ -114,3 +115,4 @@ class User {
   };
 }
 
+*/

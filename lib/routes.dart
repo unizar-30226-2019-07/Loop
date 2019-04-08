@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:selit/screens/debug_main.dart';
+import 'package:selit/screens/loading_screen.dart';
 import 'package:selit/screens/principal.dart';
 import 'package:selit/screens/users/profile.dart';
 import 'package:selit/screens/users/edit_profile.dart';
@@ -37,16 +38,18 @@ class Routes {
     );
   }
 
-  Routes(bool newUser) {
+  Routes() {
     runApp(new MaterialApp(
       title: 'Selit!',
       onGenerateRoute: _getRoute,
       initialRoute: '/',
       theme: ThemeData(
         primaryColor: Color(0xFFC0392B),
+        primaryColorLight: Color(0xFFC11328),
+        primaryColorDark: Color(0xFF9A0F1F),
         fontFamily: 'Nunito',
       ),
-      home: newUser ? LoginPage() : Principal(),
+      home: LoadingScreen(),
     ));
   }
 }

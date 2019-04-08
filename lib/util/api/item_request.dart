@@ -1,5 +1,6 @@
 import 'package:selit/class/item_class.dart';
 import 'package:selit/util/api/api_config.dart';
+import 'package:selit/util/storage.dart';
 import 'package:selit/class/items/filter_list_class.dart';
 import 'package:flutter/foundation.dart'; // uso de @required
 import 'package:http/http.dart' as http;
@@ -30,7 +31,7 @@ class ItemRequest {
     http.Response response = await http
         .get('${APIConfig.BASE_URL}/products$_paramsString', headers: {
       HttpHeaders.contentTypeHeader: ContentType.json.toString(),
-      HttpHeaders.authorizationHeader: await APIConfig.getToken()
+      HttpHeaders.authorizationHeader: await Storage.loadToken(),
     });
 
     // Crear la lista de items a partir de la respuesta y devovlerla
@@ -63,7 +64,7 @@ class ItemRequest {
     http.Response response = await http
         .get('${APIConfig.BASE_URL}/products$_paramsString', headers: {
       HttpHeaders.contentTypeHeader: ContentType.json.toString(),
-      HttpHeaders.authorizationHeader: await APIConfig.getToken()
+      HttpHeaders.authorizationHeader: await Storage.loadToken(),
     });
 
     // Crear la lista de items a partir de la respuesta y devovlerla

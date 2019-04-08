@@ -3,6 +3,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'dart:convert';
+import 'package:selit/util/storage.dart';
 import 'package:selit/class/usuario_class.dart';
 import 'package:selit/util/api/api_config.dart';
 
@@ -20,7 +21,7 @@ Future<http.Response> edit(UsuarioClass chain) async{
   final response = await http.put('${APIConfig.BASE_URL}/users/${chain.user_id}',
       headers: {
       HttpHeaders.contentTypeHeader: ContentType.json.toString(),
-      HttpHeaders.authorizationHeader: await APIConfig.getToken()
+      HttpHeaders.authorizationHeader: await Storage.loadToken(),
       },
       
       

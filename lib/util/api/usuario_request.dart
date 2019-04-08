@@ -1,53 +1,80 @@
 import 'package:selit/class/usuario_class.dart';
 import 'package:selit/class/token_class.dart';
 import 'package:selit/util/api/api_config.dart';
-import 'package:selit/util/api/http_request.dart';
+import 'package:selit/util/storage.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as json;
 import 'dart:io';
-import 'package:selit/util/seruser.dart';
-
 
 /// Interacciones con la API relacionadas con usuarios
 class UsuarioRequest {
 
-  // TODO todavia no esta funcional
-  /// Login de usuario por [username] y [password], devuelve un token si ha ido bien
-  static Future<TokenClass> login(String username, String password) async {
+  /// Login de usuario por [email] y [password], devuelve un token si ha ido bien
+  static Future<TokenClass> login(String email, String password) async {
     http.Response response =
         await http.post('${APIConfig.BASE_URL}/login', headers: {
-      HttpHeaders.authorizationHeader: await APIConfig.getToken()
+          HttpHeaders.contentTypeHeader: ContentType.json.toString(),
     }, body: {
-      "username": username,
+      "email": email,
       "password": password,
     });
     switch (response.statusCode) {
-      case 200:
-        return TokenClass.fromJson(json.jsonDecode(response.body));
+      case 200: // Login OK
+        TokenClass receivedToken =
+            TokenClass.fromJson(json.jsonDecode(response.body));
+        Storage.saveToken(receivedToken.token);
+        return receivedToken;
         break;
-      default:
-        throw ("Error al autenticar");
+      default: // Ha ocurrido un problema - TODO dividir casos?
+        return null;
     }
   }
+
+  /// Registro de usuario con ciertos campos de [UsuarioClass] con contraseña [password]
+  /// TODO no usar locationLat/Lng
+  static Future<bool> signUp(UsuarioClass newUser, String password,
+                              double locationLat, double locationLng) async {
+    http.Response response =
+        await http.post('${APIConfig.BASE_URL}/users', headers: {
+          HttpHeaders.contentTypeHeader: ContentType.json.toString(),
+    }, body: newUser.toJsonForSignUp());
+    switch (response.statusCode) {
+      case 201: // Registro OK, recurso creado (201)
+        return true;
+        break;
+      default: // Ha ocurrido un problema - TODO dividir casos?
+        return false;
+    }
+  }
+
   /// Obtener los datos del usuario con ID [userId]
   static Future<UsuarioClass> getUserById(int userId) async {
-    var response;
-    if (userId == 0){
-      response = await HttpRequest.apiGET("users/me");
+    http.Response response;
+    if (userId == 0) {
+      response = await http.get('${APIConfig.BASE_URL}/me', headers: {
+          HttpHeaders.contentTypeHeader: ContentType.json.toString(),
+          HttpHeaders.authorizationHeader: await Storage.loadToken(),
+      });
+    } else {
+      response = await http.get('${APIConfig.BASE_URL}/users/$userId', headers: {
+          HttpHeaders.contentTypeHeader: ContentType.json.toString(),
+          HttpHeaders.authorizationHeader: await Storage.loadToken(),
+      });
     }
-    else{
-      response = await HttpRequest.apiGET("users/$userId");
+    switch (response.statusCode) {
+      case 200: // El usuario se ha devuelto bien
+        return UsuarioClass.fromJson(json.jsonDecode(response.body));
+      default: // Problema - TODO dividir casos?
+        return null;
     }
-    
-    print (response.body);
-      return new UsuarioClass.fromJson(json.jsonDecode(response.body));
-    }
+    return new UsuarioClass.fromJson(json.jsonDecode(response.body));
+  }
 
   /// Obtención de lista de usuarios
   static Future<List<UsuarioClass>> getUsers() async {
     http.Response response =
         await http.get('${APIConfig.BASE_URL}/users', headers: {
-      HttpHeaders.authorizationHeader: await APIConfig.getToken(),
+      HttpHeaders.authorizationHeader: await Storage.loadToken(),
     });
     switch (response.statusCode) {
       case 200:
@@ -61,33 +88,4 @@ class UsuarioRequest {
         throw ("Error al obtener la lista de usuarios, obtenido el código ${response?.statusCode}");
     }
   }
-
 }
-
-  Future <bool> legit() async {
-    
-    bool toLogin;
-    //Primero se comprueba si la aplicación tiene un token almacenado y en caso contrario se redirige a login
-    String token = await storage.read(key: 'token');
-    if (token == null){
-      print ("Usuario virgen");
-      toLogin = true;
-    }
-    else{
-      //Con el token se procede a recuperar el perfil del usuario
-      UsuarioClass local= await UsuarioRequest.getUserById(0);
-      if (local == null){
-        //No  se ha devuelto ningún usuario por lo que se invalida el token y se redirige a login.
-        print ("Token nulo");
-        await storage.delete(key: 'token');
-        toLogin=true;
-      }
-      else{
-        //El perfil es válido por lo que se redirige al perfil.
-        print ("Legítimo");
-        toLogin=false;
-      }
-      
-    }
-  return toLogin;
-  }

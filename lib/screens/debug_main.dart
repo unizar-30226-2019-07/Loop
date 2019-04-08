@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:selit/util/seruser.dart';
+import 'package:selit/util/storage.dart';
 
 
 // Vista temporal con varios botones que llevan a diferentes vistas
@@ -49,11 +49,10 @@ class DebugMain extends StatelessWidget {
 						RaisedButton(
 								child: const Text('Sign out'),
 								onPressed: () {
-									storage.delete(key: 'token');
+									Storage.deleteToken();
                   print("Sesión cerrada");
-
 								},
-            ),
+              ),
             ],
 					),
 				),

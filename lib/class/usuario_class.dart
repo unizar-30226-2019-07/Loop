@@ -59,6 +59,12 @@ class UsuarioClass {
     "last_name": apellidos,
     "gender": sexo,
   };
+
+  Map<String, dynamic> toJsonForSignUp() => {
+    "email": email,
+    "first_name": nombre,
+    "last_name": apellidos
+  };
 }
 
 /*

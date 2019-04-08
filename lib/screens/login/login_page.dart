@@ -5,13 +5,13 @@ import 'package:flutter/services.dart';
 import 'package:selit/util/user.dart';
 import 'package:selit/style/theme.dart' as Theme;
 import 'package:selit/util/bubble_indication_painter.dart';
-import 'package:selit/util/seruser.dart';
+import 'package:selit/util/api/usuario_request.dart';
+import 'package:selit/class/usuario_class.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 import 'package:location/location.dart';
 
 final int splashDuration = 2;
-
 
 class LoginPage extends StatefulWidget {
   LoginPage({Key key}) : super(key: key);
@@ -22,9 +22,7 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage>
     with SingleTickerProviderStateMixin {
-
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
-  
 
   final FocusNode myFocusNodeEmailLogin = FocusNode();
   final FocusNode myFocusNodePasswordLogin = FocusNode();
@@ -37,8 +35,6 @@ class _LoginPageState extends State<LoginPage>
   TextEditingController loginEmailController = new TextEditingController();
   TextEditingController loginPasswordController = new TextEditingController();
 
-  
-
   IconData _eyeOpen = FontAwesomeIcons.eye;
   IconData _eyeSlash = FontAwesomeIcons.eyeSlash;
 
@@ -48,7 +44,7 @@ class _LoginPageState extends State<LoginPage>
   bool _obscureTextLogin = true;
   bool _obscureTextSignup = true;
   bool _obscureTextSignupConfirm = true;
- 
+
   static double heightLogin = 550.0;
   static double heightSignup = 850.0;
   double varHeight = heightLogin;
@@ -65,7 +61,88 @@ class _LoginPageState extends State<LoginPage>
   Color left = Colors.black;
   Color right = Colors.white;
 
-  
+  final Color _colorStatusBarGood = Colors.blue.withOpacity(0.5);
+  final Color _colorStatusBarBad = Colors.red.withOpacity(0.5);
+
+  /// Espera un tiempo mientras indica al usuario que ha iniciado
+  /// sesión correctamente y luego lo redirige a la pantalla principal
+  Future<void> _delayPrincipal() async {
+    return Timer(Duration(seconds: splashDuration), () {
+      SystemChannels.textInput.invokeMethod('TextInput.hide');
+      Navigator.of(context).pushNamed('/principal');
+    });
+  }
+
+  /// Intenta hacer login de un usuario con email y contraseña
+  /// según lo escrito en los campos de texto
+  /// Si se loguea correctamente, TODO...
+  /// Si no se loguea correctamente, muestra un aviso al usuario de que
+  /// no se ha podido iniciar sesión correctamente
+  void _tryLogin() async {
+    UsuarioRequest.login(
+            loginEmailController.text, loginPasswordController.text)
+        .then((loginToken) {
+      if (loginToken == null) {
+        // login incorrecto
+        showInSnackBar("Logueado satisfactoriamente", _colorStatusBarGood);
+        _delayPrincipal();
+      } else {
+        showInSnackBar("Usuario o contraseña incorrectos", _colorStatusBarBad);
+      }
+    });
+  }
+
+  /// Hacer registro de usuario con los campos del formulario
+  /// Si el registro es correcto, TODO...
+  /// Si el registro no es correcto, se muestra al usuario el
+  /// error cometido (contraseñas no coinciden, etc.)
+  void _trySignUp() async {
+    // Validar campos de registro
+    // Contraseñas coinciden
+    if (signupPasswordController.text != signupConfirmPasswordController.text) {
+      showInSnackBar("Las contraseñas no coinciden", Colors.yellow);
+      return;
+    }
+    // Campos no nulos y válidos
+    if (signupLastNameController.text.length < 1 ||
+        signupNameController.text.length < 1 ||
+        !validateEmail(signupEmailController.text)) {
+      showInSnackBar("Rellena toodos los campos correctamente", Colors.yellow);
+      return;
+    }
+    double locationLat, locationLng;
+    Location locationService = new Location();
+    // Intentar obtener la localización del usuario
+    try {
+      LocationData data = await locationService.getLocation();
+      locationLat = data.latitude;
+      locationLng = data.longitude;
+    } on PlatformException catch (_) {
+      showInSnackBar("Es necesaria la localización", Colors.red);
+      return;
+    }
+
+    // Crear un objeto de la clase UsuarioClass para pasar datos de usuario
+    // TODO añadir locationLat y locationLng
+    UsuarioClass registeredUser = new UsuarioClass(
+      nombre: signupNameController.text,
+      apellidos: signupLastNameController.text,
+      email: signupEmailController.text 
+    );
+
+    // Realizar la petición de inicio de sesión e informar al usuario del resultado
+    UsuarioRequest.signUp(
+      registeredUser,
+      signupPasswordController.text,
+      locationLat,
+      locationLng).then((isSignUpOk) {
+        if (isSignUpOk) {
+          showInSnackBar("Se ha enviado un correo de confirmación", _colorStatusBarGood);
+        } else {
+          showInSnackBar("La dirección de correo ya existe", _colorStatusBarBad);
+        }
+      });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -78,86 +155,88 @@ class _LoginPageState extends State<LoginPage>
         },
         child: SafeArea(
           child: SingleChildScrollView(
-              child: Container(
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height >= varHeight //850.0
-                    ? MediaQuery.of(context).size.height
-                    : varHeight,
-                decoration: new BoxDecoration(
-                  gradient: new LinearGradient(
-                      colors: [
-                        Theme.Colors.loginGradientStart,
-                        Theme.Colors.loginGradientEnd
-                      ],
-                      begin: const FractionalOffset(0.0, 0.0),
-                      end: const FractionalOffset(1.0, 1.0),
-                      stops: [0.0, 1.0],
-                      tileMode: TileMode.clamp),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.max,
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: <Widget>[
-                    Container(
-                      alignment: FractionalOffset(1.0, 0.0),
-                      child: GestureDetector(
-                          onTap: () {
-                            Navigator.of(context).pushNamed('/debug-main');
-                          },
-                          child: Icon(
-                            FontAwesomeIcons.times,
-                            size: 40.0,
-                            color: Colors.white70,
-                          ),
-                        ),
-                      ),                   
-                    Padding(
-                      padding: EdgeInsets.only(top: 5.0),
-                      child: new Image(
-                          width: 150.0,
-                          height: 177.0,
-                          fit: BoxFit.fill,
-                          image: new AssetImage('assets/img/sell.png')),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(top: 20.0),
-                      child: _buildMenuBar(context),
-                    ),
-                    Expanded(
-                      flex: 2,
-                      child: PageView(
-                        controller: _pageController,
-                        onPageChanged: (i) {
-                          if (i == 0) {
-                            setState(() {
-                              varHeight = heightLogin;
-                              right = Colors.white;
-                              left = Colors.black;
-                            });
-                          } else if (i == 1) {
-                            setState(() {
-                              varHeight = heightSignup;
-                              right = Colors.black;
-                              left = Colors.white;
-                            });
-                          }
-                        },
-                        children: <Widget>[
-                          new ConstrainedBox(
-                            constraints: const BoxConstraints.expand(),
-                            child: _buildSignIn(context),
-                          ),
-                          new ConstrainedBox(
-                            constraints: const BoxConstraints.expand(),
-                            child: _buildSignUp(context),
-                          ),
-                        ],
+            child: Container(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height >= varHeight //850.0
+                  ? MediaQuery.of(context).size.height
+                  : varHeight,
+              decoration: new BoxDecoration(
+                gradient: new LinearGradient(
+                    colors: [
+                      Theme.Colors.loginGradientStart,
+                      Theme.Colors.loginGradientEnd
+                    ],
+                    begin: const FractionalOffset(0.0, 0.0),
+                    end: const FractionalOffset(1.0, 1.0),
+                    stops: [0.0, 1.0],
+                    tileMode: TileMode.clamp),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                  Container(
+                    alignment: FractionalOffset(1.0, 0.0),
+                    child: GestureDetector(
+                      onTap: () {
+                        // TODO X de la esquina superior derecha de la pantalla
+                        // ya no debería estar, no se usa
+                        Navigator.of(context).pushNamed('/debug-main');
+                      },
+                      child: Icon(
+                        FontAwesomeIcons.times,
+                        size: 40.0,
+                        color: Colors.white70,
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(top: 5.0),
+                    child: new Image(
+                        width: 150.0,
+                        height: 177.0,
+                        fit: BoxFit.fill,
+                        image: new AssetImage('assets/img/sell.png')),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(top: 20.0),
+                    child: _buildMenuBar(context),
+                  ),
+                  Expanded(
+                    flex: 2,
+                    child: PageView(
+                      controller: _pageController,
+                      onPageChanged: (i) {
+                        if (i == 0) {
+                          setState(() {
+                            varHeight = heightLogin;
+                            right = Colors.white;
+                            left = Colors.black;
+                          });
+                        } else if (i == 1) {
+                          setState(() {
+                            varHeight = heightSignup;
+                            right = Colors.black;
+                            left = Colors.white;
+                          });
+                        }
+                      },
+                      children: <Widget>[
+                        ConstrainedBox(
+                          constraints: BoxConstraints.expand(),
+                          child: _buildSignIn(context),
+                        ),
+                        ConstrainedBox(
+                          constraints: BoxConstraints.expand(),
+                          child: _buildSignUp(context),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
+          ),
         ),
       ),
     );
@@ -186,16 +265,13 @@ class _LoginPageState extends State<LoginPage>
   }
 
   void showInSnackBar(String value, Color alfa) {
-    
     FocusScope.of(context).requestFocus(new FocusNode());
     _scaffoldKey.currentState?.removeCurrentSnackBar();
     _scaffoldKey.currentState.showSnackBar(new SnackBar(
       content: new Text(
         value,
         textAlign: TextAlign.center,
-        style: TextStyle(
-            color: Colors.white,
-            fontSize: 16.0),
+        style: TextStyle(color: Colors.white, fontSize: 16.0),
       ),
       backgroundColor: alfa,
       duration: Duration(seconds: 3),
@@ -222,9 +298,7 @@ class _LoginPageState extends State<LoginPage>
                 onPressed: _onSignInButtonPress,
                 child: Text(
                   "Iniciar sesión",
-                  style: TextStyle(
-                      color: left,
-                      fontSize: 16.0),
+                  style: TextStyle(color: left, fontSize: 16.0),
                 ),
               ),
             ),
@@ -236,9 +310,7 @@ class _LoginPageState extends State<LoginPage>
                 onPressed: _onSignUpButtonPress,
                 child: Text(
                   "Crear cuenta",
-                  style: TextStyle(
-                      color: right,
-                      fontSize: 16.0),
+                  style: TextStyle(color: right, fontSize: 16.0),
                 ),
               ),
             ),
@@ -275,9 +347,7 @@ class _LoginPageState extends State<LoginPage>
                           focusNode: myFocusNodeEmailLogin,
                           controller: loginEmailController,
                           keyboardType: TextInputType.emailAddress,
-                          style: TextStyle(
-                              fontSize: 16.0,
-                              color: Colors.black),
+                          style: TextStyle(fontSize: 16.0, color: Colors.black),
                           decoration: InputDecoration(
                             border: InputBorder.none,
                             icon: Icon(
@@ -302,9 +372,7 @@ class _LoginPageState extends State<LoginPage>
                           focusNode: myFocusNodePasswordLogin,
                           controller: loginPasswordController,
                           obscureText: _obscureTextLogin,
-                          style: TextStyle(
-                              fontSize: 16.0,
-                              color: Colors.black),
+                          style: TextStyle(fontSize: 16.0, color: Colors.black),
                           decoration: InputDecoration(
                             border: InputBorder.none,
                             icon: Icon(
@@ -356,57 +424,22 @@ class _LoginPageState extends State<LoginPage>
                       tileMode: TileMode.clamp),
                 ),
                 child: MaterialButton(
-                    highlightColor: Colors.transparent,
-                    splashColor: Theme.Colors.loginGradientEnd,
-                    //shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5.0))),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 10.0, horizontal: 42.0),
-                      child: Text(
-                        "ACCEDER",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 25.0,
-                            fontFamily: "WorkSansBold"),
-                      ),
+                  highlightColor: Colors.transparent,
+                  splashColor: Theme.Colors.loginGradientEnd,
+                  //shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5.0))),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 10.0, horizontal: 42.0),
+                    child: Text(
+                      "ACCEDER",
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 25.0,
+                          fontFamily: "WorkSansBold"),
                     ),
-                    onPressed: () {
-                        User post = User(
-                          email: loginEmailController.text,
-                          password: loginPasswordController.text,
-                        );
-                        auth(post).then((response){
-                          countDownTime() async {
-                            return Timer(
-                                Duration(seconds: splashDuration),
-                                    () {
-                                  SystemChannels.textInput.invokeMethod('TextInput.hide');
-                                  Navigator.of(context).pushNamed('/principal');
-                                }
-                            );
-                          }
-
-                          final Color legit = Colors.blue.withOpacity(0.5);
-                          final Color fake = Colors.red.withOpacity(0.5);
-                            if(response.statusCode == 200){
-                              print(response.body);
-                              showInSnackBar("Logueado satisfactoriamente", legit);
-                              countDownTime();
-                              //Navigator.of(context).pushReplacementNamed('/debug-main');
-                            }
-                             else{
-                              print(response.statusCode);
-                              showInSnackBar("Usuario o contraseña incorrectos", fake);
-                             }
-                        }).catchError((error){
-                            print('error : $error');
-                      });
-                        //print(post.user);
-                        //print(post.password);
-
-                        
-                    }
-                        ),
+                  ),
+                  onPressed: _tryLogin,
+                ),
               ),
             ],
           ),
@@ -456,9 +489,7 @@ class _LoginPageState extends State<LoginPage>
                           controller: signupNameController,
                           keyboardType: TextInputType.text,
                           textCapitalization: TextCapitalization.words,
-                          style: TextStyle(
-                              fontSize: 16.0,
-                              color: Colors.black),
+                          style: TextStyle(fontSize: 16.0, color: Colors.black),
                           decoration: InputDecoration(
                             border: InputBorder.none,
                             icon: Icon(
@@ -483,9 +514,7 @@ class _LoginPageState extends State<LoginPage>
                           controller: signupLastNameController,
                           keyboardType: TextInputType.text,
                           textCapitalization: TextCapitalization.words,
-                          style: TextStyle(
-                              fontSize: 16.0,
-                              color: Colors.black),
+                          style: TextStyle(fontSize: 16.0, color: Colors.black),
                           decoration: InputDecoration(
                             border: InputBorder.none,
                             icon: Icon(
@@ -509,9 +538,7 @@ class _LoginPageState extends State<LoginPage>
                           focusNode: myFocusNodeEmail,
                           controller: signupEmailController,
                           keyboardType: TextInputType.emailAddress,
-                          style: TextStyle(
-                              fontSize: 16.0,
-                              color: Colors.black),
+                          style: TextStyle(fontSize: 16.0, color: Colors.black),
                           decoration: InputDecoration(
                             border: InputBorder.none,
                             icon: Icon(
@@ -535,9 +562,7 @@ class _LoginPageState extends State<LoginPage>
                           focusNode: myFocusNodePassword,
                           controller: signupPasswordController,
                           obscureText: _obscureTextSignup,
-                          style: TextStyle(
-                              fontSize: 16.0,
-                              color: Colors.black),
+                          style: TextStyle(fontSize: 16.0, color: Colors.black),
                           decoration: InputDecoration(
                             border: InputBorder.none,
                             icon: Icon(
@@ -568,9 +593,7 @@ class _LoginPageState extends State<LoginPage>
                         child: TextField(
                           controller: signupConfirmPasswordController,
                           obscureText: _obscureTextSignupConfirm,
-                          style: TextStyle(
-                              fontSize: 16.0,
-                              color: Colors.black),
+                          style: TextStyle(fontSize: 16.0, color: Colors.black),
                           decoration: InputDecoration(
                             border: InputBorder.none,
                             icon: Icon(
@@ -635,56 +658,7 @@ class _LoginPageState extends State<LoginPage>
                             fontFamily: "WorkSansBold"),
                       ),
                     ),
-                    onPressed: () async {
-                      if (signupPasswordController.text != signupConfirmPasswordController.text){
-                          showInSnackBar("Las contraseñas no coinciden", Colors.yellow);
-                      }
-                      else if (signupLastNameController.text.length < 1 || signupNameController.text.length < 1 || !validateEmail(signupEmailController.text)){
-                        showInSnackBar("Rellena toodos los campos correctamente", Colors.yellow);
-                      }
-                      else{
-                        LocationData currentLocation;
-                        var locatione = new Location();
-
-                        // Platform messages may fail, so we use a try/catch PlatformException.
-                        try {
-                          currentLocation = await locatione.getLocation();
-                        } on PlatformException catch (e) {
-                          if (e.code == 'PERMISSION_DENIED') {
-                            showInSnackBar("Es necesaria la localización", Colors.red);
-                          } 
-                          currentLocation = null;
-                        }
-
-                        LocationU loc = LocationU(lat: currentLocation.latitude  , lon: currentLocation.longitude);
-                        User post = User(
-                          email: signupEmailController.text,
-                          password: signupPasswordController.text,
-                          first_name: signupNameController.text,
-                          last_name: signupLastNameController.text,
-                          location: loc
-                        );
-                        sign(post).then((response){
-                        
-                          final Color legit = Colors.blue.withOpacity(0.5);
-                          final Color fake = Colors.red.withOpacity(0.5);
-                            if(response.statusCode == 201){
-                              print(response.body);
-                              showInSnackBar("Se ha enviado un correo de confirmación", legit);
-                              
-                            }
-                             else{
-                              print(response.statusCode);
-                              print(response.body);
-                              showInSnackBar("La dirección de correo ya existe", fake);
-                             }
-                             
-                        }).catchError((error){
-                            print('error : $error');
-                      });
-                      }                        
-                    })
-                        
+                    onPressed: _trySignUp),
               ),
             ],
           ),
@@ -705,10 +679,9 @@ class _LoginPageState extends State<LoginPage>
 
   void _toggleLogin() {
     setState(() {
-      if(_obscureTextLogin){
+      if (_obscureTextLogin) {
         _eyeLogin = _eyeSlash;
-      }
-      else{
+      } else {
         _eyeLogin = _eyeOpen;
       }
       _obscureTextLogin = !_obscureTextLogin;
@@ -717,10 +690,9 @@ class _LoginPageState extends State<LoginPage>
 
   void _toggleSignup() {
     setState(() {
-      if(_obscureTextSignup){
+      if (_obscureTextSignup) {
         _eyeSignup = _eyeSlash;
-      }
-      else{
+      } else {
         _eyeSignup = _eyeOpen;
       }
       _obscureTextSignup = !_obscureTextSignup;
@@ -729,22 +701,22 @@ class _LoginPageState extends State<LoginPage>
 
   void _toggleSignupConfirm() {
     setState(() {
-      if(_obscureTextSignupConfirm){
+      if (_obscureTextSignupConfirm) {
         _eyeSignupConfirm = _eyeSlash;
-      }
-      else{
+      } else {
         _eyeSignupConfirm = _eyeOpen;
       }
       _obscureTextSignupConfirm = !_obscureTextSignupConfirm;
     });
   }
 }
+
 bool validateEmail(String value) {
-    Pattern pattern =
-        r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
-    RegExp regex = new RegExp(pattern);
-    if (!regex.hasMatch(value))
-      return false;
-    else
-      return true;
-  }
+  Pattern pattern =
+      r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+  RegExp regex = new RegExp(pattern);
+  if (!regex.hasMatch(value))
+    return false;
+  else
+    return true;
+}
