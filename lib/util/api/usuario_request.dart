@@ -31,13 +31,11 @@ class UsuarioRequest {
   }
 
   /// Registro de usuario con ciertos campos de [UsuarioClass] con contraseña [password]
-  /// TODO no usar locationLat/Lng
-  static Future<bool> signUp(UsuarioClass newUser, String password,
-                              double locationLat, double locationLng) async {
+  static Future<bool> signUp(UsuarioClass newUser, String password) async {
     http.Response response =
         await http.post('${APIConfig.BASE_URL}/users', headers: {
           HttpHeaders.contentTypeHeader: ContentType.json.toString(),
-    }, body: newUser.toJsonForSignUp());
+    }, body: newUser.toJsonForSignUp()..addAll({"password": password}));
     switch (response.statusCode) {
       case 201: // Registro OK, recurso creado (201)
         return true;

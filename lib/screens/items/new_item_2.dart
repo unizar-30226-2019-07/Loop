@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 import 'package:selit/class/item_class.dart';
-import 'package:selit/util/api/item_create.dart';
+import 'package:selit/util/api/item_request.dart';
 
 /// Segunda pantalla del formulario de subida de un nuevo producto
 /// Incluye selección de precio fijo o subasta  sus características
@@ -94,7 +94,7 @@ class _NewItemState2 extends State<NewItem2> {
       ///TODO cambiar sale por __tipoPrecio cuando estén implementadas las subastas
       _item.update("sale", double.parse(_priceController.text), _divisa);
 
-      create(_item).then((response) {
+      ItemRequest.create(_item).then((response) {
         final Color legit = Colors.blue.withOpacity(0.5);
         final Color fake = Colors.red.withOpacity(0.5);
         if (response.statusCode == 201) {

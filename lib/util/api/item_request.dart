@@ -80,5 +80,23 @@ class ItemRequest {
         return List<ItemClass>(); // TODO solo existe el codigo 200, no hay casos de error?
     }
   }
+
+  static String postToJson(ItemClass data) {
+    final dyn = data.toJsonCreate();
+    print(dyn);
+    return json.jsonEncode(dyn);
+  }
+    
+  /// Subir producto
+  static Future<http.Response> create(ItemClass chain) async {
+    final response = await http.post('${APIConfig.BASE_URL}/products',
+        headers: {
+        HttpHeaders.contentTypeHeader: ContentType.json.toString(),
+        HttpHeaders.authorizationHeader: await Storage.loadToken(),
+        },
+        body: postToJson(chain),
+    );
+    return response;
+  }
   
 }

@@ -123,19 +123,19 @@ class _LoginPageState extends State<LoginPage>
     }
 
     // Crear un objeto de la clase UsuarioClass para pasar datos de usuario
-    // TODO añadir locationLat y locationLng
     UsuarioClass registeredUser = new UsuarioClass(
       nombre: signupNameController.text,
       apellidos: signupLastNameController.text,
-      email: signupEmailController.text 
+      email: signupEmailController.text,
+      locationLat: locationLat,
+      locationLng: locationLng,
     );
 
     // Realizar la petición de inicio de sesión e informar al usuario del resultado
     UsuarioRequest.signUp(
       registeredUser,
-      signupPasswordController.text,
-      locationLat,
-      locationLng).then((isSignUpOk) {
+      signupPasswordController.text
+      ).then((isSignUpOk) {
         if (isSignUpOk) {
           showInSnackBar("Se ha enviado un correo de confirmación", _colorStatusBarGood);
         } else {

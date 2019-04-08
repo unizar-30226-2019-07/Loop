@@ -78,7 +78,11 @@ class UsuarioClass {
   Map<String, dynamic> toJsonForSignUp() => {
     "email": email,
     "first_name": nombre,
-    "last_name": apellidos
+    "last_name": apellidos,
+    "location":{
+          "lat": locationLat,
+          "lng": locationLng,
+        },
   };
 }
 
