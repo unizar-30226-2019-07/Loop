@@ -20,7 +20,8 @@ class Routes {
     '/items-list': (settings) => _buildRoute(settings, new ItemList()),
     '/item-details': (settings) =>
         _buildRoute(settings, new ItemDetails(item: settings.arguments)),
-    '/new-item': (settings) => _buildRoute(settings, new NewItem()),
+    '/new-item': (settings) =>
+        _buildRoute(settings, new NewItem(user: settings.arguments)),
     '/new-item2': (settings) =>
         _buildRoute(settings, new NewItem2(item: settings.arguments)),
     '/principal': (settings) => _buildRoute(settings, new Principal()),

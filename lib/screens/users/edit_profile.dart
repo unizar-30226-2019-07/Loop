@@ -28,7 +28,7 @@ class _EditProfileState extends State<EditProfile> {
   final TextEditingController _sexController = new TextEditingController();
   final TextEditingController _yearController = new TextEditingController();
 
-   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   /// Usuario a mostrar en el perfil
   UsuarioClass _user;
@@ -52,17 +52,14 @@ class _EditProfileState extends State<EditProfile> {
     _sexo = _user.sexo;
   }
 
-    void showInSnackBar(String value, Color alfa) {
-    
+  void showInSnackBar(String value, Color alfa) {
     FocusScope.of(context).requestFocus(new FocusNode());
     _scaffoldKey.currentState?.removeCurrentSnackBar();
     _scaffoldKey.currentState.showSnackBar(new SnackBar(
       content: new Text(
         value,
         textAlign: TextAlign.center,
-        style: TextStyle(
-            color: Colors.white,
-            fontSize: 16.0),
+        style: TextStyle(color: Colors.white, fontSize: 16.0),
       ),
       backgroundColor: alfa,
       duration: Duration(seconds: 3),
@@ -212,10 +209,7 @@ class _EditProfileState extends State<EditProfile> {
         Expanded(
           flex: 8,
           child: Container(
-              margin: EdgeInsets.only(
-                left: 25,
-                bottom: 7
-              ),
+              margin: EdgeInsets.only(left: 25, bottom: 7),
               //color: Colors.red, // util para ajustar margenes
               child: Column(children: <Widget>[
                 new FormField(
@@ -325,47 +319,42 @@ class _EditProfileState extends State<EditProfile> {
                     padding: const EdgeInsets.only(left: 10.0, top: 20.0),
                     child: new RaisedButton(
                       color: Color(0xffc0392b),
-                      child: const Text('Guardar cambios', style: TextStyle( color: Colors.white)),
-                      onPressed: ()async {
-   
-                      if (_nameController.text.length < 1 || _surnameController.text.length < 1){
-                        showInSnackBar("Rellena toodos los campos correctamente", Colors.yellow);
-                      }
-                      else{
-                        _user.update(_nameController.text, _surnameController.text, _sexo);
-                        edit(_user).then((response){
-                        
-                          final Color legit = Colors.blue.withOpacity(0.5);
-                          final Color fake = Colors.red.withOpacity(0.5);
-                            if(response.statusCode == 200){
+                      child: const Text('Guardar cambios',
+                          style: TextStyle(color: Colors.white)),
+                      onPressed: () async {
+                        if (_nameController.text.length < 1 ||
+                            _surnameController.text.length < 1) {
+                          showInSnackBar(
+                              "Rellena toodos los campos correctamente",
+                              Colors.yellow);
+                        } else {
+                          _user.update(_nameController.text,
+                              _surnameController.text, _sexo, 3, 3);
+                          edit(_user).then((response) {
+                            final Color legit = Colors.blue.withOpacity(0.5);
+                            final Color fake = Colors.red.withOpacity(0.5);
+                            if (response.statusCode == 200) {
                               print(response.body);
-                              showInSnackBar("Datos actualizados correctamente", legit);
-                              
-                            }
-                            else if(response.statusCode == 401){
+                              showInSnackBar(
+                                  "Datos actualizados correctamente", legit);
+                            } else if (response.statusCode == 401) {
                               print(response.statusCode);
                               print(response.body);
                               showInSnackBar("No autorizado", fake);
-                            }
-                            else if(response.statusCode == 402){
+                            } else if (response.statusCode == 402) {
                               print(response.statusCode);
                               print(response.body);
                               showInSnackBar("Prohibido", fake);
-                            }
-                             else{
+                            } else {
                               print(response.statusCode);
                               print(response.body);
                               showInSnackBar("No encontrado", fake);
-                             }   
-                        }
-                        ).catchError((error){
+                            }
+                          }).catchError((error) {
                             print('error : $error');
-                      }
-                      
-                        );
-                      
-                      }                       
-                    },
+                          });
+                        }
+                      },
                     )),
               ],
             )));
@@ -373,8 +362,6 @@ class _EditProfileState extends State<EditProfile> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldKey,
-      body: _buildForm());
+    return Scaffold(key: _scaffoldKey, body: _buildForm());
   }
 }

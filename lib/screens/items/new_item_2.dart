@@ -2,12 +2,13 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
-import 'package:selit/util/item.dart';
+import 'package:selit/class/item_class.dart';
+import 'package:selit/util/api/item_create.dart';
 
 /// Segunda pantalla del formulario de subida de un nuevo producto
 /// Incluye selección de precio fijo o subasta  sus características
 class NewItem2 extends StatefulWidget {
-  final Item item;
+  final ItemClass item;
 
   /// UsuarioClass del usuario a editar
   NewItem2({@required this.item});
@@ -33,13 +34,13 @@ class _NewItemState2 extends State<NewItem2> {
   String _divisa = '';
 
   //Lista opciones categoria
-  List<String> _tiposPrecio = <String>['Precio Fijo', 'Subasta'];
-  String _tipoPrecio = 'Precio Fijo';
+  List<String> _tiposPrecio = <String>['sale', 'auction'];
+  String _tipoPrecio = 'sale';
 
-  Item _item;
+  ItemClass _item;
 
   /// Constructor:
-  _NewItemState2(Item _item) {
+  _NewItemState2(ItemClass _item) {
     this._item = _item;
     _galleryFile1 = null;
     _galleryFile2 = null;
@@ -47,19 +48,13 @@ class _NewItemState2 extends State<NewItem2> {
 
   /// Titulos
   static final _styleTitle = TextStyle(
-      fontSize: 22.0,
-      color: Colors.white,
-      fontWeight: FontWeight.bold);
+      fontSize: 22.0, color: Colors.white, fontWeight: FontWeight.bold);
 
   static final _styleSubTitleB = TextStyle(
-      fontSize: 17.0,
-      color: Colors.white,
-      fontWeight: FontWeight.bold);
+      fontSize: 17.0, color: Colors.white, fontWeight: FontWeight.bold);
 
   static final _styleSubTitle = TextStyle(
-      fontSize: 17.0,
-      color: Colors.white,
-      fontWeight: FontWeight.normal);
+      fontSize: 17.0, color: Colors.white, fontWeight: FontWeight.normal);
 
   ///Selector de fecha
   DateTime selectedDate = DateTime.now();
@@ -77,16 +72,13 @@ class _NewItemState2 extends State<NewItem2> {
   }
 
   void showInSnackBar(String value, Color alfa) {
-    
     FocusScope.of(context).requestFocus(new FocusNode());
     _scaffoldKey.currentState?.removeCurrentSnackBar();
     _scaffoldKey.currentState.showSnackBar(new SnackBar(
       content: new Text(
         value,
         textAlign: TextAlign.center,
-        style: TextStyle(
-            color: Colors.white,
-            fontSize: 16.0),
+        style: TextStyle(color: Colors.white, fontSize: 16.0),
       ),
       backgroundColor: alfa,
       duration: Duration(seconds: 3),
@@ -163,8 +155,7 @@ class _NewItemState2 extends State<NewItem2> {
                           ),
                           child: Text(_item.title,
                               style: new TextStyle(
-                                  fontSize: 22.0,
-                                  fontWeight: FontWeight.bold)),
+                                  fontSize: 22.0, fontWeight: FontWeight.bold)),
                         )
                       ]),
                       Row(children: <Widget>[
@@ -334,7 +325,7 @@ class _NewItemState2 extends State<NewItem2> {
         child: new Form(
             key: _formKey,
             autovalidate: true,
-            child: _tipoPrecio == 'Precio Fijo'
+            child: _tipoPrecio == 'sale'
                 ? new ListView(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
                     children: <Widget>[
@@ -349,7 +340,49 @@ class _NewItemState2 extends State<NewItem2> {
                             color: Color(0xffc0392b),
                             child: const Text('Subir producto',
                                 style: TextStyle(color: Colors.white)),
-                            onPressed: () {},
+                            onPressed: () async {
+                              if (_priceController.text.length < 1 ||
+                                  _tipoPrecio == '' ||
+                                  _divisa == '') {
+                                showInSnackBar(
+                                    "Rellena toodos los campos correctamente",
+                                    Colors.yellow);
+                              } else {
+                                ///TODO cambiar sale por __tipoPrecio cuando estén implementadas las subastas
+                                _item.update(
+                                    "sale",
+                                    double.parse(_priceController.text),
+                                    _divisa);
+
+                                create(_item).then((response) {
+                                  final Color legit =
+                                      Colors.blue.withOpacity(0.5);
+                                  final Color fake =
+                                      Colors.red.withOpacity(0.5);
+                                  if (response.statusCode == 201) {
+                                    print(response.body);
+                                    showInSnackBar(
+                                        "Datos actualizados correctamente",
+                                        legit);
+                                  } else if (response.statusCode == 401) {
+                                    print(response.statusCode);
+                                    print(response.body);
+                                    showInSnackBar("No autorizado", fake);
+                                  } else if (response.statusCode == 402) {
+                                    print(response.statusCode);
+                                    print(response.body);
+                                    showInSnackBar("Prohibido (sin permisos para asociar al propietario)", fake);
+                                  }
+                                  else{
+                                    print(response.statusCode);
+                                    print(response.body);
+                                    showInSnackBar("Error", fake);
+                                  }
+                                }).catchError((error) {
+                                  print('error : $error');
+                                });
+                              }
+                            },
                           )),
                     ],
                   )
@@ -369,7 +402,7 @@ class _NewItemState2 extends State<NewItem2> {
                             color: Color(0xffc0392b),
                             child: const Text('Subir producto',
                                 style: TextStyle(color: Colors.white)),
-                            onPressed: () async{
+                            onPressed: () async {
                               if (_priceController.text.length < 1 ||
                                   _tipoPrecio == '' ||
                                   _divisa == '') {
@@ -377,17 +410,35 @@ class _NewItemState2 extends State<NewItem2> {
                                     "Rellena toodos los campos correctamente",
                                     Colors.yellow);
                               } else {
-                                Item item = Item(
-                                    title: _item.title,
-                                    owner_id: _item.owner_id,
-                                    description: _item.description,
-                                    category: _item.category,
-                                    type: "sale",
-                                    price: double.parse(_priceController.text),
-                                    currency: _divisa);
-                              }
+                                ///TODO cambiar sale por __tipoPrecio cuando estén implementadas las subastas
+                                _item.update(
+                                    "sale",
+                                    double.parse(_priceController.text),
+                                    _divisa);
 
-                              ///TODO post
+                                create(_item).then((response) {
+                                  final Color legit =
+                                      Colors.blue.withOpacity(0.5);
+                                  final Color fake =
+                                      Colors.red.withOpacity(0.5);
+                                  if (response.statusCode == 200) {
+                                    print(response.body);
+                                    showInSnackBar(
+                                        "Datos actualizados correctamente",
+                                        legit);
+                                  } else if (response.statusCode == 401) {
+                                    print(response.statusCode);
+                                    print(response.body);
+                                    showInSnackBar("No autorizado", fake);
+                                  } else if (response.statusCode == 402) {
+                                    print(response.statusCode);
+                                    print(response.body);
+                                    showInSnackBar("Prohibido (sin permisos para asociar al propietario)", fake);
+                                  }
+                                }).catchError((error) {
+                                  print('error : $error');
+                                });
+                              }
                             },
                           )),
                     ],

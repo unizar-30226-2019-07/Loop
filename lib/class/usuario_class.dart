@@ -1,3 +1,5 @@
+
+
 /// Datos de usuario registrado, ya sea para mostrarlos en el perfil
 /// o para cualquier otro uso. Puede tener campos nulos aunque sean
 /// campos obligatorios para un usuario registrado, ya que un campo nulo
@@ -16,6 +18,8 @@ class UsuarioClass {
   int reviews;
   String urlPerfil;
   int user_id;
+  double locationLat;
+  double locationLng;
 
   UsuarioClass(
       {
@@ -29,11 +33,13 @@ class UsuarioClass {
       this.numeroEstrellas,
       this.reviews,
       this.urlPerfil,
-      this.user_id})
-      : assert(edad > 0, 'Un usuario no puede tener edad negativa'),
-        assert(reviews > 0,
+      this.user_id,
+      this.locationLat,
+      this.locationLng})
+      : assert(edad == null || edad > 0, 'Un usuario no puede tener edad negativa'),
+        assert(reviews == null || reviews > 0,
             'Un usuario no puede tener número de reviews negativo'),
-        assert(numeroEstrellas >= 1 && numeroEstrellas <= 5,
+        assert(numeroEstrellas == null || numeroEstrellas >= 0 && numeroEstrellas <= 5,
             'Un usuario debe tener un número de estrellas entre 1 y 5');
 
   UsuarioClass.fromJson(Map<String, dynamic> json)
@@ -45,12 +51,17 @@ class UsuarioClass {
             reviews: 30,
             numeroEstrellas: json['rating'],
             sexo: json["gender"],
-            email: json["email"]);
+            email: json["email"],
+            locationLat: json['location']['lat'],
+            locationLng: json['location']['lng'],
+            );
 
-  void update(String _nombre, String _apellidos, String _sexo){
+  void update(String _nombre, String _apellidos, String _sexo, double lat, double long){
     this.nombre=_nombre;
     this.apellidos=_apellidos;
     this.sexo=_sexo;
+    this.locationLat=lat;
+    this.locationLng=long;
   }
 
   Map<String, dynamic> toJsonEdit() => {
@@ -58,6 +69,10 @@ class UsuarioClass {
     "first_name": nombre,
     "last_name": apellidos,
     "gender": sexo,
+    "location":{
+          "lat": locationLat,
+          "lng": locationLng,
+        },
   };
 }
 

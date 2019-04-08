@@ -5,7 +5,6 @@ import 'package:selit/class/image_class.dart';
 /// sobre su descripción, su tipo de venta y el usuario vendedor (ver [UsuarioClass])
 /// Para ver más información acerca de las imágenes del producto, ver [ImageClass]
 class ItemClass {
-
   int itemId;
   String type; // venta, subasta, TODO enum?
   String title;
@@ -69,6 +68,27 @@ class ItemClass {
             status: json['status'],
             numViews: json['nvis'],
             numLikes: json['nfav'],
-            owner: UsuarioClass.fromJson(json['owner']),
+            owner: UsuarioClass(), //UsuarioClass.fromJson(json['owner']), TODO ubicacion
             images: List<ImageClass>() /* TODO */);
+
+  void update(String _type, double _price, String _currency) {
+    this.type = _type;
+    this.price = _price;
+    this.currency = _currency;
+  }
+
+
+  Map<String, dynamic> toJsonCreate() => {
+        "type": type,
+        "title": title,
+        "owner_id": null,
+        "description": description,
+        "location": {
+          "lat": locationLat,
+          "lng": locationLng,
+        },
+        "category": category,
+        "price": price,
+        "currency": currency,
+      };
 }
