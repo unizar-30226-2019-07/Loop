@@ -1,15 +1,21 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:selit/util/item.dart';
+import 'package:selit/class/item_class.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
+import 'package:selit/class/usuario_class.dart';
 
 /// Primera pantalla del formulario de subida de un nuevo producto
 /// Incluye tiítulo, descripción, categoría y fotos
 class NewItem extends StatefulWidget {
+  final UsuarioClass user;
+
+  /// UsuarioClass del usuario
+  NewItem({@required this.user});
+
   @override
-  _NewItemState createState() => new _NewItemState();
+  _NewItemState createState() => new _NewItemState(user);
 }
 
 class _NewItemState extends State<NewItem> {
@@ -26,29 +32,28 @@ class _NewItemState extends State<NewItem> {
   int _imagen = 0;
 
   ///Lista opciones categoria
-  List<String> _categorias = <String>['', 'Coches', 'Ropa', 'Tecnología'];
+  List<String> _categorias = <String>['', 'Automocion', 'Ropa', 'Tecnología'];
   String _categoria = '';
 
-  static Item _item;
+  static ItemClass _item;
+
+  //Prpietario del producto
+  UsuarioClass _user;
 
   /// Constructor:
-  _NewItemState() {}
+  _NewItemState(UsuarioClass _user) {
+    this._user = _user;
+  }
 
   /// Titulos
   static final _styleTitle = TextStyle(
-      fontSize: 22.0,
-      color: Colors.white,
-      fontWeight: FontWeight.bold);
+      fontSize: 22.0, color: Colors.white, fontWeight: FontWeight.bold);
 
   static final _styleSubTitleB = TextStyle(
-      fontSize: 17.0,
-      color: Colors.white,
-      fontWeight: FontWeight.bold);
+      fontSize: 17.0, color: Colors.white, fontWeight: FontWeight.bold);
 
   static final _styleSubTitle = TextStyle(
-      fontSize: 17.0,
-      color: Colors.white,
-      fontWeight: FontWeight.normal);
+      fontSize: 17.0, color: Colors.white, fontWeight: FontWeight.normal);
 
   ///Selección de foto 1 de galería
   imageSelectorGallery() async {
@@ -59,22 +64,37 @@ class _NewItemState extends State<NewItem> {
   }
 
   void showInSnackBar(String value, Color alfa) {
-    
     FocusScope.of(context).requestFocus(new FocusNode());
     _scaffoldKey.currentState?.removeCurrentSnackBar();
     _scaffoldKey.currentState.showSnackBar(new SnackBar(
       content: new Text(
         value,
         textAlign: TextAlign.center,
-        style: TextStyle(
-            color: Colors.white,
-            fontSize: 16.0),
+        style: TextStyle(color: Colors.white, fontSize: 16.0),
       ),
       backgroundColor: alfa,
       duration: Duration(seconds: 3),
     ));
   }
 
+  void createItem() {
+    if (_titleController.text.length < 1 ||
+        _descriptionController.text.length < 1 ||
+        _categoria == '') {
+      showInSnackBar("Rellena toodos los campos correctamente", Colors.yellow);
+    } else {
+      _item = ItemClass(
+          itemId: 0,
+          title: _titleController.text,
+          description: _descriptionController.text,
+          locationLat: _user.locationLat,
+          locationLng: _user.locationLng,
+          category: _categoria,
+          owner: _user);
+
+      Navigator.of(context).pushNamed('/new-item2', arguments: _item);
+    }
+  }
 
   ///Títulos iniciales
   Widget _buildBottomMenu() {
@@ -284,24 +304,7 @@ class _NewItemState extends State<NewItem> {
                       child: const Text('Siguiente',
                           style: TextStyle(color: Colors.white)),
                       onPressed: () {
-                        if (_titleController.text.length < 1 ||
-                            _descriptionController.text.length < 1 ||
-                            _categoria == '') {
-                          showInSnackBar(
-                              "Rellena toodos los campos correctamente",
-                              Colors.yellow);
-                        } else {
-                          _item = Item(
-                            title: _titleController.text,
-                            owner_id: 0, ///TODO establecer id del usuario 
-                            description: _descriptionController.text,
-                            category: _categoria);
-
-                        Navigator.of(context)
-                            .pushNamed('/new-item2', arguments: _item);
-                        }
-
-                        
+                        createItem();
                       },
                     )),
               ],

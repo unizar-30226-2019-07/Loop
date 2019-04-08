@@ -408,7 +408,7 @@ class _ProfileState extends State<Profile> {
       // Botón para añadir nuevos items
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.of(context).pushNamed('/new-item');
+          Navigator.of(context).pushNamed('/new-item', arguments: _user);
         },
         backgroundColor: Theme.of(context).primaryColor,
         child: Icon(Icons.add, size: 30.0),
