@@ -27,8 +27,14 @@ class _EditProfileState extends State<EditProfile> {
   final TextEditingController _locationController = new TextEditingController();
   final TextEditingController _sexController = new TextEditingController();
   final TextEditingController _yearController = new TextEditingController();
+    final TextEditingController _oldPassController = new TextEditingController();
+      final TextEditingController _newPassController = new TextEditingController();
+        final TextEditingController _newPassRepController = new TextEditingController();
 
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+
+  static final _styleTitle = TextStyle(
+      fontSize: 22.0, color: Colors.black, fontWeight: FontWeight.bold);
 
   /// Usuario a mostrar en el perfil
   UsuarioClass _user;
@@ -95,6 +101,21 @@ class _EditProfileState extends State<EditProfile> {
       });
     }
   }
+
+  void cambioPass() {
+
+    if (_newPassController.text != _newPassRepController.text) {
+      showInSnackBar("Las contraseñas no coinciden", Colors.yellow);
+    } 
+    else if(_newPassController.text.length <=0 || _newPassRepController.text.length <=0 
+      || _oldPassController.text.length <=0 ){
+        showInSnackBar("Completa todos los campos", Colors.yellow);
+    }
+    else{
+
+    }
+  }
+
 
   /// Widget correspondiente a la edición del perfil del usuario _user
   /// Si un campo de _user es nulo, se muestran los campos por defecto
@@ -206,6 +227,29 @@ class _EditProfileState extends State<EditProfile> {
         )
       ],
     );
+    Widget wOldPassword = Row(
+      children: <Widget>[
+        Expanded(
+          flex: 10,
+          child: Container(
+              margin: EdgeInsets.only(left: 25, right: 10, bottom: 20),
+              //color: Colors.red, // util para ajustar margenes
+              child: Column(
+                children: <Widget>[
+                  
+                  new TextFormField(
+                    decoration: const InputDecoration(
+                      labelText: 'Contraseña antigua',
+                    ),
+                    controller: _oldPassController,
+                    keyboardType: TextInputType.emailAddress,
+                  ),
+                  
+                ],
+              )),
+        )
+      ],
+    );
 
     Widget wPassword = Row(
       children: <Widget>[
@@ -220,12 +264,14 @@ class _EditProfileState extends State<EditProfile> {
                     decoration: const InputDecoration(
                       labelText: 'Nueva contraseña',
                     ),
+                    controller: _newPassController,
                     keyboardType: TextInputType.emailAddress,
                   ),
                   new TextFormField(
                     decoration: const InputDecoration(
                       labelText: 'Repetir nueva contraseña',
                     ),
+                    controller: _newPassRepController,
                     keyboardType: TextInputType.emailAddress,
                   ),
                 ],
@@ -341,8 +387,6 @@ class _EditProfileState extends State<EditProfile> {
                 Divider(),
                 wLocation,
                 Divider(),
-                wPassword,
-                Divider(),
                 wSex,
                 wAge,
                 new Container(
@@ -353,6 +397,31 @@ class _EditProfileState extends State<EditProfile> {
                           style: TextStyle(color: Colors.white)),
                       onPressed: () async {
                         updateUser();
+                      },
+                    )),
+                Padding(
+                  padding: EdgeInsets.only(
+                    left: 6,
+                    top: 40,
+                    bottom: 10
+                  ),
+                  child: Row(children: <Widget>[
+                    Row(children: <Widget>[
+                      Text('Cambiar contraseña', style: _styleTitle)
+                    ]),
+                  ]),
+                ),
+                wOldPassword,
+                Divider(),
+                wPassword,
+                new Container(
+                    padding: const EdgeInsets.only(left: 10.0, top: 20.0, bottom: 55),
+                    child: new RaisedButton(
+                      color: Color(0xffc0392b),
+                      child: const Text('Cambiar contraseña',
+                          style: TextStyle(color: Colors.white)),
+                      onPressed: () async {
+                        cambioPass();
                       },
                     )),
               ],
