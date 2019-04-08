@@ -19,17 +19,15 @@ class _LoadingScreenState extends State<LoadingScreen> {
   /// hay un usuario que ha iniciado sesión en la aplicación)
   /// TODO quitar los print cuando se vea necesario
   Future<bool> _checkForLoggedUser(BuildContext context) async {
-    bool legitUser;
+    bool legitUser = false;
     await Storage.loadToken().then((token) async {
       if (token == null) {
         print('LOADING: No hay token');
-        legitUser = true;
       } else {
         await UsuarioRequest.getUserById(0).then((receivedUser) {
           if (receivedUser == null) {
             print('LOADING: Había token pero no era válido');
             Storage.deleteToken();
-            legitUser = false;
           } else {
             print('LOADING: Usuario registrado');
             legitUser = true;
@@ -46,6 +44,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
   @override
   void initState() {
     super.initState();
+
     _checkForLoggedUser(context).then((legit) {
       Navigator.of(context).pop();
       if (legit) {
@@ -57,6 +56,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
       }
     }).timeout(TIMEOUT, onTimeout: () {
       // TODO diferenciar internet de usuario o de la app
+      print('timeout');
       AlertDialog dialogo = AlertDialog(
         title: Text('Error al iniciar sesión'),
         content: Text('No se ha podido conectar al servidor'),
@@ -67,6 +67,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
         body: Container(
             decoration: BoxDecoration(

@@ -43,7 +43,7 @@ class ItemClass {
       this.images})
       : assert(type == null || type == "sale" || type == "auction",
             'Tipo inválido para un item (venta/subasta)'),
-        assert(distance == null || distance > 0,
+        assert(distance == null || distance >= 0,
             'La distancia debe ser al menos 0'),
         assert(price == null || price >= 0, 'El precio debe ser al menos 0'),
         assert(numViews == null || numViews >= 0,
