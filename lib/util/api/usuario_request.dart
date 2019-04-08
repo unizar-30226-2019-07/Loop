@@ -14,14 +14,14 @@ class UsuarioRequest {
     http.Response response =
         await http.post('${APIConfig.BASE_URL}/login', headers: {
           HttpHeaders.contentTypeHeader: ContentType.json.toString(),
-    }, body: {
+    }, body: json.jsonEncode({
       "email": email,
       "password": password,
-    });
+    }));
     switch (response.statusCode) {
       case 200: // Login OK
         TokenClass receivedToken =
-            TokenClass.fromJson(json.jsonDecode(response.body));
+            TokenClass(token: response.headers[HttpHeaders.authorizationHeader]);
         Storage.saveToken(receivedToken.token);
         return receivedToken;
         break;

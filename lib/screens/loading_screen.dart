@@ -35,41 +35,46 @@ class LoadingScreen extends StatelessWidget {
         });
       }
     });
+    return false;
+  }
+
+  void _checkUser(BuildContext context) async {
+    bool legit = await _checkForLoggedUser(context);
+    Navigator.of(context).pop();
+    if (legit) {
+      Navigator.of(context).pushNamed('/principal');
+    } else {
+      Navigator.of(context).pushNamed('/login-page');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    _checkForLoggedUser(context).then((legit) {
-      if (legit) {
-        Navigator.of(context).pushNamed('/principal');
-      } else {
-        Navigator.of(context).pushNamed('/login');
-      }
-    });
+    print('Construyendo laoding');
+    _checkUser(context);
     return Scaffold(
-        body: Expanded(
-            child: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Theme.of(context).primaryColorLight,
-                      Theme.of(context).primaryColorDark,
-                    ],
-                    stops: [0.0, 1.0],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                  ),
-                ),
-                child: Center(
-                    child: Column(
-                  children: <Widget>[
-                    CircularProgressIndicator(
-                        strokeWidth: 5.0,
-                        valueColor:
-                            AlwaysStoppedAnimation<Color>(Colors.white)),
-                    Text('Intentando conectar con el servidor...',
-                        style: _styleLoading),
+        body: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Theme.of(context).primaryColorLight,
+                    Theme.of(context).primaryColorDark,
                   ],
-                )))));
+                  stops: [0.0, 1.0],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
+              ),
+              child: Center(
+                  child: Column(
+                children: <Widget>[
+                  CircularProgressIndicator(
+                      strokeWidth: 5.0,
+                      valueColor:
+                          AlwaysStoppedAnimation<Color>(Colors.white)),
+                  Text('Intentando conectar con el servidor...',
+                      style: _styleLoading),
+                ],
+              ))));
   }
 }
