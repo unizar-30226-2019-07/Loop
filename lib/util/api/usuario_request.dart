@@ -26,8 +26,12 @@ class UsuarioRequest {
         Storage.saveToken(receivedToken.token);
         return receivedToken;
         break;
-      default: // TODO casos de error
-        return null;
+      case 401: //Usuario rechazado
+        throw ("Unauthorized");
+      case 403:
+        throw ("Forbidden");
+      default:
+        throw ("Unknown");
     }
   }
 
