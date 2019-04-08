@@ -26,7 +26,12 @@ class Storage {
   }
 
   static Future<int> loadUserId() async {
-    return int.tryParse(await _secureStorage.read(key: USER_ID_KEY));
+    String intStr = await _secureStorage.read(key: USER_ID_KEY);
+    if (intStr == null) {
+      return -1;
+    } else {
+      return int.parse(intStr);
+    }
   }
 
 }
