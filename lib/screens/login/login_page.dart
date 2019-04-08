@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:selit/util/user.dart';
 import 'package:selit/style/theme.dart' as Theme;
 import 'package:selit/util/bubble_indication_painter.dart';
 import 'package:selit/util/api/usuario_request.dart';
@@ -12,6 +11,7 @@ import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 import 'package:location/location.dart';
 
 final int splashDuration = 2;
+double locationLat, locationLng;
 
 class LoginPage extends StatefulWidget {
   LoginPage({Key key}) : super(key: key);
@@ -75,7 +75,7 @@ class _LoginPageState extends State<LoginPage>
 
   /// Intenta hacer login de un usuario con email y contraseña
   /// según lo escrito en los campos de texto
-  /// Si se loguea correctamente, TODO...
+
   /// Si no se loguea correctamente, muestra un aviso al usuario de que
   /// no se ha podido iniciar sesión correctamente
   void _tryLogin() async {
@@ -86,16 +86,24 @@ class _LoginPageState extends State<LoginPage>
         // login incorrecto
         showInSnackBar("Logueado satisfactoriamente", _colorStatusBarGood);
         _delayPrincipal();
-      } else {
-        showInSnackBar("Usuario o contraseña incorrectos", _colorStatusBarBad);
       }
     }).catchError((error) {
-      showInSnackBar("No hay conexión a internet", _colorStatusBarBad);
-    });
+        if (error == "Unauthorized") {
+          showInSnackBar("La cuenta no es válida", _colorStatusBarBad);
+        } else if (error == "Forbidden"){
+          showInSnackBar("Usuario o contraseña incorrectos", _colorStatusBarBad);
+        }
+        else{
+          showInSnackBar("Se ha producido un error en el servidor", _colorStatusBarBad);
+        }
+      });
   }
 
+  Function _signUpCallback;
+  Color _signUpButtonColor = Colors.grey[800]; // Desactivado
+
   /// Hacer registro de usuario con los campos del formulario
-  /// Si el registro es correcto, TODO...
+
   /// Si el registro no es correcto, se muestra al usuario el
   /// error cometido (contraseñas no coinciden, etc.)
   void _trySignUp() async {
@@ -110,17 +118,6 @@ class _LoginPageState extends State<LoginPage>
         signupNameController.text.length < 1 ||
         !validateEmail(signupEmailController.text)) {
       showInSnackBar("Rellena toodos los campos correctamente", Colors.yellow);
-      return;
-    }
-    double locationLat, locationLng;
-    Location locationService = new Location();
-    // Intentar obtener la localización del usuario
-    try {
-      LocationData data = await locationService.getLocation();
-      locationLat = data.latitude;
-      locationLng = data.longitude;
-    } on PlatformException catch (_) {
-      showInSnackBar("Es necesaria la localización", Colors.red);
       return;
     }
 
@@ -210,7 +207,7 @@ class _LoginPageState extends State<LoginPage>
                     flex: 2,
                     child: PageView(
                       controller: _pageController,
-                      onPageChanged: (i) {
+                      onPageChanged: (i) async {
                         if (i == 0) {
                           setState(() {
                             varHeight = heightLogin;
@@ -218,6 +215,21 @@ class _LoginPageState extends State<LoginPage>
                             left = Colors.black;
                           });
                         } else if (i == 1) {
+                          
+                          Location locationService = new Location();
+                          // Intentar obtener la localización del usuario
+                          try {
+                            LocationData data = await locationService.getLocation();
+                            locationLat = data.latitude;
+                            locationLng = data.longitude;
+                            setState(() {
+                              _signUpCallback = _trySignUp;
+                              _signUpButtonColor = Theme.Colors.loginGradientEnd;
+                            });
+                          } on PlatformException catch (_) {
+                            showInSnackBar("Es necesaria la localización", Colors.red);
+                          }
+
                           setState(() {
                             varHeight = heightSignup;
                             right = Colors.black;
@@ -627,30 +639,19 @@ class _LoginPageState extends State<LoginPage>
                   borderRadius: BorderRadius.all(Radius.circular(5.0)),
                   boxShadow: <BoxShadow>[
                     BoxShadow(
-                      color: Theme.Colors.loginGradientStart,
+                      color: _signUpButtonColor,
                       offset: Offset(1.0, 6.0),
                       blurRadius: 20.0,
                     ),
                     BoxShadow(
-                      color: Theme.Colors.loginGradientEnd,
+                      color: _signUpButtonColor,
                       offset: Offset(1.0, 6.0),
                       blurRadius: 20.0,
                     ),
                   ],
-                  gradient: new LinearGradient(
-                      colors: [
-                        Theme.Colors.loginGradientEnd,
-                        Theme.Colors.loginGradientStart
-                      ],
-                      begin: const FractionalOffset(0.2, 0.2),
-                      end: const FractionalOffset(1.0, 1.0),
-                      stops: [0.0, 1.0],
-                      tileMode: TileMode.clamp),
                 ),
                 child: MaterialButton(
-                    highlightColor: Colors.transparent,
-                    splashColor: Theme.Colors.loginGradientEnd,
-                    //shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5.0))),
+                    color: _signUpButtonColor,
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
                           vertical: 10.0, horizontal: 42.0),
@@ -662,7 +663,7 @@ class _LoginPageState extends State<LoginPage>
                             fontFamily: "WorkSansBold"),
                       ),
                     ),
-                    onPressed: _trySignUp),
+                    onPressed: _signUpCallback),
               ),
             ],
           ),
