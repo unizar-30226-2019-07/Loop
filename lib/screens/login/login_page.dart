@@ -451,7 +451,7 @@ class _LoginPageState extends State<LoginPage>
                       style: TextStyle(
                           color: Colors.white,
                           fontSize: 25.0,
-                          fontFamily: "WorkSansBold"),
+                          fontFamily: "NunitoBold"),
                     ),
                   ),
                   onPressed: _tryLogin,
@@ -469,7 +469,7 @@ class _LoginPageState extends State<LoginPage>
                       decoration: TextDecoration.underline,
                       color: Colors.white,
                       fontSize: 16.0,
-                      fontFamily: "WorkSansMedium"),
+                      fontFamily: "Nunito"),
                 )),
           ),
         ],
@@ -660,7 +660,7 @@ class _LoginPageState extends State<LoginPage>
                         style: TextStyle(
                             color: Colors.white,
                             fontSize: 25.0,
-                            fontFamily: "WorkSansBold"),
+                            fontFamily: "NunitoBold"),
                       ),
                     ),
                     onPressed: _signUpCallback),
