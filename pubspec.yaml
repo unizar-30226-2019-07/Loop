@@ -17,12 +17,25 @@ environment:
   sdk: ">=2.1.0 <3.0.0"
 
 dependencies:
+  http: ^0.12.0+1
+  fancy_bottom_navigation: ^0.1.0
+  font_awesome_flutter: ^8.4.0
+  flutter_secure_storage: ^3.2.0
+  flutter_range_slider: "^1.1.0"
+  flutter_tags: "^0.1.9"
+  flutter_statusbarcolor: any
+  flutter_staggered_grid_view: ^0.2.7
+  carousel_pro: ^0.0.13
+  location: ^2.3.3
+  percent_indicator: "^1.0.14"
   flutter:
     sdk: flutter
+    
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.2
+  image_picker:
 
 dev_dependencies:
   flutter_test:
@@ -40,10 +53,35 @@ flutter:
   # the material Icons class.
   uses-material-design: true
 
+  fonts:
+    - family: WorkSansSemiBold
+      fonts:
+        - asset: assets/fonts/Work_Sans/WorkSans-SemiBold.ttf
+
+    - family: WorkSansBold
+      fonts:
+        - asset: assets/fonts/Work_Sans/WorkSans-Bold.ttf
+
+    - family: WorkSansMedium
+      fonts:
+        - asset: assets/fonts/Work_Sans/WorkSans-Medium.ttf
+
+    - family: Nunito
+      fonts: 
+        - asset: assets/fonts/Nunito/Nunito-SemiBold.ttf
+    - family: NunitoBold
+      fonts: 
+        - asset: assets/fonts/Nunito/Nunito-ExtraBold.ttf
+
+
   # To add assets to your application, add an assets section, like this:
   # assets:
   #  - images/a_dot_burr.jpeg
   #  - images/a_dot_ham.jpeg
+  assets:
+    - assets/img/profile_default.jpg
+    - assets/img/login_logo.png
+    - assets/img/sell.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.io/assets-and-images/#resolution-aware.
