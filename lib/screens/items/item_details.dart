@@ -3,8 +3,8 @@ import 'package:selit/class/item_class.dart';
 import 'package:carousel_pro/carousel_pro.dart';
 
 /// Detalles de un item/producto en venta: título, descripción, precio,
-/// imágenes, etc.
-/// TODO completar
+/// imágenes, etc. También se muestra información acerca de su usuario
+/// dueño y su ubicación además de posibilidad para contactar con él.
 class ItemDetails extends StatefulWidget {
   final ItemClass item;
   ItemDetails({this.item});

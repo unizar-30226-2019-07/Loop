@@ -45,7 +45,7 @@ class UsuarioRequest {
       case 201: // Registro OK, recurso creado (201)
         return true;
         break;
-      default: // Ha ocurrido un problema - TODO dividir casos?
+      default: // TODO casos de error
         return false;
     }
   }
@@ -69,7 +69,7 @@ class UsuarioRequest {
     switch (response.statusCode) {
       case 200: // El usuario se ha devuelto bien
         return UsuarioClass.fromJson(json.jsonDecode(response.body));
-      default: // Problema - TODO dividir casos?
+      default:  // TODO casos de error
         return null;
     }
   }

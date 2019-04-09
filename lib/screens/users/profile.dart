@@ -58,21 +58,6 @@ class _ProfileState extends State<Profile> {
     _loadProfile(_userId).then((_) => _loadProfileItems());
   }
 
-  // TODO solamente está aqui para cargar las cervezas de test
-  @override
-  void initState() {
-    super.initState();
-  }
-
-/*
-  void listenForItems() async {
-    final Stream<ItemClass> stream = await ItemRequest.getItems();
-    stream.listen((ItemClass item) {
-      setState(() => _itemsEnVenta.add(item));
-    });
-  }
-*/
-
   Future<void> _loadProfile(int _userId) async {
     // Mostrar usuario placeholder mientras carga el real
     if (_user == null) {

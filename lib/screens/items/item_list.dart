@@ -7,6 +7,7 @@ import 'package:selit/widgets/items/item_tile_vertical.dart';
 import 'package:selit/util/api/item_request.dart';
 import 'package:selit/class/item_class.dart';
 import 'package:selit/class/items/filter_list_class.dart';
+import 'dart:async';
 
 /// Listado de productos en venta, junto con una barra de búsqueda y una pantalla
 /// de filtros para seleccionar qué productos ver/cómo ordenarlos ([ItemListDrawer] y [FilterListClass]).
@@ -25,7 +26,7 @@ class ItemList extends StatefulWidget {
 
 class _ItemListState extends State<ItemList> {
   /// Número de items que se cargan cada vez en la lista
-  static const int ITEMS_PER_PAGE = 10;
+  static const int ITEMS_PER_PAGE = 30; // TODO volver a poner 10 cuando la API tenga paginación
 
   /// Lista de items a mostrar en la vista
   List<ItemClass> _items = <ItemClass>[];
@@ -137,6 +138,20 @@ class _ItemListState extends State<ItemList> {
     setState(() => _items.addAll(receivedItems));
   }
 
+  static Timer queryTimer;
+
+  /// Actualizar los productos si el usuario lleva 500 ms sin cambiar
+  /// nada en la barra de búsqueda, ver [queryTimer]
+  void _updateSearchQuery(String value) {
+    if (queryTimer != null) queryTimer.cancel();
+    queryTimer = new Timer(const Duration(milliseconds: 500), () {
+      _filterManager.addFilter(newSearchQuery: value);
+      _items = []; // TODO no pedir items aqui
+      lastPetitionPage = -1;
+      _loadItems(0);
+    });
+  }
+
   /// Menú superior: barra de búsquerda y botón para abrir el menú izquierdo de filtros
   Widget _buildTopMenu() {
     return Container(
@@ -157,9 +172,7 @@ class _ItemListState extends State<ItemList> {
             child: Container(
               padding: EdgeInsets.only(right: 10.0),
               child: TextField(
-                // TODO cambiar onSubmitted por onChanged? (igual son muchas peticiones)
-                onSubmitted: (value) =>
-                    _filterManager.addFilter(newSearchQuery: value),
+                onChanged: (value) { _updateSearchQuery(value); },
                 cursorColor: Theme.of(context).primaryColor,
                 decoration: InputDecoration(
                   isDense: true,
@@ -262,7 +275,7 @@ class _ItemListState extends State<ItemList> {
           itemCount: _items.length,
           itemBuilder: (context, index) {
             _loadItems(index ~/
-                ITEMS_PER_PAGE); // número de página que está viendo el usuario
+                ITEMS_PER_PAGE + 1); // número de página que está viendo el usuario
             return ItemTile(_items[index]);
           },
         );
@@ -274,7 +287,7 @@ class _ItemListState extends State<ItemList> {
           itemCount: _items.length,
           itemBuilder: (context, index) {
             _loadItems(index ~/
-                ITEMS_PER_PAGE); // número de página que está viendo el usuario
+                ITEMS_PER_PAGE + 1); // número de página que está viendo el usuario
             return ItemTileVertical(_items[index]);
           },
           staggeredTileBuilder: (index) => StaggeredTile.fit(1),
