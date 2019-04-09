@@ -148,7 +148,7 @@ class _NewItemState extends State<NewItem> {
       children: <Widget>[
         Expanded(
           child: Container(
-              margin: EdgeInsets.only(left: 10, right: 10, bottom: 35, top: 20),
+              margin: EdgeInsets.only(left: 10, right: 10, bottom: 35, top: 30),
               //color: Colors.red, // util para ajustar margenes
               child: Column(
                 children: <Widget>[
@@ -320,7 +320,7 @@ class _NewItemState extends State<NewItem> {
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-              begin: Alignment(0.15, -1.65),
+              begin: Alignment(0.15, -1.60),
               end: Alignment(-0.15, 1.0),
               stops: [
                 0.4,
