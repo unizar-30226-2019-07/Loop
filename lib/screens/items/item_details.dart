@@ -83,6 +83,7 @@ class _ItemDetails extends State<ItemDetails> {
   void _leerIdUsuario() async{
     int idItem = _item.owner.user_id; 
     int miId = await Storage.loadUserId();
+    print('Mi id: ' + miId.toString());
     miId = 1; 
     print('Mi id: ' + miId.toString());
     print('Item id: ' + idItem.toString());

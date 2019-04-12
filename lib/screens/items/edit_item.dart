@@ -90,6 +90,7 @@ class _EditItemState extends State<EditItem> {
         _categoria == '') {
       showInSnackBar("Rellena toodos los campos correctamente", Colors.yellow);
     } else {
+      print('Id de producto: ' + _item.itemId.toString());
       _item.title =  _titleController.text;
       _item.description =  _descriptionController.text;
       _item.category =  _categoria;

@@ -39,6 +39,9 @@ class _EditItemState2 extends State<EditItem2> {
 
   ItemClass _item;
 
+  final Color _colorStatusBarGood = Colors.blue.withOpacity(0.5);
+  final Color _colorStatusBarBad = Colors.red.withOpacity(0.5);
+
   /// Constructor:
   _EditItemState2(ItemClass item) {
     this._item = item;
@@ -96,31 +99,18 @@ class _EditItemState2 extends State<EditItem2> {
       //TODO cambiar sale por __tipoPrecio cuando estén implementadas las subastas
       _item.update("sale", double.parse(_priceController.text), _divisa);
 
-      ItemRequest.edit(_item).then((response) {
-        final Color legit = Colors.blue.withOpacity(0.5);
-        final Color fake = Colors.red.withOpacity(0.5);
-        if (response.statusCode == 201 || response.statusCode == 405) { // TODO Revisar codigo devuelto 405
-          print(response.body);
-          showInSnackBar("Producto actualizado correctamente", legit);
+      ItemRequest.edit(_item).then((_) {
+          print('Item actualizado');
+          showInSnackBar("Datos actualizados correctamente", _colorStatusBarGood);
           Navigator.of(context).pop();
           Navigator.of(context).pop();
-
-        } else if (response.statusCode == 401) {
-          print(response.statusCode);
-          print(response.body);
-          showInSnackBar("No autorizado", fake);
-        } else if (response.statusCode == 402) {
-          print(response.statusCode);
-          print(response.body);
-          showInSnackBar(
-              "Prohibido (sin permisos para asociar al propietario)", fake);
-        } else {
-          print(response.statusCode);
-          print(response.body);
-          showInSnackBar("Error", fake);
-        }
       }).catchError((error) {
-        print('error : $error');
+        print('Error al actualizar');
+        if (error == "No autorizado" || error == "Prohibido") {
+          showInSnackBar("Acción no autorizada", _colorStatusBarBad);
+        } else {
+          showInSnackBar("No hay conexión a internet", _colorStatusBarBad);
+        }
       });
     }
   }

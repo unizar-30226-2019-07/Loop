@@ -102,16 +102,45 @@ class ItemRequest {
     }
   }
 
-  /// Subir producto
-  static Future<http.Response> edit(ItemClass chain) async {
-    final response = await http.put('${APIConfig.BASE_URL}/products',
+  /// Actualizar producto
+  static Future<void> edit(ItemClass item) async {
+    int _productId = item.itemId;
+    print('Id de producto en request: ' + item.itemId.toString());
+    final response = await http.put('${APIConfig.BASE_URL}/products?product_id=$_productId',
         headers: {
         HttpHeaders.contentTypeHeader: ContentType.json.toString(),
         HttpHeaders.authorizationHeader: await Storage.loadToken(),
         },
-        body: postToJson(chain),
+        body: json.jsonEncode(item.toJsonCreate()),
     );
-    return response;
+    // Crear la lista de items a partir de la respuesta y devovlerla
+    switch (response.statusCode) {
+      case 201: // Item actualizado, todo OK
+        break;
+      case 401:
+        throw("No autorizado");
+      case 402:
+        throw("Prohibido");
+    }
+  }
+
+    /// Eliminar producto
+  static Future<void> delete(ItemClass item) async {
+    int _productId = item.itemId;
+    final response = await http.delete('${APIConfig.BASE_URL}/products?product_id=$_productId',
+        headers: {
+        HttpHeaders.contentTypeHeader: ContentType.json.toString(),
+        HttpHeaders.authorizationHeader: await Storage.loadToken(),
+        },
+    );
+    switch (response.statusCode) {
+      case 201: // Item eliminado, todo OK
+        break;
+      case 401:
+        throw("No autorizado");
+      case 402:
+        throw("Prohibido");
+    }
   }
   
 }
