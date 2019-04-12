@@ -77,18 +77,18 @@ class ItemClass {
     this.currency = _currency;
   }
 
-
   Map<String, dynamic> toJsonCreate() => {
-        "type": type,
-        "title": title,
-        "owner_id": owner.user_id,
-        "description": description,
-        "location": {
-          "lat": locationLat,
-          "lng": locationLng,
-        },
-        "category": category,
-        "price": price,
-        "currency": currency,
-      };
+    "type": type,
+    "title": title,
+    "owner_id": owner.user_id,
+    "description": description,
+    "location": {
+      "lat": locationLat,
+      "lng": locationLng,
+    },
+    "category": category,
+    "price": price,
+    "currency": currency,
+  };
+  
 }

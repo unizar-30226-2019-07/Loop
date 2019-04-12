@@ -18,6 +18,7 @@ class UsuarioRequest {
       "email": email,
       "password": password,
     }));
+    print("Resultado del login: Codigo ${response.statusCode}, body ${response.headers[HttpHeaders.authorizationHeader]}");
     switch (response.statusCode) {
       case 200: // Login OK
         TokenClass receivedToken =
@@ -25,8 +26,12 @@ class UsuarioRequest {
         Storage.saveToken(receivedToken.token);
         return receivedToken;
         break;
-      default: // Ha ocurrido un problema - TODO dividir casos?
-        return null;
+      case 401: //Usuario rechazado
+        throw ("Unauthorized");
+      case 403:
+        throw ("Forbidden");
+      default:
+        throw ("Unknown");
     }
   }
 
@@ -35,12 +40,12 @@ class UsuarioRequest {
     http.Response response =
         await http.post('${APIConfig.BASE_URL}/users', headers: {
           HttpHeaders.contentTypeHeader: ContentType.json.toString(),
-    }, body: newUser.toJsonForSignUp()..addAll({"password": password}));
+    }, body: json.jsonEncode(newUser.toJsonForSignUp()..addAll({"password": password})));
     switch (response.statusCode) {
       case 201: // Registro OK, recurso creado (201)
         return true;
         break;
-      default: // Ha ocurrido un problema - TODO dividir casos?
+      default: // TODO casos de error
         return false;
     }
   }
@@ -64,10 +69,9 @@ class UsuarioRequest {
     switch (response.statusCode) {
       case 200: // El usuario se ha devuelto bien
         return UsuarioClass.fromJson(json.jsonDecode(response.body));
-      default: // Problema - TODO dividir casos?
+      default:  // TODO casos de error
         return null;
     }
-    return new UsuarioClass.fromJson(json.jsonDecode(response.body));
   }
 
   /// Obtención de lista de usuarios

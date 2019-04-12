@@ -69,6 +69,9 @@ flutter:
     - family: Nunito
       fonts: 
         - asset: assets/fonts/Nunito/Nunito-SemiBold.ttf
+    - family: NunitoBold
+      fonts: 
+        - asset: assets/fonts/Nunito/Nunito-ExtraBold.ttf
 
 
   # To add assets to your application, add an assets section, like this:
