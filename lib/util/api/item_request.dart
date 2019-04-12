@@ -99,5 +99,17 @@ class ItemRequest {
     );
     return response;
   }
+
+  /// Subir producto
+  static Future<http.Response> edit(ItemClass chain) async {
+    final response = await http.put('${APIConfig.BASE_URL}/products',
+        headers: {
+        HttpHeaders.contentTypeHeader: ContentType.json.toString(),
+        HttpHeaders.authorizationHeader: await Storage.loadToken(),
+        },
+        body: postToJson(chain),
+    );
+    return response;
+  }
   
 }
