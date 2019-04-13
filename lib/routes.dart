@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:selit/screens/debug_main.dart';
 import 'package:selit/screens/loading_screen.dart';
 import 'package:selit/screens/principal.dart';
@@ -40,7 +41,9 @@ class Routes {
   }
 
   Routes() {
-    runApp(new MaterialApp(
+    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
+    .then((_) {
+      runApp(new MaterialApp(
       title: 'Selit!',
       onGenerateRoute: _getRoute,
       initialRoute: '/',
@@ -52,5 +55,7 @@ class Routes {
       ),
       home: LoadingScreen(),
     ));
+    });
+    
   }
 }
