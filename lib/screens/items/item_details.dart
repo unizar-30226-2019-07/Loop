@@ -144,7 +144,7 @@ class _ItemDetails extends State<ItemDetails> {
         child: new Text('Editar producto',
                 style: TextStyle(
                   fontSize: 18.0,
-                  color: Colors.black,
+                  color: Colors.white,
                   fontWeight: FontWeight.bold)),
       ),
       new RaisedButton(
@@ -155,7 +155,7 @@ class _ItemDetails extends State<ItemDetails> {
         child: new Text('Eliminar producto',
                 style: TextStyle(
                   fontSize: 18.0,
-                  color: Colors.black,
+                  color: Colors.white,
                   fontWeight: FontWeight.bold)),
       ),
     ],

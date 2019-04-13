@@ -127,6 +127,7 @@ class ItemRequest {
     /// Eliminar producto
   static Future<void> delete(ItemClass item) async {
     int _productId = item.itemId;
+    print('Id de producto en request: ' + item.itemId.toString());
     final response = await http.delete('${APIConfig.BASE_URL}/products?product_id=$_productId',
         headers: {
         HttpHeaders.contentTypeHeader: ContentType.json.toString(),
