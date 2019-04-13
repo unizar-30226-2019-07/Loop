@@ -23,10 +23,10 @@ class UsuarioRequest {
       case 200: // Login OK
         TokenClass receivedToken =
             TokenClass(response.headers[HttpHeaders.authorizationHeader]);
+        Storage.saveToken(receivedToken.token);
         UsuarioClass receivedUser = 
             await UsuarioRequest.getUserById(0);
         Storage.saveUserId(receivedUser.user_id);
-        Storage.saveToken(receivedToken.token);
         return receivedToken;
         break;
       case 401: //Usuario rechazado
