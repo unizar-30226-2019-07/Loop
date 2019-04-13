@@ -159,41 +159,18 @@ class _ItemDetails extends State<ItemDetails> {
                   fontWeight: FontWeight.bold)),
       ),
     ],
-);
+    );
   }
-/*
-  
 
-
-padding: const EdgeInsets.only(left: 10.0, top: 10.0, right: 10.0),
-        alignment: Alignment.center,
-        child: GestureDetector(
-          child: Chip(
-            avatar: Icon(Icons.edit),
-            backgroundColor: Colors.yellow,
-            label: Text('Editar producto',
-                style: styleTagBlack),
-          ),
-        onTap: () => //Navigator.of(context).pushNamed('/edit-item', arguments: _item),
-            Navigator.push(context, MaterialPageRoute(builder: (context) => EditItem(item: _item))),
-          //Navigator.of(context).pushNamed('/new-item', arguments: _item.owner),
-        ),  
-*/
   final _blendColor = Color.alphaBlend(Color(0x552B2B2B), Color(0xFFC0392B));
 
   void _leerIdUsuario() async{
     int idItem = _item.owner.user_id; 
     int miId = await Storage.loadUserId();
-    print('Mi id: ' + miId.toString());
-    miId = 1; 
-    print('Mi id: ' + miId.toString());
-    print('Item id: ' + idItem.toString());
       if(miId == idItem){
         setState(() {
           _buildEditConditional = _buildEditButton();
         });
-        print('Holaaaa');
-        print('Precio actual: ' + _item.price.toString());
       }
   }
 
@@ -206,7 +183,6 @@ padding: const EdgeInsets.only(left: 10.0, top: 10.0, right: 10.0),
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     final ThemeData theme = Theme.of(context);
     final TextStyle titleStyle =
         theme.textTheme.headline.copyWith(color: Colors.white);

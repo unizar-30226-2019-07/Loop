@@ -150,7 +150,7 @@ class _EditItemState extends State<EditItem> {
       children: <Widget>[
         Expanded(
           child: Container(
-              margin: EdgeInsets.only(left: 10, right: 10, bottom: 35, top: 20),
+              margin: EdgeInsets.only(left: 10, right: 10, bottom: 35, top: 30),
               //color: Colors.red, // util para ajustar margenes
               child: Column(
                 children: <Widget>[
@@ -318,11 +318,11 @@ class _EditItemState extends State<EditItem> {
     FlutterStatusbarcolor.setStatusBarColor(Theme.of(context).primaryColor);
     return Scaffold(
       key: _scaffoldKey,
-      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: true,
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-              begin: Alignment(0.15, -1.65),
+              begin: Alignment(0.15, -1.60),
               end: Alignment(-0.15, 1.0),
               stops: [
                 0.4,
