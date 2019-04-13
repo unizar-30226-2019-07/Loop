@@ -3,6 +3,7 @@ import 'package:selit/class/item_class.dart';
 import 'package:carousel_pro/carousel_pro.dart';
 import 'package:selit/screens/items/edit_item.dart';
 import 'package:selit/util/storage.dart';
+import 'package:selit/util/api/item_request.dart';
 import 'dart:async';
 
 /// Detalles de un item/producto en venta: título, descripción, precio,
@@ -42,6 +43,9 @@ class _ItemDetails extends State<ItemDetails> {
   static IconData _emptyFavorite = Icons.favorite_border;
   bool _esFavorito = false;
 
+  final Color _colorStatusBarGood = Colors.blue.withOpacity(0.5);
+  final Color _colorStatusBarBad = Colors.red.withOpacity(0.5);
+
   IconData _favorite = Icons.favorite_border;
 
   void _favoritePressed() {
@@ -59,10 +63,109 @@ class _ItemDetails extends State<ItemDetails> {
 
   static Widget _buildEditConditional;
 
+  void showInSnackBar(String value, Color alfa) {
+    FocusScope.of(context).requestFocus(new FocusNode());
+    _scaffoldKey.currentState?.removeCurrentSnackBar();
+    _scaffoldKey.currentState.showSnackBar(new SnackBar(
+      content: new Text(
+        value,
+        textAlign: TextAlign.center,
+        style: TextStyle(color: Colors.white, fontSize: 16.0),
+      ),
+      backgroundColor: alfa,
+      duration: Duration(seconds: 3),
+    ));
+  }
+
+  void _showDialogDeleteProduct() {
+    // flutter defined function
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text("¿Seguro que quiere eliminar el producto?",
+            style: TextStyle(
+                  fontSize: 18.0,
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold)),
+          content: new Text("Si pulsa \"Eliminar\" el producto se eliminará. Los cambios no pueden deshacerse.",
+            style: TextStyle(
+                  fontSize: 15.0,
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold)),
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            new FlatButton(
+              child: new Text("CANCELAR",
+                style: TextStyle(fontSize: 16.0,
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold)),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            new FlatButton(
+              child: new Text("ELIMINAR",
+                style: TextStyle(fontSize: 16.0,
+                  color: Colors.red,
+                  fontWeight: FontWeight.bold)),
+              onPressed: () {
+                ItemRequest.delete(_item).then((_) {
+                    showInSnackBar("Datos actualizados correctamente", _colorStatusBarGood);
+                    Navigator.of(context).pop();
+                    Navigator.of(context).pop();
+                }).catchError((error) {
+                  if (error == "No autorizado" || error == "Prohibido") {
+                    showInSnackBar("Acción no autorizada", _colorStatusBarBad);
+                  } else {
+                    showInSnackBar("No hay conexión a internet", _colorStatusBarBad);
+                  }
+                });
+              },
+            ),
+          ],
+        );
+      },
+    );
+}
 
   Widget _buildEditButton(){
-    return Container(
-      padding: const EdgeInsets.only(left: 10.0, top: 10.0, right: 10.0),
+    return Row(
+    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    children: <Widget>[
+      new RaisedButton(
+        padding: const EdgeInsets.all(8.0),
+        textColor: Colors.white,
+        color: Colors.blue,
+        onPressed: () {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => EditItem(item: _item)));
+        } ,
+        child: new Text('Editar producto',
+                style: TextStyle(
+                  fontSize: 18.0,
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold)),
+      ),
+      new RaisedButton(
+        onPressed: () => _showDialogDeleteProduct(),
+        textColor: Colors.white,
+        color: Colors.red,
+        padding: const EdgeInsets.all(8.0),
+        child: new Text('Eliminar producto',
+                style: TextStyle(
+                  fontSize: 18.0,
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold)),
+      ),
+    ],
+);
+  }
+/*
+  
+
+
+padding: const EdgeInsets.only(left: 10.0, top: 10.0, right: 10.0),
         alignment: Alignment.center,
         child: GestureDetector(
           child: Chip(
@@ -74,10 +177,8 @@ class _ItemDetails extends State<ItemDetails> {
         onTap: () => //Navigator.of(context).pushNamed('/edit-item', arguments: _item),
             Navigator.push(context, MaterialPageRoute(builder: (context) => EditItem(item: _item))),
           //Navigator.of(context).pushNamed('/new-item', arguments: _item.owner),
-        ),     
-    );
-  }
-
+        ),  
+*/
   final _blendColor = Color.alphaBlend(Color(0x552B2B2B), Color(0xFFC0392B));
 
   void _leerIdUsuario() async{
