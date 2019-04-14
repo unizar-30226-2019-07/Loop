@@ -101,28 +101,15 @@ class UsuarioRequest {
   }
 
   static Future<TokenClass> password(String oldPassword, String newPassword,int user_id ) async {
+    
+    String _paramsString = '?old=$oldPassword&new=$newPassword';
 
-    print(
-       json.jsonEncode({
-          "old": oldPassword,
-          "new": newPassword,
-        }));
-
-    print(
-        '${APIConfig.BASE_URL}/users/${user_id}/change_password');
-
-    http.Response response = await http.post('${APIConfig.BASE_URL}/users/${user_id}/change_password',
+    http.Response response = await http.post('${APIConfig.BASE_URL}/users/${user_id}/change_password$_paramsString',
          headers: {
       HttpHeaders.contentTypeHeader: ContentType.json.toString(),
       HttpHeaders.authorizationHeader: await Storage.loadToken(),
       },
-        body: json.jsonEncode({
-          "old": oldPassword,
-          "new": newPassword,
-        }));
-
-        print(
-        "Resultado del cambio de contraseña: Codigo ${response.statusCode}");
+        );
             
     switch (response.statusCode) {
       case 200: // todo OK

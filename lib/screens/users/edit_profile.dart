@@ -130,8 +130,6 @@ class _EditProfileState extends State<EditProfile> {
               _oldPassController.text, _newPassController.text, miId)
           .then((_) {
         showInSnackBar("Contraseña actualizada correctamente", _colorStatusBarGood);
-        Navigator.of(context).pop();
-        Navigator.of(context).pop();
       }).catchError((error) {
         if (error == "No autorizado" || error == "Prohibido" || error =="No encontrado") {
           showInSnackBar("Acción no autorizada", _colorStatusBarBad);
@@ -177,6 +175,7 @@ class _EditProfileState extends State<EditProfile> {
             //color: Colors.red, // util para ajustar margenes
             child: Column(
               children: <Widget>[
+                
                 Container(
                   margin: EdgeInsets.only(top: 50),
                   child: _galleryFile == null
