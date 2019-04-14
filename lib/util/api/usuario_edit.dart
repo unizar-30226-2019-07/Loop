@@ -12,7 +12,6 @@ final storage = new FlutterSecureStorage();
 
 String postToJson(UsuarioClass data) {
   final dyn = data.toJsonEdit();
-  print(dyn);
   return json.encode(dyn);
 }
 

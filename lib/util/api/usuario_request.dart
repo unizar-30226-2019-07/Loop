@@ -55,6 +55,7 @@ class UsuarioRequest {
 
   /// Obtener los datos del usuario con ID [userId]
   static Future<UsuarioClass> getUserById(int userId) async {
+    print (userId);
     http.Response response;
     if (userId == 0) {
       print('GET /users/me');

@@ -1,9 +1,12 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:selit/class/usuario_class.dart';
 import 'package:selit/widgets/profile_picture.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:selit/util/api/usuario_edit.dart';
+import 'package:mime/mime.dart';
+import 'package:path/path.dart' as path;
 
 /// Página de edición de perfil (formulario con los campos
 /// necesarios para modificar los atributos del usuario)
@@ -41,6 +44,9 @@ class _EditProfileState extends State<EditProfile> {
 
   //Fichero de galería
   File _galleryFile;
+  String _base64Image;
+  String _mimeType;
+  String _charset; 
 
   //Lista opciones sexo
   List<String> _sexos = <String>['', 'hombre', 'mujer', 'Otro'];
@@ -49,12 +55,14 @@ class _EditProfileState extends State<EditProfile> {
   /// Constructor: mostrar el usuario _user
   _EditProfileState(UsuarioClass _user) {
     this._user = _user;
+    _base64Image = _user.pictureBase64;
+    _mimeType = _user.pictureMime;
+    _charset = _user.pictureCharset;
     _nameController.text = _user.nombre;
     _surnameController.text = _user.apellidos;
     _locationController.text = _user.ubicacionCiudad;
     _sexController.text = _user.sexo;
     _yearController.text = _user.edad.toString();
-    _galleryFile = null;
     _sexo = _user.sexo;
   }
 
@@ -76,7 +84,7 @@ class _EditProfileState extends State<EditProfile> {
     if (_nameController.text.length < 1 || _surnameController.text.length < 1) {
       showInSnackBar("Rellena toodos los campos correctamente", Colors.yellow);
     } else {
-      _user.update(_nameController.text, _surnameController.text, _sexo, 3, 3);
+      _user.update(_nameController.text, _surnameController.text, _sexo, 3, 3, _mimeType, _base64Image , _charset);
       edit(_user).then((response) {
         final Color legit = Colors.blue.withOpacity(0.5);
         final Color fake = Colors.red.withOpacity(0.5);
@@ -131,6 +139,9 @@ class _EditProfileState extends State<EditProfile> {
       _galleryFile = await ImagePicker.pickImage(
         source: ImageSource.gallery,
       );
+      _base64Image = base64Encode(_galleryFile.readAsBytesSync());
+      _mimeType = (lookupMimeType(_galleryFile.path));
+      _charset = "utf-8";
       setState(() {});
     }
 
@@ -148,8 +159,7 @@ class _EditProfileState extends State<EditProfile> {
                 Container(
                   margin: EdgeInsets.only(top: 50),
                   child: _galleryFile == null
-                      ? ProfilePicture(_user.urlPerfil)
-                      //TODO No deja crear ProfilePicture() con path local al seleccionar de galería
+                      ? ProfilePicture(_user)
                       : new CircleAvatar(
                           backgroundImage: new FileImage(_galleryFile),
                           radius: 70.0,

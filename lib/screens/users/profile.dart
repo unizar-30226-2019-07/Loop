@@ -153,7 +153,7 @@ class _ProfileState extends State<Profile> {
                   decoration: BoxDecoration(
                     color: Colors.white,
                   ),
-                  child: ProfilePicture(_user?.urlPerfil),
+                  child: ProfilePicture(_user),
                 ),
               ),
             ),

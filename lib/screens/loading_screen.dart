@@ -31,6 +31,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
         Storage.deleteToken();
       } else {
         print('LOADING: Usuario registrado');
+        print (token);
         legitUser = true;
       }
     }

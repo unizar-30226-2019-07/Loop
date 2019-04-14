@@ -25,7 +25,8 @@ class ItemRequest {
 
     String _otherParameters = '';
     _params.forEach((key, value) => _otherParameters += '&$key=$value');
-    String _paramsString = '?lat=$lat&lng=$lng$_otherParameters';
+    // TODO $_otherParameters
+    String _paramsString = '?lat=$lat&lng=$lng&distance=1000';
 
     // Esperar la respuesta de la petición
     http.Response response = await http
@@ -33,6 +34,7 @@ class ItemRequest {
       HttpHeaders.contentTypeHeader: ContentType.json.toString(),
       HttpHeaders.authorizationHeader: await Storage.loadToken(),
     });
+    print (_otherParameters);
 
     // Crear la lista de items a partir de la respuesta y devovlerla
     switch (response.statusCode) {
