@@ -53,13 +53,20 @@ class _ItemListState extends State<ItemList> {
   /// Para mas información, ver [FilterListClass]
   FilterListClass _filterManager;
 
+  /// Actualizar la lista de items de la página con los filtros de FilterListClass
+  void _updateList() {
+      _items = [];
+      lastPetitionPage = -1;
+      _loadItems(0);
+  }
+
   /// Lista de filtros (burbujas) para la parte superior de la pantalla
-  Widget _filterList;
+  Widget _filterList = Container();
 
   /// Actualizar lista de filtros [_filterList] (función callback para FilterListClass)
   void _updateFilters() {
     List<Map<String, dynamic>> _filters = _filterManager.getFiltersList();
-
+    _updateList(); // nueva peticion con los nuevos filtros
     setState(() {
       _filterList = Container(
           margin: EdgeInsets.symmetric(vertical: 7.0),
@@ -146,9 +153,6 @@ class _ItemListState extends State<ItemList> {
     if (queryTimer != null) queryTimer.cancel();
     queryTimer = new Timer(const Duration(milliseconds: 500), () {
       _filterManager.addFilter(newSearchQuery: value);
-      _items = []; // TODO no pedir items aqui
-      lastPetitionPage = -1;
-      _loadItems(0);
     });
   }
 
@@ -200,7 +204,6 @@ class _ItemListState extends State<ItemList> {
 
   /// Lista horizontal de filtros + modo de ordenación
   Widget _buildFilters() {
-    _updateFilters();
     return _filterList;
   }
 

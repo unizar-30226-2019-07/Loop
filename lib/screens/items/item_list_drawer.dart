@@ -3,6 +3,7 @@ import 'package:flutter_range_slider/flutter_range_slider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:selit/screens/items/item_list.dart';
 import 'package:selit/class/items/filter_list_class.dart';
+import 'dart:async';
 
 /// Listado de filtros de la lista de items, diseñado para acompañar
 /// a [ItemList]. Permite seleccionar precio y distancia con sliders, y
@@ -16,7 +17,6 @@ class ItemListDrawer extends StatefulWidget {
 }
 
 class _ItemListDrawerState extends State<ItemListDrawer> {
-
   /// Color más oscuro que el rojo principal
   final _blendColor = Color.alphaBlend(Color(0x552B2B2B), Color(0xFFC0392B));
 
@@ -30,15 +30,11 @@ class _ItemListDrawerState extends State<ItemListDrawer> {
 
   /// Títulos "¿Qué estás buscando?" (también para el alertdialog)
   static final _styleTitle = TextStyle(
-      fontSize: 22.0,
-      color: Colors.white,
-      fontWeight: FontWeight.bold);
+      fontSize: 22.0, color: Colors.white, fontWeight: FontWeight.bold);
 
   /// Texto del título del alertdialog
   static final _styleDialogTitle = TextStyle(
-      fontSize: 19.0,
-      color: Colors.white,
-      fontWeight: FontWeight.bold);
+      fontSize: 19.0, color: Colors.white, fontWeight: FontWeight.bold);
 
   /// Texto de los botones del alertdialog, para cuando esta seleccionado y no
   static final _styleDialogButtonsUnselected =
@@ -54,15 +50,19 @@ class _ItemListDrawerState extends State<ItemListDrawer> {
   /// Actualizar valores de precio
   void _updatePrice(double lower, double upper) {
     print('Precio: $lower - $upper');
-    setState(
-        () => _filterManager.addFilter(newMinPrice: lower, newMaxPrice: upper));
+    setState(() => _filterManager.addFilter(
+        newMinPrice: lower.toInt(), newMaxPrice: upper.toInt()));
   }
 
+  static Timer queryTimer; // evitar hacer muchas peticiones seguidas
+
   /// Actualizar valores de distancia
-  void _updateLocation(double lower, double upper) {
-    print('Distancia: $lower - $upper');
-    setState(() =>
-        _filterManager.addFilter(newMinDistance: lower, newMaxDistance: upper));
+  void _updateLocation(double upper) {
+    if (queryTimer != null) queryTimer.cancel();
+    queryTimer = new Timer(const Duration(milliseconds: 500), () {
+      print('Distancia: Hasta $upper');
+      setState(() => _filterManager.addFilter(newMaxDistance: upper.toInt()));
+    });
   }
 
   /// Seleccionar nueva categoría
@@ -147,36 +147,33 @@ class _ItemListDrawerState extends State<ItemListDrawer> {
       thumbColor: Colors.white, // dos botones a los lados
       overlayColor: Colors.white54, // al pulsar un boton
       valueIndicatorColor: Colors.grey[50], // indicador de xx €
-      valueIndicatorTextStyle:
-          TextStyle(color: Colors.black),
+      valueIndicatorTextStyle: TextStyle(color: Colors.black),
       activeTickMarkColor: Colors.transparent,
     );
 
     // Mostrar el precio como "40 €"
     final _formatPrecio = (double precio) => '${precio.toStringAsFixed(0)} €';
     // Mostrar la distancia como "200 m" o "1.5 km"
-    final _formatDistancia = (double distancia) => distancia < 1000
-        ? '${distancia.toStringAsFixed(0)} m'
-        : '${(distancia / 1000).toStringAsFixed(1)} km';
+    final _formatDistancia =
+        (double distancia) => '${(distancia / 1000).toStringAsFixed(1)} km';
 
     final _wPrecioSlider = Column(
       children: <Widget>[
         SliderTheme(
           data: _sliderThemeData,
           child: RangeSlider(
-            min: _filterManager.getAbsMinPrice(),
-            max: _filterManager.getAbsMaxPrice(),
-            lowerValue: _filterManager.minPrice,
-            upperValue: _filterManager.maxPrice,
-            divisions: (_filterManager.getAbsMaxPrice() -
-                    _filterManager.getAbsMinPrice())
-                .toInt(),
+            min: 0.0,
+            max: FilterListClass.absMaxPriceIndex.toDouble() - 1.0,
+            lowerValue: _filterManager.minPriceIndex.toDouble(),
+            upperValue: _filterManager.maxPriceIndex.toDouble(),
+            divisions: FilterListClass.absMaxPriceIndex - 1,
             showValueIndicator: true,
-            valueIndicatorFormatter: (i, value) => _formatPrecio(value),
+            valueIndicatorFormatter: (i, value) =>
+                _formatPrecio(FilterListClass.priceRange[value.toInt()]),
             onChanged: (double newLowerValue, double newUpperValue) {
               setState(() {
-                _filterManager.minPrice = newLowerValue;
-                _filterManager.maxPrice = newUpperValue;
+                _filterManager.minPriceIndex = newLowerValue.toInt();
+                _filterManager.maxPriceIndex = newUpperValue.toInt();
               });
             },
             onChangeEnd: _updatePrice,
@@ -185,11 +182,17 @@ class _ItemListDrawerState extends State<ItemListDrawer> {
         Row(
           children: <Widget>[
             Expanded(
-                child: Text(_formatPrecio(_filterManager.minPrice),
-                    style: _styleTextSliders, textAlign: TextAlign.left)),
+                child: Text(
+                    _formatPrecio(FilterListClass
+                        .priceRange[_filterManager.minPriceIndex]),
+                    style: _styleTextSliders,
+                    textAlign: TextAlign.left)),
             Expanded(
-                child: Text(_formatPrecio(_filterManager.maxPrice),
-                    style: _styleTextSliders, textAlign: TextAlign.end)),
+                child: Text(
+                    _formatPrecio(FilterListClass
+                        .priceRange[_filterManager.maxPriceIndex]),
+                    style: _styleTextSliders,
+                    textAlign: TextAlign.end)),
           ],
         ),
       ],
@@ -199,33 +202,30 @@ class _ItemListDrawerState extends State<ItemListDrawer> {
       children: <Widget>[
         SliderTheme(
           data: _sliderThemeData,
-          child: RangeSlider(
-            min: _filterManager.getAbsMinDistance(),
-            max: _filterManager.getAbsMaxDistance(),
-            lowerValue: _filterManager.minDistance,
-            upperValue: _filterManager.maxDistance,
-            divisions: (_filterManager.getAbsMaxDistance() -
-                    _filterManager.getAbsMinDistance()) ~/
-                100, // Incrementar la distancia cada 100 metros
-            showValueIndicator: true,
-            valueIndicatorFormatter: (i, value) => _formatDistancia(value),
-            onChanged: (double newLowerValue, double newUpperValue) {
+          child: Slider(
+            value: _filterManager.maxDistanceIndex.toDouble(),
+            label: _formatDistancia(
+                FilterListClass.distanceRange[_filterManager.maxDistanceIndex]),
+            min: 0,
+            max: FilterListClass.absMaxDistanceIndex.toDouble() - 1,
+            divisions: FilterListClass.absMaxDistanceIndex - 1,
+            semanticFormatterCallback: (double newValue) => _formatDistancia(
+                FilterListClass.distanceRange[newValue.toInt()]),
+            onChanged: (double newValue) {
+              _updateLocation(newValue);
               setState(() {
-                _filterManager.minDistance = newLowerValue;
-                _filterManager.maxDistance = newUpperValue;
+                _filterManager.maxDistanceIndex = newValue.toInt();
               });
             },
-            onChangeEnd: _updateLocation,
           ),
         ),
         Row(
           children: <Widget>[
             Expanded(
-                child: Text(_formatDistancia(_filterManager.minDistance),
-                    style: _styleTextSliders, textAlign: TextAlign.left)),
-            Expanded(
-                child: Text(_formatDistancia(_filterManager.maxDistance),
-                    style: _styleTextSliders, textAlign: TextAlign.end)),
+                child: Text(
+                    'Hasta ${_formatDistancia(FilterListClass.distanceRange[_filterManager.maxDistanceIndex])}',
+                    style: _styleTextSliders,
+                    textAlign: TextAlign.left)),
           ],
         ),
       ],
