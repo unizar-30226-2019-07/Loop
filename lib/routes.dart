@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:selit/screens/debug_main.dart';
 import 'package:selit/screens/loading_screen.dart';
 import 'package:selit/screens/principal.dart';
 import 'package:selit/screens/users/profile.dart';
@@ -10,10 +9,13 @@ import 'package:selit/screens/items/item_list.dart';
 import 'package:selit/screens/items/item_details.dart';
 import 'package:selit/screens/items/new_item.dart';
 import 'package:selit/screens/items/new_item_2.dart';
+import 'package:selit/screens/settings/settings.dart';
+import 'package:selit/screens/settings/account.dart';
 
 class Routes {
   final routes = <String, dynamic>{
-    '/debug-main': (settings) => _buildRoute(settings, new DebugMain()),
+    '/settings': (settings) => _buildRoute(settings, new Settings()),
+    '/account': (settings) => _buildRoute(settings, new Account()),
     '/profile': (settings) =>
         _buildRoute(settings, new Profile(userId: settings.arguments)),
     '/edit-profile': (settings) =>
