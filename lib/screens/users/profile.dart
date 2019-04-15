@@ -39,12 +39,18 @@ class _ProfileState extends State<Profile> {
   static final _styleNothing =
       const TextStyle(fontSize: 20.0, color: Colors.grey);
   static final _textAlignment = TextAlign.left;
-  
+
   /// Color más oscuro que el rojo principal
   final _blendColor = Color.alphaBlend(Color(0x552B2B2B), Color(0xFFC0392B));
 
   /// Controlador tabs "en venta" y "vendido"
   PageController _pageController = PageController(initialPage: 0);
+
+  /// Controlador listas "en venta" y "vendido"
+  ScrollController _controllerEnVenta =
+      ScrollController(initialScrollOffset: 0, keepScrollOffset: false);
+  ScrollController _controllerVendidos =
+      ScrollController(initialScrollOffset: 0, keepScrollOffset: false);
 
   /// Color de "en venta" (necesario alternarlo entre blanco-negro)
   Color _tabColorLeft = Colors.black;
@@ -83,7 +89,8 @@ class _ProfileState extends State<Profile> {
     if (_ubicacionCiudad == null && _ubicacionResto == null) {
       // Se obtienen sus valores de ubicación
       final coordinates = new Coordinates(_user.locationLat, _user.locationLng);
-      var addresses = await Geocoder.local.findAddressesFromCoordinates(coordinates);
+      var addresses =
+          await Geocoder.local.findAddressesFromCoordinates(coordinates);
       setState(() {
         _ubicacionCiudad = addresses.first.locality;
         _ubicacionResto = addresses.first.countryName;
@@ -99,24 +106,24 @@ class _ProfileState extends State<Profile> {
       // TODO excepción al terminar de cargar los objetos cuando se ha cambiado de pantalla
       ItemRequest.getItemsFromUser(userId: _user.userId, status: "en venta")
           .then((itemsVenta) {
-            setState(() {
-              if (itemsVenta.isEmpty) {
-                _itemsEnVentaEmpty = true;
-              } else {
-                _itemsEnVenta = itemsVenta;
-              }
-            });
-          });
+        setState(() {
+          if (itemsVenta.isEmpty) {
+            _itemsEnVentaEmpty = true;
+          } else {
+            _itemsEnVenta = itemsVenta;
+          }
+        });
+      });
       ItemRequest.getItemsFromUser(userId: _user.userId, status: "vendido")
           .then((itemsVendidos) {
-            setState(() {
-              if (itemsVendidos.isEmpty) {
-                _itemsVendidosEmpty = true;
-              } else {
-                _itemsVendidos = itemsVendidos;
-              }
-            });
-          });
+        setState(() {
+          if (itemsVendidos.isEmpty) {
+            _itemsVendidosEmpty = true;
+          } else {
+            _itemsVendidos = itemsVendidos;
+          }
+        });
+      });
     }
   }
 
@@ -128,16 +135,16 @@ class _ProfileState extends State<Profile> {
   void _onPressedEnVenta() {
     _pageController.animateToPage(0,
         duration: Duration(milliseconds: 300), curve: Curves.decelerate);
-    setState(() {
-      _tabColorLeft = Colors.black;
-      _tabColorRight = Colors.white;
-    });
+    _controllerEnVenta.animateTo(0,
+        duration: Duration(milliseconds: 150), curve: Curves.linear);
   }
 
   // Pulsación del boton "vendidos"
   void _onPressedVendidos() {
     _pageController.animateToPage(1,
         duration: Duration(milliseconds: 300), curve: Curves.decelerate);
+    _controllerVendidos.animateTo(0,
+        duration: Duration(milliseconds: 150), curve: Curves.linear);
   }
 
   /// Constructor para los botones "en venta" y "vendido"
@@ -174,7 +181,8 @@ class _ProfileState extends State<Profile> {
           children: <Widget>[
             Container(
               margin: EdgeInsets.only(top: 20),
-              child: ClipOval( // borde de 2 pixeles sobre la foto
+              child: ClipOval(
+                // borde de 2 pixeles sobre la foto
                 child: Container(
                   color: _blendColor,
                   padding: EdgeInsets.all(2.0),
@@ -196,69 +204,64 @@ class _ProfileState extends State<Profile> {
     );
 
     Widget wEditProfile = _user == null
-      ? Container()
-      : Container(
-          margin: EdgeInsets.only(right:15),
-          child: GestureDetector(
-            onTap: _onPressedEditProfile,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(4.0),
-              child: Container(
-                padding: EdgeInsets.all(2.0),
-                color: _blendColor,
-                alignment: Alignment.centerRight,
-                width: 130.0,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
+        ? Container()
+        : Container(
+            margin: EdgeInsets.only(right: 15),
+            child: GestureDetector(
+                onTap: _onPressedEditProfile,
+                child: ClipRRect(
+                    borderRadius: BorderRadius.circular(4.0),
+                    child: Container(
+                        padding: EdgeInsets.all(2.0),
+                        color: _blendColor,
+                        alignment: Alignment.centerRight,
+                        width: 130.0,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: <Widget>[
+                            Container(
+                              margin: EdgeInsets.only(right: 5),
+                              child: Icon(Icons.edit,
+                                  color: Colors.white, size: 18.0),
+                            ),
+                            Container(
+                                margin: EdgeInsets.only(right: 10),
+                                child: Text('Editar perfil',
+                                    style: _styleEditProfile))
+                          ],
+                        )))));
+
+    Widget wLocation = _ubicacionCiudad == null || _ubicacionResto == null
+        ? Container()
+        : SizedBox(
+            width: double.infinity,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Row(
                   children: <Widget>[
                     Container(
                       margin: EdgeInsets.only(right: 5),
-                      child: Icon(Icons.edit, color: Colors.white, size: 18.0),
+                      child: Icon(Icons.location_on, color: Colors.white),
                     ),
-                    Container(
-                      margin: EdgeInsets.only(right: 10),
-                      child: Text('Editar perfil', style: _styleEditProfile)
-                    )
+                    Text(
+                      _ubicacionCiudad,
+                      style: _styleUbicacion,
+                      textAlign: _textAlignment,
+                    ),
                   ],
-                )
-              )
-            )
-          )
-        );
-
-    Widget wLocation = _ubicacionCiudad == null || _ubicacionResto == null
-      ? Container()
-      : SizedBox(
-          width: double.infinity,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Row(
-                children: <Widget>[
-                  Container(
-                    margin: EdgeInsets.only(right: 5),
-                    child: Icon(Icons.location_on, color: Colors.white),
-                  ),
-                  Text(
-                    _ubicacionCiudad,
+                ),
+                Container(
+                  alignment: Alignment.topLeft,
+                  margin: EdgeInsets.only(left: 30),
+                  child: Text(
+                    _ubicacionResto,
                     style: _styleUbicacion,
                     textAlign: _textAlignment,
                   ),
-                ],
-              ),
-              Container(
-                alignment: Alignment.topLeft,
-                margin: EdgeInsets.only(left: 30),
-                child: Text(
-                  _ubicacionResto,
-                  style: _styleUbicacion,
-                  textAlign: _textAlignment,
-                ),
-              )
-            ],
-          )
-        );
-
+                )
+              ],
+            ));
 
     Widget wUserDataRight = Expanded(
       flex: 6,
@@ -270,7 +273,8 @@ class _ProfileState extends State<Profile> {
               wEditProfile,
               Container(
                   alignment: Alignment.centerLeft,
-                  padding: EdgeInsets.only(top: wEditProfile == Container() ? 25 : 10),
+                  padding: EdgeInsets.only(
+                      top: wEditProfile == Container() ? 25 : 10),
                   child: Text(_user?.nombre ?? '---',
                       style: _styleNombre, textAlign: _textAlignment)),
               Container(
@@ -280,7 +284,8 @@ class _ProfileState extends State<Profile> {
                       style: _styleNombre, textAlign: _textAlignment)),
               Container(
                   alignment: Alignment.centerLeft,
-                  margin: EdgeInsets.only(top: 10, bottom: wLocation == Container() ? 45 : 10),
+                  margin: EdgeInsets.only(
+                      top: 10, bottom: wLocation == Container() ? 45 : 10),
                   child: Text('${_user?.sexo}, ${_user?.edad} años',
                       style: _styleSexoEdad, textAlign: _textAlignment)),
               wLocation
@@ -295,7 +300,8 @@ class _ProfileState extends State<Profile> {
 
     Widget wProductListSelling;
     if (_itemsEnVenta.isEmpty) {
-      if (_itemsEnVentaEmpty) {  // Efectivamente esta vacio, no esta cargando
+      if (_itemsEnVentaEmpty) {
+        // Efectivamente esta vacio, no esta cargando
         wProductListSelling = Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
@@ -306,7 +312,8 @@ class _ProfileState extends State<Profile> {
             )
           ],
         );
-      } else { // Todavia esta cargando
+      } else {
+        // Todavia esta cargando
         wProductListSelling = Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
@@ -320,6 +327,7 @@ class _ProfileState extends State<Profile> {
       wProductListSelling = Container(
         margin: EdgeInsets.only(top: 5),
         child: ListView.builder(
+          controller: _controllerEnVenta,
           padding: EdgeInsets.symmetric(horizontal: 15),
           itemCount: _itemsEnVenta.length,
           itemBuilder: (context, index) => ItemTile(_itemsEnVenta[index]),
@@ -329,7 +337,8 @@ class _ProfileState extends State<Profile> {
 
     Widget wProductListSold;
     if (_itemsVendidos.isEmpty) {
-      if (_itemsVendidosEmpty) { // Efectivamente esta vacio, no esta cargando
+      if (_itemsVendidosEmpty) {
+        // Efectivamente esta vacio, no esta cargando
         wProductListSold = Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
@@ -340,7 +349,8 @@ class _ProfileState extends State<Profile> {
             )
           ],
         );
-      } else { // Todavia esta cargando
+      } else {
+        // Todavia esta cargando
         wProductListSold = Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
@@ -354,6 +364,7 @@ class _ProfileState extends State<Profile> {
       wProductListSold = Container(
         margin: EdgeInsets.only(top: 5),
         child: ListView.builder(
+          controller: _controllerVendidos,
           padding: EdgeInsets.symmetric(horizontal: 15),
           itemCount: _itemsVendidos.length,
           itemBuilder: (context, index) => ItemTile(_itemsVendidos[index]),
