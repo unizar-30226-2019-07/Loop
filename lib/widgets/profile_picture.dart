@@ -1,15 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:selit/class/usuario_class.dart';
+import 'package:selit/class/image_class.dart';
 
 /// Foto de perfil con carga dinámica (mostrar la foto por defecto o la del usuario)
 class ProfilePicture extends StatelessWidget {
-  static const DEFAULT = 'assets/img/profile_default.jpg';
+  static final defaultImage = Image.asset('assets/img/profile_default.jpg', fit: BoxFit.cover);
+  static final color = Colors.grey[300];
 
-  final UsuarioClass _user;
+  final ImageClass _image;
 
-  ProfilePicture(this._user);
+  ProfilePicture(this._image);
 
   @override
-  Widget build(BuildContext context) =>
-      _user == null ? Image.asset(DEFAULT) : _user.profileImage.image;
+  Widget build(BuildContext context) => ClipOval(
+    child: AspectRatio(
+      aspectRatio: 1.0, // cuadrado
+      child: Container(
+        color: color,
+        child: _image?.image == null ? defaultImage : _image.image,
+      ),
+    )
+  );
+      
 }

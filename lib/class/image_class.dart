@@ -23,6 +23,7 @@ class ImageClass {
           HttpHeaders.authorizationHeader: await token,
         },
       ),
+      fit: BoxFit.cover,
       fadeInDuration: Duration(milliseconds: 250),
     );
   }
@@ -31,7 +32,7 @@ class ImageClass {
   ImageClass.network({@required this.imageId, @required Future<String> tokenHeader}) {
     assert(imageId == null || imageId > 0, 'Una imagen debe tener un ID mayor que 0');
     if (imageId == null) {
-      image = Image.asset('assets/img/profile_default.jpg'); // TODO elegir imagen por defecto
+      image = Image.asset('assets/img/profile_default.jpg', fit: BoxFit.cover); // TODO elegir imagen por defecto
     } else {
       _loadImage(tokenHeader);
     }

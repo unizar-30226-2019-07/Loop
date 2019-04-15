@@ -51,15 +51,18 @@ class _EditProfileState extends State<EditProfile> {
   List<String> _sexos = <String>['', 'hombre', 'mujer', 'otro'];
   String _sexo = '';
 
+  ImageClass _displayImage;
+
   /// Constructor: mostrar el usuario _user
   _EditProfileState(UsuarioClass _user) {
     this._user = _user;
     _nameController.text = _user.nombre;
     _surnameController.text = _user.apellidos;
-    _locationController.text = _user.ubicacionCiudad;
+    //_locationController.text = _user.ubicacionCiudad;
     _sexController.text = _user.sexo;
     _yearController.text = _user.edad.toString();
     _sexo = _user.sexo;
+    _displayImage = _user.profileImage;
   }
 
   void showInSnackBar(String value, Color alfa) {
@@ -78,9 +81,16 @@ class _EditProfileState extends State<EditProfile> {
 
   void updateUser() {
     if (_nameController.text.length < 1 || _surnameController.text.length < 1) {
-      showInSnackBar("Rellena toodos los campos correctamente", Colors.yellow);
+      showInSnackBar("Rellena todos los campos correctamente", Colors.yellow);
     } else {
-      _user.update(_nameController.text, _surnameController.text, _sexo, _user.locationLat, _user.locationLng);
+      _user.update(
+        nombre: _nameController.text,
+        apellidos: _surnameController.text,
+        sexo: _sexo,
+        locationLat: _user.locationLat,
+        locationLng: _user.locationLng,
+        image: _displayImage
+      );
       edit(_user).then((response) {
         final Color legit = Colors.blue.withOpacity(0.5);
         final Color fake = Colors.red.withOpacity(0.5);
@@ -148,7 +158,7 @@ class _EditProfileState extends State<EditProfile> {
         source: ImageSource.gallery,
       );
       setState(() {
-        _user.profileImage = ImageClass.file(fileImage: pickedFile);
+        _displayImage = ImageClass.file(fileImage: pickedFile);
       });
     }
 
@@ -164,8 +174,12 @@ class _EditProfileState extends State<EditProfile> {
               children: <Widget>[
                 Container(
                   margin: EdgeInsets.only(top: 50),
-                  child: ClipOval(
-                    child: ProfilePicture(_user),
+                  child: ClipOval( // borde de 2 pixeles sobre la foto
+                    child: Container(
+                      color: Colors.grey[600],
+                      padding: EdgeInsets.all(2.0),
+                      child: ProfilePicture(_displayImage),
+                    ),
                   ),
                 ),
                 Container(

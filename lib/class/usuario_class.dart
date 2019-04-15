@@ -14,8 +14,6 @@ class UsuarioClass {
   String email;
   int edad;
   DateTime nacimiento;
-  String ubicacionCiudad; // Ej: Zaragoza
-  String ubicacionResto; // Ej: Aragon, España
   double numeroEstrellas;
   int reviews;
   String token;
@@ -30,8 +28,6 @@ class UsuarioClass {
       this.sexo,
       this.email,
       this.edad,
-      this.ubicacionCiudad,
-      this.ubicacionResto,
       this.numeroEstrellas,
       this.reviews,
       this.token,
@@ -65,13 +61,19 @@ class UsuarioClass {
               tokenHeader: Storage.loadToken(),
             ));
 
-  void update(String _nombre, String _apellidos, String _sexo, double lat,
-      double long) {
-    this.nombre = _nombre;
-    this.apellidos = _apellidos;
-    this.sexo = _sexo;
-    this.locationLat = lat;
-    this.locationLng = long;
+  void update(
+      {String nombre,
+      String apellidos,
+      String sexo,
+      double locationLat,
+      double locationLng,
+      ImageClass image}) {
+    this.nombre = nombre;
+    this.apellidos = apellidos;
+    this.sexo = sexo;
+    this.locationLat = locationLat;
+    this.locationLng = locationLng;
+    this.profileImage = image;
   }
 
   Map<String, dynamic> toJsonEdit() => {
