@@ -1,7 +1,12 @@
 /// Lista de filtros empleada para la comunicación entre ItemList e ItemListDrawer
 /// Contiene todos los filtros posibles a aplicar sobre el listado de objetos
 class FilterListClass {
-  //
+  /// Nombres de categorías empleados por la API
+  static final List<String> categoryAPINames = [
+    '',
+    'Automocion',
+    'Informatica'
+  ];
 
   // Nombres a mostrar en el menú del drawer y burbujas de filtros
   static final List<String> categoryNames = [
@@ -171,9 +176,9 @@ class FilterListClass {
     map.putIfAbsent("priceTo", () => priceRange[maxPriceIndex].toString());
     // Distancia
     map.putIfAbsent("distance", () => distanceRange[maxDistanceIndex].toString());
-    // Categoria, TODO obtener el nombre de la categoria de otra lista que no sea [categoryNames]
+    // Categoria
     if (categoryId != 0)
-      map.putIfAbsent("category", () => categoryNames[categoryId]);
+      map.putIfAbsent("category", () => categoryAPINames[categoryId]);
     // Ordenación
     final _sortList = [
       'distance ASC',
