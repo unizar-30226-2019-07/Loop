@@ -112,16 +112,6 @@ class ItemTile extends StatelessWidget {
                       ),
                     ],
                   ),
-                  /*ListTile(
-                        title: Text(_item?.title ?? '---'),
-                        subtitle: Text(_item.description ?? '---', overflow: TextOverflow.ellipsis, textAlign: TextAlign.left,maxLines:5),
-                        trailing: Text('${_item?.price} ${_item?.currency}'),
-                        leading: Container(
-                          margin: EdgeInsets.only(left: 6.0, bottom: 15.0),
-                          child: Image.network('https://i.imgur.com/rqSvE0T.png', // TODO sustituir por .images
-                            width: 65.0, fit: BoxFit.fill)
-                        ),
-                      ),*/
                 ),
               ),
             ),

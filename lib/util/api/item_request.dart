@@ -42,8 +42,8 @@ class ItemRequest {
     switch (response.statusCode) {
       case 200:
         List<ItemClass> products = new List<ItemClass>();
-        (json.jsonDecode(response.body) as List<dynamic>).forEach((userJson) {
-          products.add(ItemClass.fromJson(userJson));
+        (json.jsonDecode(response.body) as List<dynamic>).forEach((productJson) {
+          products.add(ItemClass.fromJson(productJson));
         });
         return products;
         break;
@@ -77,8 +77,8 @@ class ItemRequest {
     switch (response.statusCode) {
       case 200:
         List<ItemClass> products = new List<ItemClass>();
-        (json.jsonDecode(response.body) as List<dynamic>).forEach((userJson) {
-          products.add(ItemClass.fromJson(userJson));
+        (json.jsonDecode(response.body) as List<dynamic>).forEach((productJson) {
+          products.add(ItemClass.fromJson(productJson));
         });
         return products;
         break;

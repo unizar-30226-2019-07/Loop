@@ -41,6 +41,7 @@ class ItemTileVertical extends StatelessWidget {
                   child: Column(
                     mainAxisSize: MainAxisSize.max,
                     children: <Widget>[
+                      // TODO si el producto no tiene imágenes, no mostrar ni Image ni SizedBox
                       // Imagen superior: máximo de 200 píxeles
                       SizedBox(
                         width: double.infinity,
@@ -94,7 +95,6 @@ class ItemTileVertical extends StatelessWidget {
                         ),
                     ],
                   ),
-                      
                 ),
               ),
             ),

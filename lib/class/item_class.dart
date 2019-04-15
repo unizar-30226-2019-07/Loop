@@ -1,5 +1,6 @@
 import 'package:selit/class/usuario_class.dart';
 import 'package:selit/class/image_class.dart';
+import 'package:selit/util/storage.dart';
 
 /// Objeto/producto en venta de la aplicación, almacena información
 /// sobre su descripción, su tipo de venta y el usuario vendedor (ver [UsuarioClass])
@@ -51,6 +52,18 @@ class ItemClass {
         assert(numLikes == null || numLikes >= 0,
             'El número de likes debe ser al menos 0');
 
+  // TODO no esta probado, las imagenes de los productos todavia no están implementadas
+  static List<ImageClass> _getImages(Map<String, dynamic> json) {
+    List<ImageClass> images = List<ImageClass>();
+    if (json != null) {
+      Future<String> token = Storage.loadToken();
+      (json as List<dynamic>).forEach((imageJson) {
+        images.add(ImageClass.network(imageId: json['imageId'], tokenHeader: token));
+      });
+    }
+    return images;
+  }
+
   /// Constructor a partir de JSON
   ItemClass.fromJson(Map<String, dynamic> json)
       : this(
@@ -69,7 +82,8 @@ class ItemClass {
             numViews: json['nvis'],
             numLikes: json['nfav'],
             owner: UsuarioClass.fromJson(json['owner']),
-            images: List<ImageClass>() /* TODO */);
+            images: _getImages(json['picture'])
+          );
 
   void update(String _type, double _price, String _currency) {
     this.type = _type;
