@@ -21,7 +21,7 @@ class ItemClass {
   int numViews;
   int numLikes;
   UsuarioClass owner; // vendedor del item
-  List<ImageClass> images; // lista de 0+ imágenes
+  List<ImageClass> media; // lista de 0+ imágenes
 
   /// Constructor por defecto, comprobar que los atributos son correctos
   ItemClass(
@@ -41,7 +41,7 @@ class ItemClass {
       this.numLikes,
       this.owner,
 
-      this.images})
+      this.media})
       : assert(type == null || type == "sale" || type == "auction",
             'Tipo inválido para un item (venta/subasta)'),
         assert(distance == null || distance >= 0,
@@ -82,7 +82,7 @@ class ItemClass {
             numViews: json['nvis'],
             numLikes: json['nfav'],
             owner: UsuarioClass.fromJson(json['owner']),
-            images: _getImages(json['picture'])
+            media: _getImages(json['picture'])
           );
 
   void update(String _type, double _price, String _currency) {

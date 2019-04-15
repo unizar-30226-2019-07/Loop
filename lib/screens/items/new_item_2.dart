@@ -95,7 +95,7 @@ class _NewItemState2 extends State<NewItem2> {
       showInSnackBar("Rellena todos los campos correctamente", Colors.yellow);
     } else {
       ///TODO cambiar sale por __tipoPrecio cuando estén implementadas las subastas
-      _item.update("sale", double.parse(_priceController.text), _divisa);
+      _item.update("sale", double.parse(_priceController.text.replaceAll(',', '.')), _divisa);
 
       ItemRequest.create(_item).then((_) {
           showInSnackBar("Datos actualizados correctamente", _colorStatusBarGood);
@@ -262,7 +262,7 @@ class _NewItemState2 extends State<NewItem2> {
                       labelText: 'Precio',
                     ),
                     controller: _priceController,
-                    keyboardType: TextInputType.number,
+                    keyboardType: TextInputType.numberWithOptions(signed: false, decimal: true),
                   ),
                 ],
               )),
@@ -321,7 +321,7 @@ class _NewItemState2 extends State<NewItem2> {
                       labelText: 'Límite',
                     ),
                     controller: _limitController,
-                    keyboardType: TextInputType.number,
+                    keyboardType: TextInputType.numberWithOptions(signed: false, decimal: true),
                   ),
                 ],
               )),
