@@ -103,7 +103,7 @@ class ItemRequest {
     int _productId = item.itemId;
     print('Id de producto en request: ' + item.itemId.toString());
     final response = await http.put(
-      '${APIConfig.BASE_URL}/products?product_id=$_productId',
+      '${APIConfig.BASE_URL}/products/$_productId',
       headers: {
         HttpHeaders.contentTypeHeader: ContentType.json.toString(),
         HttpHeaders.authorizationHeader: await Storage.loadToken(),
@@ -112,6 +112,7 @@ class ItemRequest {
     );
 
     if (response.statusCode != 201) {
+      print(response.statusCode);
       throw(APIConfig.getErrorString(response));
     }
   }
@@ -121,7 +122,7 @@ class ItemRequest {
     int _productId = item.itemId;
     print('Id de producto en request: ' + item.itemId.toString());
     final response = await http.delete(
-      '${APIConfig.BASE_URL}/products?product_id=$_productId',
+      '${APIConfig.BASE_URL}/products/$_productId',
       headers: {
         HttpHeaders.contentTypeHeader: ContentType.json.toString(),
         HttpHeaders.authorizationHeader: await Storage.loadToken(),
@@ -129,6 +130,7 @@ class ItemRequest {
     );
 
     if (response.statusCode != 200) {
+      print(response.statusCode);
       throw(APIConfig.getErrorString(response));
     }
   }
