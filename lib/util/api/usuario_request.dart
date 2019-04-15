@@ -68,8 +68,9 @@ class UsuarioRequest {
     }
 
     if (response.statusCode == 200) {
+      String token = await Storage.loadToken();
       UsuarioClass perfil =
-          UsuarioClass.fromJson(json.jsonDecode(response.body));
+          UsuarioClass.fromJson(json.jsonDecode(response.body), token);
       return perfil;
     } else {
       throw(APIConfig.getErrorString(response));
@@ -96,9 +97,10 @@ class UsuarioRequest {
     });
 
     if (response.statusCode == 200) {
+      String token = await Storage.loadToken();
       List<UsuarioClass> users = new List<UsuarioClass>();
       (json.jsonDecode(response.body) as List<dynamic>).forEach((userJson) {
-        users.add(UsuarioClass.fromJson(userJson));
+        users.add(UsuarioClass.fromJson(userJson, token));
       });
       return users;
     } else {

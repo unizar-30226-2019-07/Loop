@@ -340,7 +340,7 @@ class _ProfileState extends State<Profile> {
           controller: _controllerEnVenta,
           padding: EdgeInsets.symmetric(horizontal: 15),
           itemCount: _itemsEnVenta.length,
-          itemBuilder: (context, index) => ItemTile(_itemsEnVenta[index]),
+          itemBuilder: (context, index) => ItemTile(_itemsEnVenta[index], index % 2 == 0),
         ),
       );
     }
@@ -377,7 +377,7 @@ class _ProfileState extends State<Profile> {
           controller: _controllerVendidos,
           padding: EdgeInsets.symmetric(horizontal: 15),
           itemCount: _itemsVendidos.length,
-          itemBuilder: (context, index) => ItemTile(_itemsVendidos[index]),
+          itemBuilder: (context, index) => ItemTile(_itemsVendidos[index], index % 2 == 0),
         ),
       );
     }

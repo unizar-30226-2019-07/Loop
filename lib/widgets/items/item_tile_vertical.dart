@@ -41,20 +41,16 @@ class ItemTileVertical extends StatelessWidget {
                   child: Column(
                     mainAxisSize: MainAxisSize.max,
                     children: <Widget>[
-                      // TODO si el producto no tiene imágenes, no mostrar ni Image ni SizedBox
                       // Imagen superior: máximo de 200 píxeles
-                      SizedBox(
-                        width: double.infinity,
-                        child: Container(
-                          constraints: BoxConstraints(maxHeight: 200.0),
-                          child: Image.network(
-                            'https://images.pexels.com/photos/845405/pexels-photo-845405.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260', // TODO sustituir por .images
-                            fit: BoxFit.cover,
-                            color: Colors.white12, // filtro para blanquear
-                            colorBlendMode: BlendMode.srcOver,
+                      _item.media.isEmpty
+                        ? Container()
+                        : SizedBox(
+                            width: double.infinity,
+                            child: Container(
+                              constraints: BoxConstraints(maxHeight: 200.0),
+                              child: _item.media[0].image,
+                            ),
                           ),
-                        ),
-                      ),
                       // Borde entre la imagen y el resto
                       SizedBox.fromSize(
                         size: Size(double.infinity, 1.0),

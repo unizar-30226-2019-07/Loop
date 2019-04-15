@@ -44,7 +44,7 @@ class UsuarioClass {
                 numeroEstrellas >= 0 && numeroEstrellas <= 5,
             'Un usuario debe tener un número de estrellas entre 1 y 5');
 
-  UsuarioClass.fromJson(Map<String, dynamic> json)
+  UsuarioClass.fromJson(Map<String, dynamic> json, String tokenHeader)
       : this(
             userId: json['idUsuario'],
             nombre: json['first_name'],
@@ -58,7 +58,7 @@ class UsuarioClass {
             locationLng: json['location']['lng'],
             profileImage: ImageClass.network(
               imageId: json['picture']['idImagen'],
-              tokenHeader: Storage.loadToken(),
+              tokenHeader: tokenHeader,
             ));
 
   void update(

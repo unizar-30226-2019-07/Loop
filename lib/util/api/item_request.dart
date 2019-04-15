@@ -40,8 +40,9 @@ class ItemRequest {
     // Crear la lista de items a partir de la respuesta y devovlerla
     if (response.statusCode == 200) {
       List<ItemClass> products = new List<ItemClass>();
+      String token = await Storage.loadToken();
       (json.jsonDecode(response.body) as List<dynamic>).forEach((productJson) {
-        products.add(ItemClass.fromJson(productJson));
+        products.add(ItemClass.fromJson(productJson, token));
       });
       return products;
     } else {
@@ -71,8 +72,9 @@ class ItemRequest {
 
     if (response.statusCode == 200) {
       List<ItemClass> products = new List<ItemClass>();
+      String token = await Storage.loadToken();
       (json.jsonDecode(response.body) as List<dynamic>).forEach((productJson) {
-        products.add(ItemClass.fromJson(productJson));
+        products.add(ItemClass.fromJson(productJson, token));
       });
       return products;
     } else {

@@ -52,20 +52,18 @@ class ItemClass {
         assert(numLikes == null || numLikes >= 0,
             'El número de likes debe ser al menos 0');
 
-  // TODO no esta probado, las imagenes de los productos todavia no están implementadas
-  static List<ImageClass> _getImages(Map<String, dynamic> json) {
+  static List<ImageClass> _getImages(List<dynamic> json, String tokenHeader) {
     List<ImageClass> images = List<ImageClass>();
     if (json != null) {
-      Future<String> token = Storage.loadToken();
-      (json as List<dynamic>).forEach((imageJson) {
-        images.add(ImageClass.network(imageId: json['imageId'], tokenHeader: token));
+      json.forEach((imageJson) {
+        images.add(ImageClass.network(imageId: imageJson['idImagen'], tokenHeader: tokenHeader));
       });
     }
     return images;
   }
 
   /// Constructor a partir de JSON
-  ItemClass.fromJson(Map<String, dynamic> json)
+  ItemClass.fromJson(Map<String, dynamic> json, String tokenHeader)
       : this(
             itemId: json['id_producto'],
             type: json['type'],
@@ -81,8 +79,8 @@ class ItemClass {
             status: json['status'],
             numViews: json['nvis'],
             numLikes: json['nfav'],
-            owner: UsuarioClass.fromJson(json['owner']),
-            media: _getImages(json['picture'])
+            owner: UsuarioClass.fromJson(json['owner'], tokenHeader),
+            media: _getImages(json['media'], tokenHeader)
           );
 
   void update(String _type, double _price, String _currency) {

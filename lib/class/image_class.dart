@@ -14,23 +14,19 @@ class ImageClass {
   String mime;
   String charset;
 
-  void _loadImage(Future<String> token) async {
-    image = Image.network(
-      '${APIConfig.BASE_URL}/pictures/$imageId',
-      headers: {
-        HttpHeaders.authorizationHeader: await token,
-      },
-      fit: BoxFit.cover,
-    );
-  }
-
   // Constructor a partir de un ID
-  ImageClass.network({@required this.imageId, @required Future<String> tokenHeader}) {
+  ImageClass.network({@required this.imageId, @required String tokenHeader}) {
     assert(imageId == null || imageId > 0, 'Una imagen debe tener un ID mayor que 0');
     if (imageId == null) {
-      image = Image.asset('assets/img/profile_default.jpg', fit: BoxFit.cover); // TODO elegir imagen por defecto
+      image = Image.asset('assets/img/profile_default.jpg', fit: BoxFit.cover);
     } else {
-      _loadImage(tokenHeader);
+      image = Image.network(
+        '${APIConfig.BASE_URL}/pictures/$imageId',
+        headers: {
+          HttpHeaders.authorizationHeader: tokenHeader,
+        },
+        fit: BoxFit.cover,
+      );
     }
   }
 

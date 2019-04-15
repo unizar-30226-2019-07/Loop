@@ -281,7 +281,7 @@ class _ItemListState extends State<ItemList> {
           itemBuilder: (context, index) {
             _loadItems(index ~/
                 ITEMS_PER_PAGE + 1); // número de página que está viendo el usuario
-            return ItemTile(_items[index]);
+            return ItemTile(_items[index], index % 2 == 0);
           },
         );
       } else {
