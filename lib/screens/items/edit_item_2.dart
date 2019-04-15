@@ -105,8 +105,7 @@ class _EditItemState2 extends State<EditItem2> {
           Navigator.of(context).pop();
           Navigator.of(context).pop();
       }).catchError((error) {
-        print('Error al actualizar');
-        if (error == "No autorizado" || error == "Prohibido") {
+        if (error == "Unauthorized" || error == "Forbidden") {
           showInSnackBar("Acción no autorizada", _colorStatusBarBad);
         } else {
           showInSnackBar("No hay conexión a internet", _colorStatusBarBad);

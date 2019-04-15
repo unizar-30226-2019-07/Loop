@@ -1,4 +1,3 @@
-
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:selit/class/usuario_class.dart';
@@ -84,13 +83,12 @@ class _EditProfileState extends State<EditProfile> {
       showInSnackBar("Rellena todos los campos correctamente", Colors.yellow);
     } else {
       _user.update(
-        nombre: _nameController.text,
-        apellidos: _surnameController.text,
-        sexo: _sexo,
-        locationLat: _user.locationLat,
-        locationLng: _user.locationLng,
-        image: _displayImage
-      );
+          nombre: _nameController.text,
+          apellidos: _surnameController.text,
+          sexo: _sexo,
+          locationLat: _user.locationLat,
+          locationLng: _user.locationLng,
+          image: _displayImage);
       edit(_user).then((response) {
         final Color legit = Colors.blue.withOpacity(0.5);
         final Color fake = Colors.red.withOpacity(0.5);
@@ -124,22 +122,23 @@ class _EditProfileState extends State<EditProfile> {
         _oldPassController.text.length <= 0) {
       showInSnackBar("Completa todos los campos", Colors.yellow);
     } else {
-      int miId = await Storage.loadUserId();      
+      int miId = await Storage.loadUserId();
       UsuarioRequest.password(
               _oldPassController.text, _newPassController.text, miId)
           .then((_) {
-        showInSnackBar("Contraseña actualizada correctamente", _colorStatusBarGood);
+        showInSnackBar(
+            "Contraseña actualizada correctamente", _colorStatusBarGood);
       }).catchError((error) {
-        if (error == "No autorizado" || error == "Prohibido" || error =="No encontrado") {
+        if (error == "Unauthorized" ||
+            error == "Forbidden" ||
+            error == "Not Found") {
           showInSnackBar("Acción no autorizada", _colorStatusBarBad);
-        } else if(error == "Precondición fallida (contraseña actual incorrecta)"){
+        } else if (error == "Precondition Failed") {
           showInSnackBar("Contraseña incorrecta", _colorStatusBarBad);
-        }
-        else {
+        } else {
           showInSnackBar("No hay conexión a internet", _colorStatusBarBad);
         }
       });
-
     }
   }
 
@@ -174,7 +173,8 @@ class _EditProfileState extends State<EditProfile> {
               children: <Widget>[
                 Container(
                   margin: EdgeInsets.only(top: 50),
-                  child: ClipOval( // borde de 2 pixeles sobre la foto
+                  child: ClipOval(
+                    // borde de 2 pixeles sobre la foto
                     child: Container(
                       color: Colors.grey[600],
                       padding: EdgeInsets.all(2.0),

@@ -84,6 +84,8 @@ class _ProfileState extends State<Profile> {
           realUser.token = token;
           _user = realUser;
         });
+      }).catchError((error) {
+        print('Error al cargar el perfil de usuario: $error');
       });
     }
     if (_ubicacionCiudad == null && _ubicacionResto == null) {
@@ -113,6 +115,8 @@ class _ProfileState extends State<Profile> {
             _itemsEnVenta = itemsVenta;
           }
         });
+      }).catchError((error) {
+        print('Error al cargar los productos en venta de usuario: $error');
       });
       ItemRequest.getItemsFromUser(userId: _user.userId, status: "vendido")
           .then((itemsVendidos) {
@@ -123,6 +127,8 @@ class _ProfileState extends State<Profile> {
             _itemsVendidos = itemsVendidos;
           }
         });
+      }).catchError((error) {
+        print('Error al cargar los productos vendidos de usuario: $error');
       });
     }
   }

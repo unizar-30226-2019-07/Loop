@@ -9,6 +9,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 import 'package:location/location.dart';
 
+import 'package:selit/screens/debug_main.dart';
+
 final int splashDuration = 2;
 double locationLat, locationLng;
 
@@ -92,9 +94,8 @@ class _LoginPageState extends State<LoginPage>
           showInSnackBar("La cuenta no es válida", _colorStatusBarBad);
         } else if (error == "Forbidden"){
           showInSnackBar("Usuario o contraseña incorrectos", _colorStatusBarBad);
-        }
-        else{
-          showInSnackBar("Se ha producido un error en el servidor", _colorStatusBarBad);
+        } else {
+          showInSnackBar("Ha ocurrido un error en el servidor", _colorStatusBarBad);
         }
       });
   }
@@ -135,14 +136,13 @@ class _LoginPageState extends State<LoginPage>
     UsuarioRequest.signUp(
       registeredUser,
       signupPasswordController.text
-      ).then((isSignUpOk) {
-        if (isSignUpOk) {
-          showInSnackBar("Se ha enviado un correo de confirmación", _colorStatusBarGood);
-        } else {
+      ).then((_) => showInSnackBar("Se ha enviado un correo de confirmación", _colorStatusBarGood)
+      ).catchError((error) {
+        if (error == "Conflict") {
           showInSnackBar("La dirección de correo ya existe", _colorStatusBarBad);
+        } else {
+          showInSnackBar("No hay conexión a internet", _colorStatusBarBad);
         }
-      }).catchError((error) {
-        showInSnackBar("No hay conexión a internet", _colorStatusBarBad);
       });
   }
 
@@ -183,7 +183,9 @@ class _LoginPageState extends State<LoginPage>
                       onTap: () {
                         // TODO X de la esquina superior derecha de la pantalla
                         // ya no debería estar, no se usa
-                        Navigator.of(context).pushNamed('/debug-main');
+                        Navigator.of(context).push(
+                          MaterialPageRoute(builder: (context) => DebugMain()),
+                        );
                       },
                       child: Icon(
                         FontAwesomeIcons.times,

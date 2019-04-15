@@ -9,7 +9,6 @@ import 'dart:io';
 
 /// Interacciones con la API relacionadas con items (productos, objetos)
 class ItemRequest {
-
   /// Obtener lista de items (para la pantalla principal)
   static Future<List<ItemClass>> getItems(
       {@required double lat,
@@ -17,9 +16,10 @@ class ItemRequest {
       int size,
       int page,
       @required FilterListClass filters}) async {
+
     // Mapa empleado para generar los parámetros de la request
-    Map<String, String> _params = filters
-        .getFiltersMap(); // search, priceFrom/To, distance, category, types, sort
+    // search, priceFrom/To, distance, category, types, sort
+    Map<String, String> _params = filters.getFiltersMap();
     if (size != null) _params.putIfAbsent("size", () => size.toString());
     if (page != null) _params.putIfAbsent("page", () => page.toString());
 
@@ -36,19 +36,16 @@ class ItemRequest {
       HttpHeaders.authorizationHeader: await Storage.loadToken(),
     });
     print('ITEM API STOP ◼');
-    print (_otherParameters);
 
     // Crear la lista de items a partir de la respuesta y devovlerla
-    switch (response.statusCode) {
-      case 200:
-        List<ItemClass> products = new List<ItemClass>();
-        (json.jsonDecode(response.body) as List<dynamic>).forEach((productJson) {
-          products.add(ItemClass.fromJson(productJson));
-        });
-        return products;
-        break;
-      default:
-        return List<ItemClass>(); // TODO casos de error + throw
+    if (response.statusCode == 200) {
+      List<ItemClass> products = new List<ItemClass>();
+      (json.jsonDecode(response.body) as List<dynamic>).forEach((productJson) {
+        products.add(ItemClass.fromJson(productJson));
+      });
+      return products;
+    } else {
+      throw(APIConfig.getErrorString(response));
     }
   }
 
@@ -57,7 +54,6 @@ class ItemRequest {
   /// sin cargar por páginas
   static Future<List<ItemClass>> getItemsFromUser(
       {@required int userId, @required String status}) async {
-    
     // TODO workaround para ignorar la distancia de los objetos
     String _paramsString = '?lat=0.0&lng=0.0&distance=99999999.9';
     // Si status no es ni "en venta" ni "vendido", default a "en venta"
@@ -73,38 +69,30 @@ class ItemRequest {
     });
     print('ITEM USER STOP ◼');
 
-    // Crear la lista de items a partir de la respuesta y devovlerla
-    switch (response.statusCode) {
-      case 200:
-        List<ItemClass> products = new List<ItemClass>();
-        (json.jsonDecode(response.body) as List<dynamic>).forEach((productJson) {
-          products.add(ItemClass.fromJson(productJson));
-        });
-        return products;
-        break;
-      default:
-        return List<ItemClass>(); // TODO casos de error + throw
+    if (response.statusCode == 200) {
+      List<ItemClass> products = new List<ItemClass>();
+      (json.jsonDecode(response.body) as List<dynamic>).forEach((productJson) {
+        products.add(ItemClass.fromJson(productJson));
+      });
+      return products;
+    } else {
+      throw(APIConfig.getErrorString(response));
     }
   }
 
   /// Subir producto
   static Future<void> create(ItemClass item) async {
-    final response = await http.post('${APIConfig.BASE_URL}/products',
-        headers: {
+    final response = await http.post(
+      '${APIConfig.BASE_URL}/products',
+      headers: {
         HttpHeaders.contentTypeHeader: ContentType.json.toString(),
         HttpHeaders.authorizationHeader: await Storage.loadToken(),
-        },
-        body: json.jsonEncode(item.toJsonCreate()),
+      },
+      body: json.jsonEncode(item.toJsonCreate()),
     );
 
-    // Crear la lista de items a partir de la respuesta y devovlerla
-    switch (response.statusCode) {
-      case 201: // Item creado, todo OK
-        break;
-      case 401:
-        throw("No autorizado");
-      case 402:
-        throw("Prohibido");
+    if (response.statusCode != 201) {
+      throw(APIConfig.getErrorString(response));
     }
   }
 
@@ -112,42 +100,34 @@ class ItemRequest {
   static Future<void> edit(ItemClass item) async {
     int _productId = item.itemId;
     print('Id de producto en request: ' + item.itemId.toString());
-    final response = await http.put('${APIConfig.BASE_URL}/products?product_id=$_productId',
-        headers: {
+    final response = await http.put(
+      '${APIConfig.BASE_URL}/products?product_id=$_productId',
+      headers: {
         HttpHeaders.contentTypeHeader: ContentType.json.toString(),
         HttpHeaders.authorizationHeader: await Storage.loadToken(),
-        },
-        body: json.jsonEncode(item.toJsonCreate()),
+      },
+      body: json.jsonEncode(item.toJsonCreate()),
     );
-    // Crear la lista de items a partir de la respuesta y devovlerla
-    switch (response.statusCode) {
-      case 201: // Item actualizado, todo OK
-        break;
-      case 401:
-        throw("No autorizado");
-      case 402:
-        throw("Prohibido");
+
+    if (response.statusCode != 201) {
+      throw(APIConfig.getErrorString(response));
     }
   }
 
-    /// Eliminar producto
+  /// Eliminar producto
   static Future<void> delete(ItemClass item) async {
     int _productId = item.itemId;
     print('Id de producto en request: ' + item.itemId.toString());
-    final response = await http.delete('${APIConfig.BASE_URL}/products?product_id=$_productId',
-        headers: {
+    final response = await http.delete(
+      '${APIConfig.BASE_URL}/products?product_id=$_productId',
+      headers: {
         HttpHeaders.contentTypeHeader: ContentType.json.toString(),
         HttpHeaders.authorizationHeader: await Storage.loadToken(),
-        },
+      },
     );
-    switch (response.statusCode) {
-      case 201: // Item eliminado, todo OK
-        break;
-      case 401:
-        throw("No autorizado");
-      case 402:
-        throw("Prohibido");
+
+    if (response.statusCode != 200) {
+      throw(APIConfig.getErrorString(response));
     }
   }
-  
 }

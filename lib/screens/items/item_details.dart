@@ -116,7 +116,7 @@ class _ItemDetails extends State<ItemDetails> {
                     Navigator.of(context).pop();
                     Navigator.of(context).pop();
                 }).catchError((error) {
-                  if (error == "No autorizado" || error == "Prohibido") {
+                  if (error == "Unauthorized" || error == "Forbidden") {
                     showInSnackBar("Acción no autorizada", _colorStatusBarBad);
                   } else {
                     showInSnackBar("No hay conexión a internet", _colorStatusBarBad);

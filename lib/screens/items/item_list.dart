@@ -138,7 +138,9 @@ class _ItemListState extends State<ItemList> {
         lng: 0.0,
         filters: _filterManager,
         size: ITEMS_PER_PAGE,
-        page: pageNum);
+        page: pageNum).catchError((error) {
+          print("Error al obtener la lista de objetos: $error");
+        });
     // Evitar mostrar más items si se ha llegado al fin de la lista
     if (receivedItems.length < ITEMS_PER_PAGE) lastPetitionPage++;
     // Mostrar los items en la lista
