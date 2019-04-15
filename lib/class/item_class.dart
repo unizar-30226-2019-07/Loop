@@ -80,7 +80,7 @@ class ItemClass {
   Map<String, dynamic> toJsonCreate() => {
     "type": type,
     "title": title,
-    "owner_id": owner.user_id,
+    "owner_id": owner.userId,
     "description": description,
     "location": {
       "lat": locationLat,

@@ -73,12 +73,12 @@ class _ProfileState extends State<Profile> {
   }
 
   void _loadProfileItems() {
-    if (_user?.user_id == null) {
+    if (_user?.userId == null) {
       print('ERROR: Intentando cargar objetos de un usuario sin ID');
     } else {
       // Cargar los objetos en venta y vendidos para el usuario
       // TODO excepción al terminar de cargar los objetos cuando se ha cambiado de pantalla
-      ItemRequest.getItemsFromUser(userId: _user.user_id, status: "en venta")
+      ItemRequest.getItemsFromUser(userId: _user.userId, status: "en venta")
           .then((itemsVenta) {
             setState(() {
               if (itemsVenta.isEmpty) {
@@ -88,7 +88,7 @@ class _ProfileState extends State<Profile> {
               }
             });
           });
-      ItemRequest.getItemsFromUser(userId: _user.user_id, status: "vendido")
+      ItemRequest.getItemsFromUser(userId: _user.userId, status: "vendido")
           .then((itemsVendidos) {
             setState(() {
               if (itemsVendidos.isEmpty) {
@@ -152,12 +152,7 @@ class _ProfileState extends State<Profile> {
             Container(
               margin: EdgeInsets.only(top: 20),
               child: ClipOval(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                  ),
-                  child: ProfilePicture(_user),
-                ),
+                child: ProfilePicture(_user),
               ),
             ),
             Container(

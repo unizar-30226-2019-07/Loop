@@ -165,7 +165,7 @@ class _ItemDetails extends State<ItemDetails> {
   final _blendColor = Color.alphaBlend(Color(0x552B2B2B), Color(0xFFC0392B));
 
   void _leerIdUsuario() async{
-    int idItem = _item.owner.user_id; 
+    int idItem = _item.owner.userId; 
     int miId = await Storage.loadUserId();
       if(miId == idItem){
         setState(() {

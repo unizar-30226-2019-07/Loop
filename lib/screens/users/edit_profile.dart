@@ -1,11 +1,11 @@
-import 'dart:convert';
+
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:selit/class/usuario_class.dart';
+import 'package:selit/class/image_class.dart';
 import 'package:selit/widgets/profile_picture.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:selit/util/api/usuario_edit.dart';
-import 'package:mime/mime.dart';
 import 'package:selit/util/storage.dart';
 import 'package:selit/util/api/usuario_request.dart';
 
@@ -47,12 +47,6 @@ class _EditProfileState extends State<EditProfile> {
   /// Usuario a mostrar en el perfil
   UsuarioClass _user;
 
-  //Fichero de galería
-  File _galleryFile;
-  String _base64Image;
-  String _mimeType;
-  String _charset;
-
   //Lista opciones sexo
   List<String> _sexos = <String>['', 'hombre', 'mujer', 'otro'];
   String _sexo = '';
@@ -60,9 +54,6 @@ class _EditProfileState extends State<EditProfile> {
   /// Constructor: mostrar el usuario _user
   _EditProfileState(UsuarioClass _user) {
     this._user = _user;
-    _base64Image = _user.pictureBase64;
-    _mimeType = _user.pictureMime;
-    _charset = _user.pictureCharset;
     _nameController.text = _user.nombre;
     _surnameController.text = _user.apellidos;
     _locationController.text = _user.ubicacionCiudad;
@@ -89,8 +80,7 @@ class _EditProfileState extends State<EditProfile> {
     if (_nameController.text.length < 1 || _surnameController.text.length < 1) {
       showInSnackBar("Rellena toodos los campos correctamente", Colors.yellow);
     } else {
-      _user.update(_nameController.text, _surnameController.text, _sexo, _user.locationLat, _user.locationLng,
-          _mimeType, _base64Image, _charset);
+      _user.update(_nameController.text, _surnameController.text, _sexo, _user.locationLat, _user.locationLng);
       edit(_user).then((response) {
         final Color legit = Colors.blue.withOpacity(0.5);
         final Color fake = Colors.red.withOpacity(0.5);
@@ -154,13 +144,12 @@ class _EditProfileState extends State<EditProfile> {
 
     //Selección de foto de galería
     imageSelectorGallery() async {
-      _galleryFile = await ImagePicker.pickImage(
+      File pickedFile = await ImagePicker.pickImage(
         source: ImageSource.gallery,
       );
-      _base64Image = base64Encode(_galleryFile.readAsBytesSync());
-      _mimeType = (lookupMimeType(_galleryFile.path));
-      _charset = "utf-8";
-      setState(() {});
+      setState(() {
+        _user.profileImage = ImageClass.file(fileImage: pickedFile);
+      });
     }
 
     Widget wDataTop = Row(
@@ -171,18 +160,13 @@ class _EditProfileState extends State<EditProfile> {
             margin: EdgeInsets.only(
               left: 10,
             ),
-            //color: Colors.red, // util para ajustar margenes
             child: Column(
               children: <Widget>[
-                
                 Container(
                   margin: EdgeInsets.only(top: 50),
-                  child: _galleryFile == null
-                      ? ProfilePicture(_user)
-                      : new CircleAvatar(
-                          backgroundImage: new FileImage(_galleryFile),
-                          radius: 70.0,
-                        ),
+                  child: ClipOval(
+                    child: ProfilePicture(_user),
+                  ),
                 ),
                 Container(
                   margin: EdgeInsets.only(top: 10, left: 15),

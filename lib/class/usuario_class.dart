@@ -1,12 +1,13 @@
 import 'package:date_format/date_format.dart';
+import 'package:selit/class/image_class.dart';
+import 'package:selit/util/storage.dart';
 
 /// Datos de usuario registrado, ya sea para mostrarlos en el perfil
 /// o para cualquier otro uso. Puede tener campos nulos aunque sean
 /// campos obligatorios para un usuario registrado, ya que un campo nulo
 /// representa el usuario por defecto hasta que cargue el usuario real
 class UsuarioClass {
-  // TODO por ahora contiene los datos que se muestran en el perfil,
-  // supongo más adelante contendrá toda la información relacionada
+  int userId;
   String nombre;
   String apellidos;
   String sexo;
@@ -18,16 +19,12 @@ class UsuarioClass {
   double numeroEstrellas;
   int reviews;
   String token;
-  int user_id;
   double locationLat;
   double locationLng;
-  int idImagen;
-  String pictureMime;
-  String pictureCharset;
-  String pictureBase64;
+  ImageClass profileImage;
 
   UsuarioClass(
-      {
+      {this.userId,
       this.nombre,
       this.apellidos,
       this.sexo,
@@ -38,20 +35,22 @@ class UsuarioClass {
       this.numeroEstrellas,
       this.reviews,
       this.token,
-      this.user_id,
-      this.idImagen,
       this.nacimiento,
       this.locationLat,
-      this.locationLng})
-      : assert(edad == null || edad > 0, 'Un usuario no puede tener edad negativa'),
+      this.locationLng,
+      this.profileImage})
+      : assert(edad == null || edad > 0,
+            'Un usuario no puede tener edad negativa'),
         assert(reviews == null || reviews > 0,
             'Un usuario no puede tener número de reviews negativo'),
-        assert(numeroEstrellas == null || numeroEstrellas >= 0 && numeroEstrellas <= 5,
+        assert(
+            numeroEstrellas == null ||
+                numeroEstrellas >= 0 && numeroEstrellas <= 5,
             'Un usuario debe tener un número de estrellas entre 1 y 5');
 
   UsuarioClass.fromJson(Map<String, dynamic> json)
       : this(
-            user_id: json['idUsuario'],
+            userId: json['idUsuario'],
             nombre: json['first_name'],
             apellidos: json['last_name'],
             edad: 18,
@@ -61,44 +60,39 @@ class UsuarioClass {
             email: json["email"],
             locationLat: json['location']['lat'],
             locationLng: json['location']['lng'],
-            idImagen : json ['picture']['idImagen']
+            profileImage: ImageClass.network(
+              imageId: json['picture']['idImagen'],
+              tokenHeader: Storage.loadToken(),
+            ));
 
-            );
-
-  void update(String _nombre, String _apellidos, String _sexo, double lat, double long, String _mime, String _base64, String _charset){
-    this.nombre=_nombre;
-    this.apellidos=_apellidos;
-    this.sexo=_sexo;
-    this.locationLat=lat;
-    this.locationLng=long;
-    this.pictureBase64 = _base64;
-    this.pictureCharset = _charset;
-    this.pictureMime= _mime;
+  void update(String _nombre, String _apellidos, String _sexo, double lat,
+      double long) {
+    this.nombre = _nombre;
+    this.apellidos = _apellidos;
+    this.sexo = _sexo;
+    this.locationLat = lat;
+    this.locationLng = long;
   }
 
   Map<String, dynamic> toJsonEdit() => {
-    "email": email,
-    "first_name": nombre,
-    "last_name": apellidos,
-    "gender": sexo,
-    "location": {
-      "lat": locationLat,
-      "lng": locationLng,
-    },
-    "picture": {
-      "mime" : pictureMime,
-      "charset" : pictureCharset,
-      "base64" : pictureBase64
-    },
-  };
+        "email": email,
+        "first_name": nombre,
+        "last_name": apellidos,
+        "gender": sexo,
+        "location": {
+          "lat": locationLat,
+          "lng": locationLng,
+        },
+        "picture": profileImage.toJson(),
+      };
 
   Map<String, dynamic> toJsonForSignUp() => {
-    "email": email,
-    "first_name": nombre,
-    "last_name": apellidos,
-    "location": {
-      "lat": locationLat,
-      "lng": locationLng,
-    },
-  };
+        "email": email,
+        "first_name": nombre,
+        "last_name": apellidos,
+        "location": {
+          "lat": locationLat,
+          "lng": locationLng,
+        },
+      };
 }

@@ -17,7 +17,7 @@ String postToJson(UsuarioClass data) {
 
  /// Actulizar los datos del usuario con ID [userId]
 Future<http.Response> edit(UsuarioClass chain) async{
-  final response = await http.put('${APIConfig.BASE_URL}/users/${chain.user_id}',
+  final response = await http.put('${APIConfig.BASE_URL}/users/${chain.userId}',
       headers: {
       HttpHeaders.contentTypeHeader: ContentType.json.toString(),
       HttpHeaders.authorizationHeader: await Storage.loadToken(),

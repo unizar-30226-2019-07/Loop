@@ -27,7 +27,7 @@ class UsuarioRequest {
             TokenClass(response.headers[HttpHeaders.authorizationHeader]);
         Storage.saveToken(receivedToken.token);
         UsuarioClass receivedUser = await UsuarioRequest.getUserById(0);
-        Storage.saveUserId(receivedUser.user_id);
+        Storage.saveUserId(receivedUser.userId);
         return receivedToken;
         break;
       case 401: //Usuario rechazado
@@ -74,6 +74,7 @@ class UsuarioRequest {
         HttpHeaders.authorizationHeader: await Storage.loadToken(),
       });
     }
+    print('Usuario: ${response.body}');
     switch (response.statusCode) {
       case 200: // El usuario se ha devuelto bien
         UsuarioClass perfil = UsuarioClass.fromJson(json.jsonDecode(response.body));
@@ -119,11 +120,11 @@ class UsuarioRequest {
     }
   }
 
-  static Future<TokenClass> password(String oldPassword, String newPassword,int user_id ) async {
+  static Future<TokenClass> password(String oldPassword, String newPassword,int userId ) async {
     
     String _paramsString = '?old=$oldPassword&new=$newPassword';
 
-    http.Response response = await http.post('${APIConfig.BASE_URL}/users/${user_id}/change_password$_paramsString',
+    http.Response response = await http.post('${APIConfig.BASE_URL}/users/$userId/change_password$_paramsString',
          headers: {
       HttpHeaders.contentTypeHeader: ContentType.json.toString(),
       HttpHeaders.authorizationHeader: await Storage.loadToken(),
