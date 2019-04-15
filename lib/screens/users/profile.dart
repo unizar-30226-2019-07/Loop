@@ -141,16 +141,20 @@ class _ProfileState extends State<Profile> {
   void _onPressedEnVenta() {
     _pageController.animateToPage(0,
         duration: Duration(milliseconds: 300), curve: Curves.decelerate);
-    _controllerEnVenta.animateTo(0,
-        duration: Duration(milliseconds: 150), curve: Curves.linear);
+    if (_controllerEnVenta.hasClients) {
+      _controllerEnVenta.animateTo(0,
+          duration: Duration(milliseconds: 150), curve: Curves.linear);
+    }
   }
 
   // Pulsación del boton "vendidos"
   void _onPressedVendidos() {
     _pageController.animateToPage(1,
         duration: Duration(milliseconds: 300), curve: Curves.decelerate);
-    _controllerVendidos.animateTo(0,
-        duration: Duration(milliseconds: 150), curve: Curves.linear);
+    if (_controllerVendidos.hasClients) {
+      _controllerVendidos.animateTo(0,
+          duration: Duration(milliseconds: 150), curve: Curves.linear);
+    }
   }
 
   /// Constructor para los botones "en venta" y "vendido"
