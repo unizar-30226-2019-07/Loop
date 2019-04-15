@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:selit/class/image_class.dart';
 import 'package:selit/class/item_class.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:percent_indicator/percent_indicator.dart';
@@ -29,7 +30,6 @@ class _NewItemState extends State<NewItem> {
 
   ///Ficheros de galería
   List<File> _images = <File>[null, null, null, null, null];
-  int _imagen = 0;
 
   ///Lista opciones categoria
   List<String> _categorias = <String>['', 'Automocion', 'Ropa', 'Tecnología'];
@@ -56,11 +56,13 @@ class _NewItemState extends State<NewItem> {
       fontSize: 17.0, color: Colors.white, fontWeight: FontWeight.normal);
 
   ///Selección de foto 1 de galería
-  imageSelectorGallery() async {
-    _images[_imagen] = await ImagePicker.pickImage(
+  imageSelectorGallery(int index) async {
+    File selectedFile = await ImagePicker.pickImage(
       source: ImageSource.gallery,
     );
-    setState(() {});
+    setState(() {
+      _images[index] = selectedFile;
+    });
   }
 
   void showInSnackBar(String value, Color alfa) {
@@ -83,6 +85,9 @@ class _NewItemState extends State<NewItem> {
         _categoria == '') {
       showInSnackBar("Rellena toodos los campos correctamente", Colors.yellow);
     } else {
+      // Quitar imágenes no usadas
+      _images.removeWhere((x) => x == null);
+      // Preparar item para pasar a newItem2
       _item = ItemClass(
           itemId: 0,
           title: _titleController.text,
@@ -90,7 +95,9 @@ class _NewItemState extends State<NewItem> {
           locationLat: _user.locationLat,
           locationLng: _user.locationLng,
           category: _categoria,
-          owner: _user);
+          owner: _user,
+          media: List.generate(_images.length,
+            (i) => ImageClass.file(fileImage: _images[i])));
 
       Navigator.of(context).pushNamed('/new-item2', arguments: _item);
     }
@@ -249,8 +256,7 @@ class _NewItemState extends State<NewItem> {
                         ),
                         child: new FlatButton(
                             onPressed: () {
-                              _imagen = index;
-                              imageSelectorGallery();
+                              imageSelectorGallery(index);
                             },
                             shape: new RoundedRectangleBorder(
                                 borderRadius: new BorderRadius.circular(30.0)),
@@ -271,7 +277,7 @@ class _NewItemState extends State<NewItem> {
                         padding: const EdgeInsets.all(3.0),
                         decoration: new BoxDecoration(
                             image: new DecorationImage(
-                              image: new AssetImage(_images[index].path),
+                              image: FileImage(_images[index]),
                               fit: BoxFit.cover,
                             ),
                             borderRadius: BorderRadius.circular(15.0),

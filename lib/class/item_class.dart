@@ -103,6 +103,7 @@ class ItemClass {
     "category": category,
     "price": price,
     "currency": currency,
+    "media": media.map((i) => i.toJson()), 
   };
   
 }

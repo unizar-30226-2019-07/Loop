@@ -82,13 +82,17 @@ class ItemRequest {
 
   /// Subir producto
   static Future<void> create(ItemClass item) async {
+
+    String str = json.jsonEncode(item.toJsonCreate());
+    print(str);
+
     final response = await http.post(
       '${APIConfig.BASE_URL}/products',
       headers: {
         HttpHeaders.contentTypeHeader: ContentType.json.toString(),
         HttpHeaders.authorizationHeader: await Storage.loadToken(),
       },
-      body: json.jsonEncode(item.toJsonCreate()),
+      body: str,
     );
 
     if (response.statusCode != 201) {
