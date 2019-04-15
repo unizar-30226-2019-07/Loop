@@ -29,11 +29,13 @@ class ItemRequest {
     String _paramsString = '?lat=$lat&lng=$lng&distance=1000';
 
     // Esperar la respuesta de la petición
+    print('ITEM API PLAY ▶');
     http.Response response = await http
         .get('${APIConfig.BASE_URL}/products$_paramsString', headers: {
       HttpHeaders.contentTypeHeader: ContentType.json.toString(),
       HttpHeaders.authorizationHeader: await Storage.loadToken(),
     });
+    print('ITEM API STOP ◼');
     print (_otherParameters);
 
     // Crear la lista de items a partir de la respuesta y devovlerla
@@ -63,11 +65,13 @@ class ItemRequest {
     _paramsString += "&owner=$userId&status=$_statusParam";
 
     // Esperar la respuesta de la petición
+    print('ITEM USER PLAY ▶');
     http.Response response = await http
         .get('${APIConfig.BASE_URL}/products$_paramsString', headers: {
       HttpHeaders.contentTypeHeader: ContentType.json.toString(),
       HttpHeaders.authorizationHeader: await Storage.loadToken(),
     });
+    print('ITEM USER STOP ◼');
 
     // Crear la lista de items a partir de la respuesta y devovlerla
     switch (response.statusCode) {

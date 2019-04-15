@@ -1,4 +1,4 @@
-
+import 'package:date_format/date_format.dart';
 
 /// Datos de usuario registrado, ya sea para mostrarlos en el perfil
 /// o para cualquier otro uso. Puede tener campos nulos aunque sean
@@ -12,14 +12,16 @@ class UsuarioClass {
   String sexo;
   String email;
   int edad;
+  DateTime nacimiento;
   String ubicacionCiudad; // Ej: Zaragoza
   String ubicacionResto; // Ej: Aragon, España
   double numeroEstrellas;
   int reviews;
-  String urlPerfil;
+  String token;
   int user_id;
   double locationLat;
   double locationLng;
+  int idImagen;
   String pictureMime;
   String pictureCharset;
   String pictureBase64;
@@ -35,11 +37,10 @@ class UsuarioClass {
       this.ubicacionResto,
       this.numeroEstrellas,
       this.reviews,
-      this.urlPerfil,
+      this.token,
       this.user_id,
-      this.pictureBase64,
-      this.pictureCharset,
-      this.pictureMime,
+      this.idImagen,
+      this.nacimiento,
       this.locationLat,
       this.locationLng})
       : assert(edad == null || edad > 0, 'Un usuario no puede tener edad negativa'),
@@ -60,9 +61,7 @@ class UsuarioClass {
             email: json["email"],
             locationLat: json['location']['lat'],
             locationLng: json['location']['lng'],
-            pictureMime: json['picture']['mime'],
-            pictureCharset: json['picture']['charset'],
-            pictureBase64: json['picture']['base64'],
+            idImagen : json ['picture']['idImagen']
 
             );
 

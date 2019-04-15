@@ -7,7 +7,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:selit/util/api/usuario_edit.dart';
 import 'package:mime/mime.dart';
 import 'package:selit/util/storage.dart';
-import 'package:path/path.dart' as path;
 import 'package:selit/util/api/usuario_request.dart';
 
 /// Página de edición de perfil (formulario con los campos
@@ -55,7 +54,7 @@ class _EditProfileState extends State<EditProfile> {
   String _charset;
 
   //Lista opciones sexo
-  List<String> _sexos = <String>['', 'hombre', 'mujer', 'Otro'];
+  List<String> _sexos = <String>['', 'hombre', 'mujer', 'otro'];
   String _sexo = '';
 
   /// Constructor: mostrar el usuario _user
@@ -90,7 +89,7 @@ class _EditProfileState extends State<EditProfile> {
     if (_nameController.text.length < 1 || _surnameController.text.length < 1) {
       showInSnackBar("Rellena toodos los campos correctamente", Colors.yellow);
     } else {
-      _user.update(_nameController.text, _surnameController.text, _sexo, 3, 3,
+      _user.update(_nameController.text, _surnameController.text, _sexo, _user.locationLat, _user.locationLng,
           _mimeType, _base64Image, _charset);
       edit(_user).then((response) {
         final Color legit = Colors.blue.withOpacity(0.5);

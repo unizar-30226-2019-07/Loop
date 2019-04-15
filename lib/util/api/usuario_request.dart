@@ -1,6 +1,7 @@
 import 'package:selit/class/usuario_class.dart';
 import 'package:selit/class/token_class.dart';
 import 'package:selit/util/api/api_config.dart';
+import 'package:geocoder/geocoder.dart';
 import 'package:selit/util/storage.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as json;
@@ -75,7 +76,25 @@ class UsuarioRequest {
     }
     switch (response.statusCode) {
       case 200: // El usuario se ha devuelto bien
-        return UsuarioClass.fromJson(json.jsonDecode(response.body));
+        UsuarioClass perfil = UsuarioClass.fromJson(json.jsonDecode(response.body));
+        //Se obtienen sus valores de ubicación y se incorporan al usuario
+        final coordinates = new Coordinates(perfil.locationLat, perfil.locationLng);
+        var addresses = await Geocoder.local.findAddressesFromCoordinates(coordinates);
+        perfil.ubicacionCiudad = addresses.first.locality;
+        perfil.ubicacionResto = addresses.first.subLocality;
+        //TODO: Los signos aparecen bien pero luego al envíar a la base no se reconocen.
+        /*
+        if (perfil.sexo == null || perfil.sexo == 'otro'){
+          perfil.sexo = '⚲';
+        }
+        else if (perfil.sexo == 'mujer'){
+          perfil.sexo = '♀'; 
+        }
+        else{
+          perfil.sexo = '♂'; 
+        }
+      */
+        return perfil;
       default: // TODO casos de error
         return null;
     }

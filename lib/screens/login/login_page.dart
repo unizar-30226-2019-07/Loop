@@ -85,7 +85,7 @@ class _LoginPageState extends State<LoginPage>
         .then((loginToken) {
       if (loginToken != null) {
         // login incorrecto
-        showInSnackBar("Logueado satisfactoriamente", _colorStatusBarGood);
+        showInSnackBar("Iniciando sesión", _colorStatusBarGood);
         _delayPrincipal();
       }
     }).catchError((error) {

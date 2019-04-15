@@ -4,6 +4,7 @@ import 'package:selit/class/item_class.dart';
 import 'package:selit/util/api/usuario_request.dart';
 import 'package:selit/util/api/item_request.dart';
 import 'package:selit/util/bubble_indication_painter.dart';
+import 'package:selit/util/storage.dart';
 import 'package:selit/widgets/items/item_tile.dart';
 import 'package:selit/widgets/star_rating.dart';
 import 'package:selit/widgets/profile_picture.dart';
@@ -61,8 +62,10 @@ class _ProfileState extends State<Profile> {
   Future<void> _loadProfile(int _userId) async {
     // Mostrar usuario placeholder mientras carga el real
     if (_user == null) {
+      String token = await Storage.loadToken();
       await UsuarioRequest.getUserById(_userId).then((realUser) {
         setState(() {
+          realUser.token = token;
           _user = realUser;
         });
       });
