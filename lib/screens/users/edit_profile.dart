@@ -157,7 +157,9 @@ class _EditProfileState extends State<EditProfile> {
         source: ImageSource.gallery,
       );
       setState(() {
-        _displayImage = ImageClass.file(fileImage: pickedFile);
+        if (pickedFile != null) {
+          _displayImage = ImageClass.file(fileImage: pickedFile);
+        }
       });
     }
 

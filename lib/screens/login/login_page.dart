@@ -92,7 +92,7 @@ class _LoginPageState extends State<LoginPage>
     }).catchError((error) {
         if (error == "Unauthorized") {
           showInSnackBar("La cuenta no es válida", _colorStatusBarBad);
-        } else if (error == "Forbidden"){
+        } else if (error == "Forbidden") {
           showInSnackBar("Usuario o contraseña incorrectos", _colorStatusBarBad);
         } else {
           showInSnackBar("Ha ocurrido un error en el servidor", _colorStatusBarBad);

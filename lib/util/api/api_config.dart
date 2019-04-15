@@ -7,9 +7,23 @@ class APIConfig {
   /// URL base a conectar (con puerto)
   static const BASE_URL = 'http://selit.naval.cat:8080';
 
+  static Map _errorCodes = {
+    400: "Bad Request",
+    401: "Unauthorized",
+    403: "Forbidden",
+    404: "Not Found",
+    405: "Method Not Allowed",
+    409: "Conflict",
+    412: "Precondition Failed",
+    415: "Unsupported Media"
+  };
+
   static String getErrorString(http.Response response) {
-    Map<String, dynamic> body = json.jsonDecode(response.body);
-    return body['error'] == null ? "Unknown Error" : body['error'];
+    String error;
+    if (response?.statusCode != null) {
+      error = _errorCodes[response.statusCode];
+    }
+    return error ?? "Unknown Error";
   }
 
 }

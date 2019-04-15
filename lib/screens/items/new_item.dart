@@ -61,7 +61,9 @@ class _NewItemState extends State<NewItem> {
       source: ImageSource.gallery,
     );
     setState(() {
-      _images[index] = selectedFile;
+      if (selectedFile != null) {
+        _images[index] = selectedFile;
+      }
     });
   }
 

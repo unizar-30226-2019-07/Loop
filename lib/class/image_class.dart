@@ -8,23 +8,19 @@ import 'dart:io';
 /// almacena su ID interno del sistema. Empleado por ambos [UsuarioClass] e [ItemClass]
 class ImageClass {
   int imageId;
-  Widget image;
+  Image image;
 
   String base64;
   String mime;
   String charset;
 
   void _loadImage(Future<String> token) async {
-    image = FadeInImage(
-      placeholder: AssetImage('assets/img/profile_default.jpg'),
-      image: NetworkImage(
-        '${APIConfig.BASE_URL}/pictures/$imageId',
-        headers: {
-          HttpHeaders.authorizationHeader: await token,
-        },
-      ),
+    image = Image.network(
+      '${APIConfig.BASE_URL}/pictures/$imageId',
+      headers: {
+        HttpHeaders.authorizationHeader: await token,
+      },
       fit: BoxFit.cover,
-      fadeInDuration: Duration(milliseconds: 250),
     );
   }
 

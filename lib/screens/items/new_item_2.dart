@@ -105,6 +105,7 @@ class _NewItemState2 extends State<NewItem2> {
         if (error == "Unauthorized" || error == "Forbidden") {
           showInSnackBar("Acción no autorizada", _colorStatusBarBad);
         } else {
+          print("Error: $error");
           showInSnackBar("No hay conexión a internet", _colorStatusBarBad);
         }
       });
