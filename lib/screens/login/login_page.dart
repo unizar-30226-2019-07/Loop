@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:selit/style/theme.dart' as Theme;
 import 'package:selit/util/bubble_indication_painter.dart';
 import 'package:selit/util/api/usuario_request.dart';
 import 'package:selit/class/usuario_class.dart';
@@ -166,8 +165,8 @@ class _LoginPageState extends State<LoginPage>
               decoration: new BoxDecoration(
                 gradient: new LinearGradient(
                     colors: [
-                      Theme.Colors.loginGradientStart,
-                      Theme.Colors.loginGradientEnd
+                      Theme.of(context).primaryColorLight,
+                      Theme.of(context).primaryColorDark,
                     ],
                     begin: const FractionalOffset(0.0, 0.0),
                     end: const FractionalOffset(1.0, 1.0),
@@ -226,7 +225,7 @@ class _LoginPageState extends State<LoginPage>
                             locationLng = data.longitude;
                             setState(() {
                               _signUpCallback = _trySignUp;
-                              _signUpButtonColor = Theme.Colors.loginGradientEnd;
+                              _signUpButtonColor = Theme.of(context).primaryColorDark;
                             });
                           } on PlatformException catch (_) {
                             showInSnackBar("Es necesaria la localización", Colors.red);
@@ -421,20 +420,20 @@ class _LoginPageState extends State<LoginPage>
                   borderRadius: BorderRadius.all(Radius.circular(5.0)),
                   boxShadow: <BoxShadow>[
                     BoxShadow(
-                      color: Theme.Colors.loginGradientStart,
+                      color: Theme.of(context).primaryColorLight,
                       offset: Offset(1.0, 6.0),
                       blurRadius: 20.0,
                     ),
                     BoxShadow(
-                      color: Theme.Colors.loginGradientEnd,
+                      color: Theme.of(context).primaryColorDark,
                       offset: Offset(1.0, 6.0),
                       blurRadius: 20.0,
                     ),
                   ],
                   gradient: new LinearGradient(
                       colors: [
-                        Theme.Colors.loginGradientEnd,
-                        Theme.Colors.loginGradientStart
+                        Theme.of(context).primaryColorDark,
+                        Theme.of(context).primaryColorLight,
                       ],
                       begin: const FractionalOffset(0.2, 0.2),
                       end: const FractionalOffset(1.0, 1.0),
@@ -443,7 +442,7 @@ class _LoginPageState extends State<LoginPage>
                 ),
                 child: MaterialButton(
                   highlightColor: Colors.transparent,
-                  splashColor: Theme.Colors.loginGradientEnd,
+                  splashColor: Theme.of(context).primaryColorDark,
                   //shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5.0))),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
