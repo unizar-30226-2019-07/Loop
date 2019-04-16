@@ -82,7 +82,7 @@ class UsuarioClass {
         "email": email,
         "first_name": nombre,
         "last_name": apellidos,
-        "gender": "hombre",
+        "gender": sexo,
         "rating": numeroEstrellas, // TODO
         "location": {
           "lat": locationLat,

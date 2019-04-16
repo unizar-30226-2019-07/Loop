@@ -20,18 +20,18 @@ class ItemRequest {
     // Mapa empleado para generar los parámetros de la request
     // search, priceFrom/To, distance, category, types, sort
     Map<String, String> _params = filters.getFiltersMap();
-    if (size != null) _params.putIfAbsent("size", () => size.toString());
-    if (page != null) _params.putIfAbsent("page", () => page.toString());
+    if (size != null) _params.putIfAbsent("\$size", () => size.toString());
+    if (page != null) _params.putIfAbsent("\$page", () => page.toString());
 
-    String _otherParameters = '';
+    String _otherParameters = '?lat=$lat&lng=$lng&distance=1000';
     _params.forEach((key, value) => _otherParameters += '&$key=$value');
-    // TODO $_otherParameters
-    String _paramsString = '?lat=$lat&lng=$lng&distance=1000';
+
+    print("Parametros: $_otherParameters");
 
     // Esperar la respuesta de la petición
     print('ITEM API PLAY ▶');
     http.Response response = await http
-        .get('${APIConfig.BASE_URL}/products$_paramsString', headers: {
+        .get('${APIConfig.BASE_URL}/products$_otherParameters', headers: {
       HttpHeaders.contentTypeHeader: ContentType.json.toString(),
       HttpHeaders.authorizationHeader: await Storage.loadToken(),
     });

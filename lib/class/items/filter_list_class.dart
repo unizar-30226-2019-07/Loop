@@ -186,7 +186,7 @@ class FilterListClass {
       'price ASC',
       'price DESC'
     ];
-    map.putIfAbsent("sort", () => _sortList[orderId]);
+    map.putIfAbsent("\$sort", () => _sortList[orderId]);
     return map;
   }
 }

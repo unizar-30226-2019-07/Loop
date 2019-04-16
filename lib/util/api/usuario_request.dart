@@ -81,6 +81,8 @@ class UsuarioRequest {
       throw ("Unknown Error");
     }
 
+    print("Edición de usuario: ${json.jsonEncode(usuario.toJsonEdit())}");
+
     http.Response response = await http
         .put('${APIConfig.BASE_URL}/users/${usuario.userId}', headers: {
       HttpHeaders.contentTypeHeader: ContentType.json.toString(),

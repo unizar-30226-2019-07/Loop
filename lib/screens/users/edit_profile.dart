@@ -6,7 +6,6 @@ import 'package:selit/class/usuario_class.dart';
 import 'package:selit/class/image_class.dart';
 import 'package:selit/widgets/profile_picture.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:selit/util/api/usuario_edit.dart';
 import 'package:selit/util/storage.dart';
 import 'package:selit/util/api/usuario_request.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -42,8 +41,6 @@ class _EditProfileState extends State<EditProfile> {
 
   static final _styleTitle = TextStyle(
       fontSize: 22.0, color: Colors.black, fontWeight: FontWeight.bold);
-  static final _styleSubtitle = TextStyle(
-      fontSize: 17.0, color: Colors.grey[600], fontWeight: FontWeight.w600);
   static final _styleText = TextStyle(
       fontSize: 17.0, color: Colors.black);
   static final _styleButton = TextStyle(
@@ -580,17 +577,21 @@ class _EditProfileState extends State<EditProfile> {
                 Divider(),
                 wSex,
                 wAge,
-                SizedBox(
-                  width: double.infinity,
-                  child: RaisedButton(
-                    padding: EdgeInsets.symmetric(vertical: 7.0, horizontal: 20.0),
-                    color: Theme.of(context).primaryColor,
-                    child: Text('Guardar cambios', style: _styleButton),
-                    onPressed: updateUser,
-                  )
+                Container(
+                  margin: EdgeInsets.only(bottom: 20),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: RaisedButton(
+                      padding: EdgeInsets.symmetric(vertical: 7.0, horizontal: 20.0),
+                      color: Theme.of(context).primaryColor,
+                      child: Text('Guardar cambios', style: _styleButton),
+                      onPressed: updateUser,
+                    )
+                  ),
                 ),
+                Divider(),
                 Padding(
-                  padding: EdgeInsets.only(left: 6, top: 40, bottom: 10),
+                  padding: EdgeInsets.only(left: 6, top: 20, bottom: 10),
                   child: Row(children: <Widget>[
                     Row(children: <Widget>[
                       Text('Cambiar contraseña', style: _styleTitle)
