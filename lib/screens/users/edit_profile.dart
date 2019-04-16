@@ -4,7 +4,6 @@ import 'package:selit/class/usuario_class.dart';
 import 'package:selit/class/image_class.dart';
 import 'package:selit/widgets/profile_picture.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:selit/util/api/usuario_edit.dart';
 import 'package:selit/util/storage.dart';
 import 'package:selit/util/api/usuario_request.dart';
 
@@ -27,6 +26,7 @@ class _EditProfileState extends State<EditProfile> {
 
   final TextEditingController _nameController = new TextEditingController();
   final TextEditingController _surnameController = new TextEditingController();
+  final TextEditingController _emailController = new TextEditingController();
   final TextEditingController _locationController = new TextEditingController();
   final TextEditingController _sexController = new TextEditingController();
   final TextEditingController _yearController = new TextEditingController();
@@ -57,6 +57,7 @@ class _EditProfileState extends State<EditProfile> {
     this._user = _user;
     _nameController.text = _user.nombre;
     _surnameController.text = _user.apellidos;
+    _emailController.text = _user.email;
     //_locationController.text = _user.ubicacionCiudad;
     _sexController.text = _user.sexo;
     _yearController.text = _user.edad.toString();
@@ -79,37 +80,29 @@ class _EditProfileState extends State<EditProfile> {
   }
 
   void updateUser() {
-    if (_nameController.text.length < 1 || _surnameController.text.length < 1) {
+    if (_nameController.text.length < 1 || _surnameController.text.length < 1 || _emailController.text.length < 1) {
       showInSnackBar("Rellena todos los campos correctamente", Colors.yellow);
     } else {
       _user.update(
           nombre: _nameController.text,
           apellidos: _surnameController.text,
           sexo: _sexo,
+          email: _emailController.text,
           locationLat: _user.locationLat,
           locationLng: _user.locationLng,
           image: _displayImage);
-      edit(_user).then((response) {
-        final Color legit = Colors.blue.withOpacity(0.5);
-        final Color fake = Colors.red.withOpacity(0.5);
-        if (response.statusCode == 200) {
-          print(response.body);
-          showInSnackBar("Datos actualizados correctamente", legit);
-        } else if (response.statusCode == 401) {
-          print(response.statusCode);
-          print(response.body);
-          showInSnackBar("No autorizado", fake);
-        } else if (response.statusCode == 402) {
-          print(response.statusCode);
-          print(response.body);
-          showInSnackBar("Prohibido", fake);
-        } else {
-          print(response.statusCode);
-          print(response.body);
-          showInSnackBar("No encontrado", fake);
-        }
+       UsuarioRequest.edit(_user).then((response) {
+        showInSnackBar(
+            "Datos actualizados correctamente", _colorStatusBarGood);
+
       }).catchError((error) {
-        print('error : $error');
+        if (error == "Unauthorized" ||
+            error == "Forbidden" ||
+            error == "Not Found") {
+          showInSnackBar("Acción no autorizada", _colorStatusBarBad);
+        } else {
+          showInSnackBar("No hay conexión a internet", _colorStatusBarBad);
+        }
       });
     }
   }
@@ -234,6 +227,29 @@ class _EditProfileState extends State<EditProfile> {
         )
       ],
     );
+
+    Widget wEmail = Row(
+      children: <Widget>[
+        Expanded(
+          flex: 10,
+          child: Container(
+              margin: EdgeInsets.only(left: 25, right: 10, bottom: 20),
+              //color: Colors.red, // util para ajustar margenes
+              child: Column(
+                children: <Widget>[
+                  new TextFormField(
+                    decoration: const InputDecoration(
+                      labelText: 'Email',
+                    ),
+                    controller: _emailController,
+                    keyboardType: TextInputType.emailAddress,
+                  ),
+                ],
+              )),
+        )
+      ],
+    );
+
 
     Widget wLocation = Row(
       children: <Widget>[
@@ -412,7 +428,9 @@ class _EditProfileState extends State<EditProfile> {
               children: <Widget>[
                 wDataTop,
                 Divider(),
-                wLocation,
+                wEmail,
+                //Divider(),
+                //wLocation,
                 Divider(),
                 wSex,
                 wAge,

@@ -126,6 +126,19 @@ class UsuarioRequest {
     }
   }
 
+   /// Actulizar los datos del usuario con ID [userId]
+static Future<void> edit(UsuarioClass chain) async{
+  final response = await http.put('${APIConfig.BASE_URL}/users/${chain.userId}',
+      headers: {
+      HttpHeaders.contentTypeHeader: ContentType.json.toString(),
+      HttpHeaders.authorizationHeader: await Storage.loadToken(),
+      },
+
+      body: json.jsonEncode(chain.toJsonEdit())
+  );
+  return response;
+}
+
   static Future<void> delete( int userId) async {
     http.Response response = await http.delete(
       '${APIConfig.BASE_URL}/users/$userId',

@@ -80,6 +80,9 @@ class _AccountState extends State<Account> {
             error == "Not Found") {
           showInSnackBar("Acción no autorizada", _colorStatusBarBad);
         }
+        else {
+          showInSnackBar("No hay conexión a internet", _colorStatusBarBad);
+        }
       });
     }
   }
