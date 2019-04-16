@@ -101,18 +101,16 @@ class ItemRequest {
   /// Actualizar producto
   static Future<void> edit(ItemClass item) async {
     int _productId = item.itemId;
-    print('Id de producto en request: ' + item.itemId.toString());
     final response = await http.put(
       '${APIConfig.BASE_URL}/products/$_productId',
       headers: {
         HttpHeaders.contentTypeHeader: ContentType.json.toString(),
         HttpHeaders.authorizationHeader: await Storage.loadToken(),
       },
-      body: json.jsonEncode(item.toJsonCreate()),
+      body: json.jsonEncode(item.toJsonEdit()),
     );
 
-    if (response.statusCode != 201) {
-      print(response.statusCode);
+    if (response.statusCode != 200) {
       throw(APIConfig.getErrorString(response));
     }
   }
@@ -120,7 +118,6 @@ class ItemRequest {
   /// Eliminar producto
   static Future<void> delete(ItemClass item) async {
     int _productId = item.itemId;
-    print('Id de producto en request: ' + item.itemId.toString());
     final response = await http.delete(
       '${APIConfig.BASE_URL}/products/$_productId',
       headers: {
@@ -130,7 +127,6 @@ class ItemRequest {
     );
 
     if (response.statusCode != 200) {
-      print(response.statusCode);
       throw(APIConfig.getErrorString(response));
     }
   }

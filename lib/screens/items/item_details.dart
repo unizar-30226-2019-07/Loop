@@ -4,6 +4,9 @@ import 'package:carousel_pro/carousel_pro.dart';
 import 'package:selit/screens/items/edit_item.dart';
 import 'package:selit/util/storage.dart';
 import 'package:selit/util/api/item_request.dart';
+import 'package:selit/widgets/profile_picture.dart';
+import 'package:selit/screens/users/profile.dart';
+import 'package:selit/widgets/star_rating.dart';
 import 'dart:async';
 
 /// Detalles de un item/producto en venta: título, descripción, precio,
@@ -299,6 +302,7 @@ class _ItemDetails extends State<ItemDetails> {
 
                 Container(
                     padding: const EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 15.0),
+                    alignment: Alignment.topLeft,
                     child: Text(_item?.description ?? '---',
                         style:
                             TextStyle(fontSize: 15.0, color: Colors.black))),
@@ -308,7 +312,67 @@ class _ItemDetails extends State<ItemDetails> {
                     child: Text('Categorías: ' + _item.category,
                         style:
                             TextStyle(fontSize: 17.0, color: Colors.black54))),
-              ])))),
+                Container(
+                  padding: const EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 20.0),
+                  alignment: Alignment.centerLeft,
+                  child: Card(
+                    // This ensures that the Card's children (including the ink splash) are clipped correctly.
+                    clipBehavior: Clip.antiAlias,
+                    elevation: 2.0,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                        side: BorderSide(color: Colors.grey[300], width: 1.0)),
+                    child: InkWell(
+                      onTap: () => Navigator.of(context)
+                          .pushNamed('/profile', arguments: _item.owner.userId),
+                      splashColor:
+                          Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
+                      highlightColor: Colors.transparent,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.max,
+                        children: <Widget>[
+                          SizedBox.fromSize(
+                            size: Size(100.0, 100.0),
+                            child: Container(
+                              //color: _blendColor,
+                              padding: EdgeInsets.all(2.0),
+                              child: ProfilePicture(_item.owner.profileImage),
+                            ),
+                          ),
+                          Expanded(
+                            child: Container(
+                              padding: EdgeInsets.all(8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Container(
+                                    child: Text(_item.owner.nombre + ' ' + _item.owner.apellidos,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: descriptionStyle.copyWith(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black),
+                                    ),
+                                  ),
+                                  Container(child: StarRating(starRating: _item.owner?.numeroEstrellas ?? 5, starColor: Colors.black, profileView: false, starSize: 18.0,)), 
+                                  Container(
+                                    padding: EdgeInsets.only(top: 3.0),
+                                    child: Row(
+                                      children: <Widget>[
+                                        Icon(Icons.location_on),
+                                        Text(_item.distance.toStringAsFixed(0) + ' km'),
+                                      ],
+                                  ),)
+                                  
+                            ],)
+
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+      )])))),
     );
   }
 }

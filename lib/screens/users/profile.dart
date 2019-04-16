@@ -202,7 +202,7 @@ class _ProfileState extends State<Profile> {
             ),
             Container(
                 margin: EdgeInsets.only(top: 10),
-                child: StarRating(starRating: _user?.numeroEstrellas ?? 5)),
+                child: StarRating(starRating: _user?.numeroEstrellas ?? 5, starColor: Colors.white, profileView: true,)),
             Container(
                 margin: EdgeInsets.only(top: 5, bottom: 15),
                 alignment: Alignment.center,

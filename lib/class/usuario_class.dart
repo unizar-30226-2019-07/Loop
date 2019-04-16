@@ -67,12 +67,14 @@ class UsuarioClass {
       {String nombre,
       String apellidos,
       String sexo,
+      String email,
       double locationLat,
       double locationLng,
       ImageClass image}) {
     this.nombre = nombre;
     this.apellidos = apellidos;
     this.sexo = sexo;
+    this.email = email;
     this.locationLat = locationLat;
     this.locationLng = locationLng;
     this.profileImage = image;

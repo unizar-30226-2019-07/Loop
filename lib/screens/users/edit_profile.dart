@@ -30,6 +30,7 @@ class _EditProfileState extends State<EditProfile> {
 
   final TextEditingController _nameController = new TextEditingController();
   final TextEditingController _surnameController = new TextEditingController();
+  final TextEditingController _emailController = new TextEditingController();
   final TextEditingController _sexController = new TextEditingController();
   final TextEditingController _yearController = new TextEditingController();
   final TextEditingController _oldPassController = new TextEditingController();
@@ -91,6 +92,7 @@ class _EditProfileState extends State<EditProfile> {
     );
     _positionMarker =
         Marker(markerId: MarkerId("Home"), position: _userPosition);
+    _emailController.text = _user.email;
     _sexController.text = _user.sexo;
     _yearController.text = _user.edad.toString();
     _sexo = _user.sexo;
@@ -125,13 +127,14 @@ class _EditProfileState extends State<EditProfile> {
   }
 
   void updateUser() {
-    if (_nameController.text.length < 1 || _surnameController.text.length < 1) {
+    if (_nameController.text.length < 1 || _surnameController.text.length < 1 || _emailController.text.length < 1) {
       showInSnackBar("Rellena todos los campos correctamente", Colors.yellow);
     } else {
       _user.update(
           nombre: _nameController.text,
           apellidos: _surnameController.text,
           sexo: _sexo,
+          email: _emailController.text,
           locationLat: _user.locationLat,
           locationLng: _user.locationLng,
           image: _displayImage);
@@ -397,9 +400,28 @@ class _EditProfileState extends State<EditProfile> {
           padding: EdgeInsets.symmetric(vertical: 7.0, horizontal: 20.0),
           color: Colors.grey[600],
           child: Text('Abrir mapa', style: _styleButton),
-          onPressed: _openLocationDialog,
+          onPressed: _openLocationDialog)));
+
+    Widget wEmail = Row(
+      children: <Widget>[
+        Expanded(
+          flex: 10,
+          child: Container(
+              margin: EdgeInsets.only(left: 15, right: 10, bottom: 5),
+              //color: Colors.red, // util para ajustar margenes
+              child: Column(
+                children: <Widget>[
+                  new TextFormField(
+                    decoration: const InputDecoration(
+                      labelText: 'Email',
+                    ),
+                    controller: _emailController,
+                    keyboardType: TextInputType.emailAddress,
+                  ),
+                ],
+              )),
         )
-      )
+      ],
     );
 
     Widget wOldPassword = Row(
@@ -458,7 +480,7 @@ class _EditProfileState extends State<EditProfile> {
         Expanded(
           flex: 8,
           child: Container(
-              margin: EdgeInsets.only(left: 25, bottom: 7),
+              margin: EdgeInsets.only(left: 15, bottom: 7),
               //color: Colors.red, // util para ajustar margenes
               child: Column(children: <Widget>[
                 new FormField(
@@ -516,7 +538,7 @@ class _EditProfileState extends State<EditProfile> {
         Expanded(
           flex: 8,
           child: Container(
-              margin: EdgeInsets.only(left: 25, bottom: 30),
+              margin: EdgeInsets.only(left: 15, bottom: 30),
               //color: Colors.red, // util para ajustar margenes
               child: Column(children: <Widget>[
                 new TextFormField(
@@ -575,6 +597,11 @@ class _EditProfileState extends State<EditProfile> {
                   ),
                 ),
                 Divider(),
+                Container(
+                  margin: EdgeInsets.fromLTRB(10.0, 20.0, 0.0, 10.0),
+                  child: Text('Mi información', style: _styleTitle),
+                ),
+                wEmail,
                 wSex,
                 wAge,
                 Container(
