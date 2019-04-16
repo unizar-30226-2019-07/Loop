@@ -6,6 +6,7 @@ import 'package:selit/util/storage.dart';
 import 'package:selit/util/api/item_request.dart';
 import 'package:selit/widgets/profile_picture.dart';
 import 'package:selit/screens/users/profile.dart';
+import 'package:selit/widgets/star_rating.dart';
 import 'dart:async';
 
 /// Detalles de un item/producto en venta: título, descripción, precio,
@@ -302,6 +303,7 @@ class _ItemDetails extends State<ItemDetails> {
                 Container(
                     padding: const EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 15.0),
                     child: Text(_item?.description ?? '---',
+                        textAlign: TextAlign.left,
                         style:
                             TextStyle(fontSize: 15.0, color: Colors.black))),
                 Container(
@@ -337,14 +339,26 @@ class _ItemDetails extends State<ItemDetails> {
                               child: ProfilePicture(_item.owner.profileImage),
                             ),
                           ),
-                          
-                            /*
-                          // Imagen del usuario
-                          SizedBox.fromSize(
-                            size: Size(1.0, double.infinity),
-                            child: _item.owner.profileImage.image),
-                          // Borde entre la imagen y el resto
-                         */
+                          Expanded(
+                            child: Container(
+                              padding: EdgeInsets.all(8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                    Container(
+                                      child: Text(_item.owner.nombre + ' ' + _item.owner.apellidos,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: descriptionStyle.copyWith(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black),
+                                      ),
+                                    ),
+                                  Container(child: StarRating(starRating: _item.owner?.numeroEstrellas ?? 5, starColor: Colors.black, profileView: false, starSize: 18.0,)), 
+                            ],)
+
+                            ),
+                          )
                         ],
                       ),
                     ),
