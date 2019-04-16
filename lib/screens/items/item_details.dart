@@ -237,6 +237,7 @@ class _ItemDetails extends State<ItemDetails> {
                     zoomGesturesEnabled: false,
                     tiltGesturesEnabled: false,
                     initialCameraPosition: pos,
+                    onTap: null,
                     onMapCreated: (GoogleMapController controller) {
                       if (!_controller.isCompleted) {
                         _controller.complete(controller);
@@ -318,7 +319,7 @@ class _ItemDetails extends State<ItemDetails> {
                                         child: Carousel(
                                           images: _images,
                                           boxFit: BoxFit.scaleDown,
-                                          showIndicator: true,
+                                          showIndicator: _images.length > 1,
                                           autoplay: false,
                                         ),
                                       ),
