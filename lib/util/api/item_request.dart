@@ -101,6 +101,7 @@ class ItemRequest {
   /// Actualizar producto
   static Future<void> edit(ItemClass item) async {
     int _productId = item.itemId;
+    print('Status: ' + item.status);
     print('Id de producto en request: ' + item.itemId.toString());
     final response = await http.put(
       '${APIConfig.BASE_URL}/products/$_productId',

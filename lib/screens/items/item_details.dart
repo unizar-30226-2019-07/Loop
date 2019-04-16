@@ -4,6 +4,8 @@ import 'package:carousel_pro/carousel_pro.dart';
 import 'package:selit/screens/items/edit_item.dart';
 import 'package:selit/util/storage.dart';
 import 'package:selit/util/api/item_request.dart';
+import 'package:selit/widgets/profile_picture.dart';
+import 'package:selit/screens/users/profile.dart';
 import 'dart:async';
 
 /// Detalles de un item/producto en venta: título, descripción, precio,
@@ -308,7 +310,46 @@ class _ItemDetails extends State<ItemDetails> {
                     child: Text('Categorías: ' + _item.category,
                         style:
                             TextStyle(fontSize: 17.0, color: Colors.black54))),
-              ])))),
+                Container(
+                  padding: const EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 20.0),
+                  alignment: Alignment.centerLeft,
+                  child: Card(
+                    // This ensures that the Card's children (including the ink splash) are clipped correctly.
+                    clipBehavior: Clip.antiAlias,
+                    elevation: 2.0,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                        side: BorderSide(color: Colors.grey[300], width: 1.0)),
+                    child: InkWell(
+                      onTap: () => Navigator.of(context)
+                          .pushNamed('/profile', arguments: _item.owner.userId),
+                      splashColor:
+                          Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
+                      highlightColor: Colors.transparent,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.max,
+                        children: <Widget>[
+                          SizedBox.fromSize(
+                            size: Size(100.0, 100.0),
+                            child: Container(
+                              //color: _blendColor,
+                              padding: EdgeInsets.all(2.0),
+                              child: ProfilePicture(_item.owner.profileImage),
+                            ),
+                          ),
+                          
+                            /*
+                          // Imagen del usuario
+                          SizedBox.fromSize(
+                            size: Size(1.0, double.infinity),
+                            child: _item.owner.profileImage.image),
+                          // Borde entre la imagen y el resto
+                         */
+                        ],
+                      ),
+                    ),
+                  ),
+      )])))),
     );
   }
 }
