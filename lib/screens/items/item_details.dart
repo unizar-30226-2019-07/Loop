@@ -302,8 +302,8 @@ class _ItemDetails extends State<ItemDetails> {
 
                 Container(
                     padding: const EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 15.0),
+                    alignment: Alignment.topLeft,
                     child: Text(_item?.description ?? '---',
-                        textAlign: TextAlign.left,
                         style:
                             TextStyle(fontSize: 15.0, color: Colors.black))),
                 Container(
@@ -345,16 +345,25 @@ class _ItemDetails extends State<ItemDetails> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: <Widget>[
-                                    Container(
-                                      child: Text(_item.owner.nombre + ' ' + _item.owner.apellidos,
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: descriptionStyle.copyWith(
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black),
-                                      ),
+                                  Container(
+                                    child: Text(_item.owner.nombre + ' ' + _item.owner.apellidos,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: descriptionStyle.copyWith(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black),
                                     ),
+                                  ),
                                   Container(child: StarRating(starRating: _item.owner?.numeroEstrellas ?? 5, starColor: Colors.black, profileView: false, starSize: 18.0,)), 
+                                  Container(
+                                    padding: EdgeInsets.only(top: 3.0),
+                                    child: Row(
+                                      children: <Widget>[
+                                        Icon(Icons.location_on),
+                                        Text(_item.distance.toStringAsFixed(0) + ' km'),
+                                      ],
+                                  ),)
+                                  
                             ],)
 
                             ),
