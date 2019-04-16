@@ -7,6 +7,7 @@ import 'package:selit/widgets/items/item_tile_vertical.dart';
 import 'package:selit/util/api/item_request.dart';
 import 'package:selit/class/item_class.dart';
 import 'package:selit/class/items/filter_list_class.dart';
+import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 import 'dart:async';
 
 /// Listado de productos en venta, junto con una barra de búsqueda y una pantalla
@@ -26,7 +27,7 @@ class ItemList extends StatefulWidget {
 
 class _ItemListState extends State<ItemList> {
   /// Número de items que se cargan cada vez en la lista
-  static const int ITEMS_PER_PAGE = 30; // TODO volver a poner 10 cuando la API tenga paginación
+  static const int ITEMS_PER_PAGE = 10;
 
   /// Lista de items a mostrar en la vista
   List<ItemClass> _items = <ItemClass>[];
@@ -133,18 +134,20 @@ class _ItemListState extends State<ItemList> {
   /// Ejemplo: página 0 -> items del 0 al 9 (10 items en total)
   void _getItemsData(int pageNum) async {
     // Petición de items
-    List<ItemClass> receivedItems = await ItemRequest.getItems(
-        lat: 0.0,
-        lng: 0.0,
-        filters: _filterManager,
-        size: ITEMS_PER_PAGE,
-        page: pageNum).catchError((error) {
-          print("Error al obtener la lista de objetos: $error");
-        });
-    // Evitar mostrar más items si se ha llegado al fin de la lista
-    if (receivedItems.length < ITEMS_PER_PAGE) lastPetitionPage++;
-    // Mostrar los items en la lista
-    setState(() => _items.addAll(receivedItems));
+    ItemRequest.getItems(
+      lat: 0.0,
+      lng: 0.0,
+      filters: _filterManager,
+      size: ITEMS_PER_PAGE,
+      page: pageNum).then((List<ItemClass> receivedItems) {
+        print(receivedItems.length);
+        // Evitar mostrar más items si se ha llegado al fin de la lista
+        if (receivedItems.length < ITEMS_PER_PAGE) lastPetitionPage++;
+        // Mostrar los items en la lista
+        setState(() => _items.addAll(receivedItems));
+      }).catchError((error) {
+        print("Error al obtener la lista de objetos: $error");
+      });
   }
 
   static Timer queryTimer;
@@ -303,6 +306,7 @@ class _ItemListState extends State<ItemList> {
 
   @override
   Widget build(BuildContext context) {
+    FlutterStatusbarcolor.setStatusBarColor(Colors.transparent);
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: Container(

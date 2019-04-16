@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'dart:async';
+import 'package:geocoder/geocoder.dart';
 import 'package:flutter/material.dart';
 import 'package:selit/class/usuario_class.dart';
 import 'package:selit/class/image_class.dart';
@@ -6,6 +8,9 @@ import 'package:selit/widgets/profile_picture.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:selit/util/storage.dart';
 import 'package:selit/util/api/usuario_request.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 
 /// Página de edición de perfil (formulario con los campos
 /// necesarios para modificar los atributos del usuario)
@@ -27,7 +32,6 @@ class _EditProfileState extends State<EditProfile> {
   final TextEditingController _nameController = new TextEditingController();
   final TextEditingController _surnameController = new TextEditingController();
   final TextEditingController _emailController = new TextEditingController();
-  final TextEditingController _locationController = new TextEditingController();
   final TextEditingController _sexController = new TextEditingController();
   final TextEditingController _yearController = new TextEditingController();
   final TextEditingController _oldPassController = new TextEditingController();
@@ -39,12 +43,37 @@ class _EditProfileState extends State<EditProfile> {
 
   static final _styleTitle = TextStyle(
       fontSize: 22.0, color: Colors.black, fontWeight: FontWeight.bold);
+  static final _styleText = TextStyle(
+      fontSize: 17.0, color: Colors.black);
+  static final _styleButton = TextStyle(
+      fontSize: 19.0, color: Colors.white);
+
+  /// Texto del título del alertdialog
+  static final _styleDialogTitle = TextStyle(
+      fontSize: 19.0, color: Colors.black, fontWeight: FontWeight.w600);
+  static final _styleDialogAccept =
+      TextStyle(fontSize: 19.0, color: Colors.white, fontWeight: FontWeight.bold); // color rojo
+  static final _styleDialogCancel = TextStyle(
+      fontSize: 19.0, color: Colors.grey[600], fontWeight: FontWeight.bold);
+  static final _styleLocationButton = TextStyle(
+      fontSize: 17.0, color: Colors.blue[600], fontWeight: FontWeight.bold);
 
   final Color _colorStatusBarGood = Colors.blue.withOpacity(0.5);
   final Color _colorStatusBarBad = Colors.red.withOpacity(0.5);
 
   /// Usuario a mostrar en el perfil
   UsuarioClass _user;
+
+  /// Ubicación del usuario (nombre del sitio)
+  String _ubicacionCiudad = "a";
+  String _ubicacionResto = "b";
+
+  /// Uso de mapas para seleccionar ubicación
+  Completer<GoogleMapController> _controller = Completer();
+  LatLng _userPosition; // la de UsuarioClass
+  LatLng _selectedPosition; // la seleccionada en el mapa
+  Marker _positionMarker; // marcador de posición del usuario en el mapa
+  CameraPosition _cameraPosition; // posicion inicial al abrir el mapa
 
   //Lista opciones sexo
   List<String> _sexos = <String>['', 'hombre', 'mujer', 'otro'];
@@ -57,12 +86,31 @@ class _EditProfileState extends State<EditProfile> {
     this._user = _user;
     _nameController.text = _user.nombre;
     _surnameController.text = _user.apellidos;
+    _userPosition = LatLng(_user.locationLat, _user.locationLng);
+    _cameraPosition = CameraPosition(
+      target: _userPosition,
+      zoom: 15,
+    );
+    _positionMarker =
+        Marker(markerId: MarkerId("Home"), position: _userPosition);
     _emailController.text = _user.email;
-    //_locationController.text = _user.ubicacionCiudad;
     _sexController.text = _user.sexo;
     _yearController.text = _user.edad.toString();
     _sexo = _user.sexo;
     _displayImage = _user.profileImage;
+    _loadCoordinates();
+  }
+
+  void _loadCoordinates() async {
+    if (_user?.locationLat != null && _user?.locationLng != null) {
+      final coordinates = new Coordinates(_user.locationLat, _user.locationLng);
+      var addresses =
+          await Geocoder.local.findAddressesFromCoordinates(coordinates);
+      setState(() {
+        _ubicacionCiudad = addresses.first.locality;
+        _ubicacionResto = addresses.first.countryName;
+      });
+    }
   }
 
   void showInSnackBar(String value, Color alfa) {
@@ -91,17 +139,15 @@ class _EditProfileState extends State<EditProfile> {
           locationLat: _user.locationLat,
           locationLng: _user.locationLng,
           image: _displayImage);
-       UsuarioRequest.edit(_user).then((response) {
-        showInSnackBar(
-            "Datos actualizados correctamente", _colorStatusBarGood);
-
+      UsuarioRequest.editUser(_user).then((_) {
+          showInSnackBar("Datos actualizados correctamente", _colorStatusBarGood);
       }).catchError((error) {
-        if (error == "Unauthorized" ||
-            error == "Forbidden" ||
-            error == "Not Found") {
+        if (error == "Unauthorized" || error == "Forbidden") {
           showInSnackBar("Acción no autorizada", _colorStatusBarBad);
+        } else if (error == "Not Found") {
+          showInSnackBar("Usuario no encontrado", _colorStatusBarBad);
         } else {
-          showInSnackBar("No hay conexión a internet", _colorStatusBarBad);
+          showInSnackBar("No hay conexión a Internet", _colorStatusBarBad);
         }
       });
     }
@@ -135,6 +181,114 @@ class _EditProfileState extends State<EditProfile> {
     }
   }
 
+  /// Actualizar SOLO LOCALMENTE la ubicación de usuario
+  /// para guardar cambios deberá pulsar el boton de "Guardar Cambios"
+  void _updateLocation() {
+    double newLat = _selectedPosition.latitude;
+    double newLng = _selectedPosition.longitude;
+    setState(() {
+      _userPosition = LatLng(newLat, newLng);
+      _cameraPosition = CameraPosition(
+        target: _userPosition,
+        zoom: 15,
+      );
+      _user.locationLat = newLat;
+      _user.locationLng = newLng;
+      _positionMarker = Marker(markerId: MarkerId("Home"), position: _selectedPosition);
+      _loadCoordinates();
+    });
+  }
+
+  /// Cuadro de diálogo para seleccionar ubicación de usuario
+  Widget _buildLocationDialog() {
+    Widget wMapStack = Stack(
+      children: <Widget>[
+        GoogleMap(
+          mapType: MapType.normal,
+          initialCameraPosition: _cameraPosition,
+          onCameraMove: (controller) => _selectedPosition = controller.target,
+          onMapCreated: (GoogleMapController controller) {
+            if (!_controller.isCompleted) {
+              _controller.complete(controller);
+            }
+          },
+          markers: Set<Marker>()..add(_positionMarker),
+        ),
+        Positioned(
+          right: 5,
+          bottom: 5,
+          child: RaisedButton(
+            color: Colors.white,
+            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            onPressed: () async {
+              GoogleMapController mapController = await _controller.future;
+              CameraPosition zoomPosition = CameraPosition(
+                target: _cameraPosition.target,
+                zoom: 18
+              );
+              mapController.animateCamera(
+                  CameraUpdate.newCameraPosition(zoomPosition));
+            },
+            child: Row(
+              children: <Widget>[
+                Container(
+                  margin: EdgeInsets.only(right: 5),
+                  child: Icon(Icons.my_location, color: Colors.blue[600]),
+                ),
+                Text('Volver', style: _styleLocationButton),
+              ],
+            ),
+          ),
+        ),
+        Center(
+            child: Container(
+          padding: EdgeInsets.only(bottom: 47),
+          child: Icon(FontAwesomeIcons.mapMarkerAlt,
+              size: 40.0, color: Colors.red),
+        )),
+      ],
+    );
+
+    return AlertDialog(
+        backgroundColor: Colors.white,
+        contentPadding: EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 5.0),
+        shape: RoundedRectangleBorder(
+            side: BorderSide(color: Colors.grey[400], width: 2.0),
+            borderRadius: BorderRadius.circular(10.0)),
+        title: Text('Selecciona tu ubicación', style: _styleDialogTitle),
+        content: SizedBox.fromSize(
+            size: Size(double.infinity, 300.0),
+            child: ClipRRect(
+                borderRadius: BorderRadius.circular(5.0),
+                child: Container(
+                    padding: EdgeInsets.all(2.0),
+                    color: Colors.grey[400],
+                    child: ClipRRect(
+                        borderRadius: BorderRadius.circular(5.0),
+                        child: wMapStack)))),
+        actions: <Widget>[
+          RaisedButton(
+              color: Theme.of(context).primaryColor,
+              padding: EdgeInsets.symmetric(horizontal: 25.0),
+              onPressed: () {
+                _updateLocation();
+                Navigator.of(context).pop();
+              },
+              child: Text('Aceptar',
+                  style: _styleDialogAccept)),
+          FlatButton(
+              padding: EdgeInsets.symmetric(horizontal: 15.0),
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('Cancelar', style: _styleDialogCancel))
+        ]);
+  }
+
+  /// Abrir el cuadro de diálogo que pide ubicación
+  void _openLocationDialog() {
+    _controller = Completer<GoogleMapController>();
+    showDialog(context: context, builder: (context) => _buildLocationDialog());
+  }
+
   /// Widget correspondiente a la edición del perfil del usuario _user
   /// Si un campo de _user es nulo, se muestran los campos por defecto
   Widget _buildForm() {
@@ -157,6 +311,7 @@ class _EditProfileState extends State<EditProfile> {
     }
 
     Widget wDataTop = Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Expanded(
           flex: 4,
@@ -165,9 +320,9 @@ class _EditProfileState extends State<EditProfile> {
               left: 10,
             ),
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
                 Container(
-                  margin: EdgeInsets.only(top: 50),
                   child: ClipOval(
                     // borde de 2 pixeles sobre la foto
                     child: Container(
@@ -178,21 +333,20 @@ class _EditProfileState extends State<EditProfile> {
                   ),
                 ),
                 Container(
-                  margin: EdgeInsets.only(top: 10, left: 15),
+                  margin: EdgeInsets.only(top: 10),
                   alignment: Alignment.center,
-                  child: Row(
-                    children: <Widget>[
-                      new FlatButton(
-                          onPressed: imageSelectorGallery,
-                          shape: new RoundedRectangleBorder(
-                              borderRadius: new BorderRadius.circular(30.0)),
-                          child: Row(
-                            children: <Widget>[
-                              Icon(Icons.edit),
-                              Text("Editar")
-                            ],
-                          ))
-                    ],
+                  child: GestureDetector(
+                    onTap: imageSelectorGallery,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Container(
+                          margin: EdgeInsets.only(right: 5),
+                          child: Icon(Icons.edit)
+                        ),
+                        Text('Editar foto'),
+                      ],
+                    ),
                   ),
                 )
               ],
@@ -202,8 +356,7 @@ class _EditProfileState extends State<EditProfile> {
         Expanded(
           flex: 6,
           child: Container(
-              margin: EdgeInsets.only(left: 25, right: 10, bottom: 35, top: 20),
-              //color: Colors.red, // util para ajustar margenes
+              margin: EdgeInsets.only(left: 25.0, right: 10.0, bottom: 25.0),
               child: Column(
                 children: <Widget>[
                   new TextFormField(
@@ -219,7 +372,6 @@ class _EditProfileState extends State<EditProfile> {
                         labelText: 'Apellidos',
                       ),
                       controller: _surnameController,
-                      keyboardType: TextInputType.datetime,
                     ),
                   ),
                 ],
@@ -228,12 +380,35 @@ class _EditProfileState extends State<EditProfile> {
       ],
     );
 
+    Widget wLocationInfo = _ubicacionCiudad == null || _ubicacionResto == null
+      ? Container()
+      : Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            Container(
+              margin: EdgeInsets.only(right: 5),
+              child: Icon(Icons.location_on),
+            ),
+            Text('$_ubicacionCiudad, $_ubicacionResto', style: _styleText)
+          ],
+        );
+
+    Widget wLocationButton = Container(
+      margin: EdgeInsets.only(top: 10.0),
+      child: SizedBox(
+        width: double.infinity,
+        child: RaisedButton(
+          padding: EdgeInsets.symmetric(vertical: 7.0, horizontal: 20.0),
+          color: Colors.grey[600],
+          child: Text('Abrir mapa', style: _styleButton),
+          onPressed: _openLocationDialog)));
+
     Widget wEmail = Row(
       children: <Widget>[
         Expanded(
           flex: 10,
           child: Container(
-              margin: EdgeInsets.only(left: 25, right: 10, bottom: 20),
+              margin: EdgeInsets.only(left: 15, right: 10, bottom: 5),
               //color: Colors.red, // util para ajustar margenes
               child: Column(
                 children: <Widget>[
@@ -250,34 +425,12 @@ class _EditProfileState extends State<EditProfile> {
       ],
     );
 
-
-    Widget wLocation = Row(
-      children: <Widget>[
-        Expanded(
-          flex: 10,
-          child: Container(
-              margin: EdgeInsets.only(left: 25, right: 10, bottom: 20),
-              //color: Colors.red, // util para ajustar margenes
-              child: Column(
-                children: <Widget>[
-                  new TextFormField(
-                    decoration: const InputDecoration(
-                      labelText: 'Ubicación',
-                    ),
-                    controller: _locationController,
-                    keyboardType: TextInputType.emailAddress,
-                  ),
-                ],
-              )),
-        )
-      ],
-    );
     Widget wOldPassword = Row(
       children: <Widget>[
         Expanded(
           flex: 10,
           child: Container(
-              margin: EdgeInsets.only(left: 25, right: 10, bottom: 20),
+              margin: EdgeInsets.only(left: 15, right: 10, bottom: 20),
               //color: Colors.red, // util para ajustar margenes
               child: Column(
                 children: <Widget>[
@@ -299,7 +452,7 @@ class _EditProfileState extends State<EditProfile> {
         Expanded(
           flex: 10,
           child: Container(
-              margin: EdgeInsets.only(left: 25, right: 10, bottom: 20),
+              margin: EdgeInsets.only(left: 15, right: 10, bottom: 20),
               //color: Colors.red, // util para ajustar margenes
               child: Column(
                 children: <Widget>[
@@ -328,7 +481,7 @@ class _EditProfileState extends State<EditProfile> {
         Expanded(
           flex: 8,
           child: Container(
-              margin: EdgeInsets.only(left: 25, bottom: 7),
+              margin: EdgeInsets.only(left: 15, bottom: 7),
               //color: Colors.red, // util para ajustar margenes
               child: Column(children: <Widget>[
                 new FormField(
@@ -386,7 +539,7 @@ class _EditProfileState extends State<EditProfile> {
         Expanded(
           flex: 8,
           child: Container(
-              margin: EdgeInsets.only(left: 25, bottom: 30),
+              margin: EdgeInsets.only(left: 15, bottom: 30),
               //color: Colors.red, // util para ajustar margenes
               child: Column(children: <Widget>[
                 new TextFormField(
@@ -418,34 +571,55 @@ class _EditProfileState extends State<EditProfile> {
     );
 
     return SafeArea(
-        top: false,
-        bottom: false,
         child: new Form(
             key: _formKey,
             autovalidate: true,
             child: new ListView(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               children: <Widget>[
+                Container(
+                  margin: EdgeInsets.fromLTRB(10.0, 20.0, 0.0, 10.0),
+                  child: Text('Editar perfil', style: _styleTitle),
+                ),
                 wDataTop,
                 Divider(),
-                wEmail,
-                //Divider(),
-                //wLocation,
+                Container(
+                  margin: EdgeInsets.fromLTRB(10.0, 15.0, 0.0, 10.0),
+                  child: Text('Mi ubicación', style: _styleTitle),
+                ),
+                Container(
+                  margin: EdgeInsets.fromLTRB(15.0, 0.0, 15.0, 10.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      wLocationInfo,
+                      wLocationButton,
+                    ],
+                  ),
+                ),
                 Divider(),
+                Container(
+                  margin: EdgeInsets.fromLTRB(10.0, 20.0, 0.0, 10.0),
+                  child: Text('Mi información', style: _styleTitle),
+                ),
+                wEmail,
                 wSex,
                 wAge,
-                new Container(
-                    padding: const EdgeInsets.only(left: 10.0, top: 20.0),
-                    child: new RaisedButton(
-                      color: Color(0xffc0392b),
-                      child: const Text('Guardar cambios',
-                          style: TextStyle(color: Colors.white)),
-                      onPressed: () async {
-                        updateUser();
-                      },
-                    )),
+                Container(
+                  margin: EdgeInsets.only(bottom: 20),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: RaisedButton(
+                      padding: EdgeInsets.symmetric(vertical: 7.0, horizontal: 20.0),
+                      color: Theme.of(context).primaryColor,
+                      child: Text('Guardar cambios', style: _styleButton),
+                      onPressed: updateUser,
+                    )
+                  ),
+                ),
+                Divider(),
                 Padding(
-                  padding: EdgeInsets.only(left: 6, top: 40, bottom: 10),
+                  padding: EdgeInsets.only(left: 6, top: 20, bottom: 10),
                   child: Row(children: <Widget>[
                     Row(children: <Widget>[
                       Text('Cambiar contraseña', style: _styleTitle)
@@ -455,23 +629,25 @@ class _EditProfileState extends State<EditProfile> {
                 wOldPassword,
                 Divider(),
                 wPassword,
-                new Container(
-                    padding: const EdgeInsets.only(
-                        left: 10.0, top: 20.0, bottom: 55),
-                    child: new RaisedButton(
-                      color: Color(0xffc0392b),
-                      child: const Text('Cambiar contraseña',
-                          style: TextStyle(color: Colors.white)),
-                      onPressed: () async {
-                        cambioPass();
-                      },
-                    )),
+                Container(
+                  margin: EdgeInsets.only(top: 10.0, bottom: 40.0),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: RaisedButton(
+                      padding: EdgeInsets.symmetric(vertical: 7.0, horizontal: 20.0),
+                      color: Theme.of(context).primaryColor,
+                      child: Text('Cambiar contraseña', style: _styleButton),
+                      onPressed: cambioPass,
+                    )
+                  ),
+                ),
               ],
             )));
   }
 
   @override
   Widget build(BuildContext context) {
+    FlutterStatusbarcolor.setStatusBarColor(Theme.of(context).primaryColor.withAlpha(200));
     return Scaffold(key: _scaffoldKey, body: _buildForm());
   }
 }

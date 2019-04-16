@@ -30,7 +30,7 @@ class UsuarioRequest {
       Storage.saveUserId(receivedUser.userId);
       return receivedToken;
     } else {
-      throw(APIConfig.getErrorString(response));
+      throw (APIConfig.getErrorString(response));
     }
   }
 
@@ -44,13 +44,12 @@ class UsuarioRequest {
             newUser.toJsonForSignUp()..addAll({"password": password})));
 
     if (response.statusCode != 201) {
-      throw(APIConfig.getErrorString(response));
+      throw (APIConfig.getErrorString(response));
     }
   }
 
   /// Obtener los datos del usuario con ID [userId]
   static Future<UsuarioClass> getUserById(int userId) async {
-    print(userId);
     http.Response response;
     if (userId == 0) {
       print('GET /users/me');
@@ -73,7 +72,25 @@ class UsuarioRequest {
           UsuarioClass.fromJson(json.jsonDecode(response.body), token);
       return perfil;
     } else {
-      throw(APIConfig.getErrorString(response));
+      throw (APIConfig.getErrorString(response));
+    }
+  }
+
+  static Future<void> editUser(UsuarioClass usuario) async {
+    if (usuario?.userId == null) {
+      throw ("Unknown Error");
+    }
+
+    print("Edición de usuario: ${json.jsonEncode(usuario.toJsonEdit())}");
+
+    http.Response response = await http
+        .put('${APIConfig.BASE_URL}/users/${usuario.userId}', headers: {
+      HttpHeaders.contentTypeHeader: ContentType.json.toString(),
+      HttpHeaders.authorizationHeader: await Storage.loadToken(),
+    }, body: json.jsonEncode(usuario.toJsonEdit()));
+
+    if (response.statusCode != 200) {
+      throw (APIConfig.getErrorString(response));
     }
   }
   //TODO: Los signos aparecen bien pero luego al envíar a la base no se reconocen.
@@ -104,7 +121,7 @@ class UsuarioRequest {
       });
       return users;
     } else {
-      throw(APIConfig.getErrorString(response));
+      throw (APIConfig.getErrorString(response));
     }
   }
 
@@ -122,7 +139,7 @@ class UsuarioRequest {
     );
 
     if (response.statusCode != 200) {
-      throw(APIConfig.getErrorString(response));
+      throw (APIConfig.getErrorString(response));
     }
   }
 

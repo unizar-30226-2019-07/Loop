@@ -401,7 +401,7 @@ class _EditItemState2 extends State<EditItem2> {
 
   @override
   Widget build(BuildContext context) {
-    FlutterStatusbarcolor.setStatusBarColor(Theme.of(context).primaryColor);
+    FlutterStatusbarcolor.setStatusBarColor(Colors.transparent);
     return Scaffold(
       key: _scaffoldKey,
       resizeToAvoidBottomInset: true,

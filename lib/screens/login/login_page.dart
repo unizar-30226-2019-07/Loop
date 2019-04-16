@@ -148,7 +148,7 @@ class _LoginPageState extends State<LoginPage>
 
   @override
   Widget build(BuildContext context) {
-    FlutterStatusbarcolor.setStatusBarColor(Color(0xffC11328));
+    FlutterStatusbarcolor.setStatusBarColor(Theme.of(context).primaryColorLight);
     return new Scaffold(
       key: _scaffoldKey,
       body: NotificationListener<OverscrollIndicatorNotification>(

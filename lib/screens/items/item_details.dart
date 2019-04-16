@@ -5,9 +5,8 @@ import 'package:selit/screens/items/edit_item.dart';
 import 'package:selit/util/storage.dart';
 import 'package:selit/util/api/item_request.dart';
 import 'package:selit/widgets/profile_picture.dart';
-import 'package:selit/screens/users/profile.dart';
+import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 import 'package:selit/widgets/star_rating.dart';
-import 'dart:async';
 
 /// Detalles de un item/producto en venta: título, descripción, precio,
 /// imágenes, etc. También se muestra información acerca de su usuario
@@ -197,6 +196,7 @@ class _ItemDetails extends State<ItemDetails> {
 
   @override
   Widget build(BuildContext context) {
+    FlutterStatusbarcolor.setStatusBarColor(Theme.of(context).primaryColor.withAlpha(200));
     final ThemeData theme = Theme.of(context);
     final TextStyle titleStyle =
         theme.textTheme.headline.copyWith(color: Colors.white);
@@ -367,9 +367,8 @@ class _ItemDetails extends State<ItemDetails> {
                                       child: Row(
                                         children: <Widget>[
                                           Icon(Icons.location_on),
-                                          Text(_item.distance
-                                                  .toStringAsFixed(0) +
-                                              ' km'),
+                                          Text(
+                                              'A ${_item.distance.toStringAsFixed(1)} km'),
                                         ],
                                       ),
                                     )
