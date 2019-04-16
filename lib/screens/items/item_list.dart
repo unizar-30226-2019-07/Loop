@@ -140,7 +140,7 @@ class _ItemListState extends State<ItemList> {
       filters: _filterManager,
       size: ITEMS_PER_PAGE,
       page: pageNum).then((List<ItemClass> receivedItems) {
-        print(receivedItems.length);
+        print("Recibidos ${receivedItems.length} items");
         // Evitar mostrar más items si se ha llegado al fin de la lista
         if (receivedItems.length < ITEMS_PER_PAGE) lastPetitionPage++;
         // Mostrar los items en la lista

@@ -213,22 +213,22 @@ class _ProfileState extends State<Profile> {
               ),
             ),
             Container(
-                margin: EdgeInsets.only(top: 10),
-                child: _user?.numeroEstrellas == null
+              margin: EdgeInsets.only(top: 10),
+              child: _user?.numeroEstrellas == null
                   ? Container(margin: EdgeInsets.only(top: 25))
                   : StarRating(
-                    starRating: _user.numeroEstrellas,
-                    starColor: Colors.white,
-                    profileView: true,
-                  ),
-                ),
+                      starRating: _user.numeroEstrellas,
+                      starColor: Colors.white,
+                      profileView: true,
+                    ),
+            ),
             _user?.reviews == null
-              ? Container(margin: EdgeInsets.only(top: 40))
-              : Container(
-                  margin: EdgeInsets.only(top: 5, bottom: 15),
-                  alignment: Alignment.center,
-                  child: Text('${_user?.reviews} reviews',
-                      style: _styleReviews, textAlign: _textAlignment))
+                ? Container(margin: EdgeInsets.only(top: 40))
+                : Container(
+                    margin: EdgeInsets.only(top: 5, bottom: 15),
+                    alignment: Alignment.center,
+                    child: Text('${_user?.reviews} reviews',
+                        style: _styleReviews, textAlign: _textAlignment))
           ],
         ),
       ),
@@ -296,6 +296,17 @@ class _ProfileState extends State<Profile> {
               ],
             ));
 
+    int edad;
+    if (_user?.nacimiento != null) {
+      DateTime now = DateTime.now();
+      edad = now.year - _user.nacimiento.year;
+      if (_user.nacimiento.month > now.month ||
+          (_user.nacimiento.month == now.month &&
+              _user.nacimiento.day >= now.day)) {
+                edad--; // no ha cumplido años este año
+              }
+    }
+
     Widget wUserDataRight = Expanded(
       flex: 6,
       child: Container(
@@ -319,10 +330,12 @@ class _ProfileState extends State<Profile> {
                   alignment: Alignment.centerLeft,
                   margin: EdgeInsets.only(
                       top: 10, bottom: wLocation == Container() ? 45 : 10),
-                  child: Text('${_user?.edad != null ? _user?.edad : ''}'
-                      '${_user?.edad != null ? ' años' : ''}'
+                  child: Text(
+                      '${edad != null ? edad : ''}'
+                      '${edad != null ? ' años' : ''}'
                       '${_user?.sexo != null ? _sexSymbol[_user.sexo] : ''}',
-                      style: _styleSexoEdad, textAlign: _textAlignment)),
+                      style: _styleSexoEdad,
+                      textAlign: _textAlignment)),
               wLocation
             ],
           )),

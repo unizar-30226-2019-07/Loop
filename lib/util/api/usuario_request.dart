@@ -67,6 +67,7 @@ class UsuarioRequest {
     }
 
     if (response.statusCode == 200) {
+      print('Recibido usuario: ${response.body}');
       String token = await Storage.loadToken();
       UsuarioClass perfil =
           UsuarioClass.fromJson(json.jsonDecode(response.body), token);

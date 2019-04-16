@@ -1,13 +1,13 @@
 import 'package:selit/class/usuario_class.dart';
 import 'package:selit/class/image_class.dart';
-import 'package:selit/util/storage.dart';
+import 'package:intl/intl.dart';
 
 /// Objeto/producto en venta de la aplicación, almacena información
 /// sobre su descripción, su tipo de venta y el usuario vendedor (ver [UsuarioClass])
 /// Para ver más información acerca de las imágenes del producto, ver [ImageClass]
 class ItemClass {
   int itemId;
-  String type; // venta, subasta, TODO enum?
+  String type; // sale / auction
   String title;
   String description;
   DateTime published; // día/hora de publicación
@@ -17,7 +17,7 @@ class ItemClass {
   String category; // informática, automoción, etc
   double price; // precio en cualquier moneda
   String currency; // eur, usd, etc.
-  String status; // TODO enum?
+  String status; // en venta / vendido
   int numViews;
   int numLikes;
   UsuarioClass owner; // vendedor del item
@@ -40,10 +40,11 @@ class ItemClass {
       this.numViews,
       this.numLikes,
       this.owner,
-
       this.media})
       : assert(type == null || type == "sale" || type == "auction",
             'Tipo inválido para un item (venta/subasta)'),
+        assert(status == null || status == "en venta" || status == "vendido",
+            'Status inválido para un item (en venta/vendido)'),
         assert(distance == null || distance >= 0,
             'La distancia debe ser al menos 0'),
         assert(price == null || price >= 0, 'El precio debe ser al menos 0'),
@@ -69,7 +70,7 @@ class ItemClass {
             type: json['type'],
             title: json['title'],
             description: json['description'],
-            published: DateTime.now() /* TODO */,
+            published: DateFormat("yyyy-MM-dd").parse(json['publicate_date']),
             locationLat: json['location']['lat'],
             locationLng: json['location']['lng'],
             distance: json['distance'],

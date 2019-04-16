@@ -33,7 +33,6 @@ class _EditProfileState extends State<EditProfile> {
   final TextEditingController _surnameController = new TextEditingController();
   final TextEditingController _emailController = new TextEditingController();
   final TextEditingController _sexController = new TextEditingController();
-  final TextEditingController _yearController = new TextEditingController();
   final TextEditingController _oldPassController = new TextEditingController();
   final TextEditingController _newPassController = new TextEditingController();
   final TextEditingController _newPassRepController =
@@ -47,6 +46,8 @@ class _EditProfileState extends State<EditProfile> {
       fontSize: 17.0, color: Colors.black);
   static final _styleButton = TextStyle(
       fontSize: 19.0, color: Colors.white);
+  static final _styleAgeTitle = TextStyle(
+      fontSize: 14.0, color: Colors.grey[600], fontWeight: FontWeight.bold);
 
   /// Texto del título del alertdialog
   static final _styleDialogTitle = TextStyle(
@@ -64,9 +65,12 @@ class _EditProfileState extends State<EditProfile> {
   /// Usuario a mostrar en el perfil
   UsuarioClass _user;
 
+  /// Fecha de nacimiento
+  DateTime _selectedDate;
+
   /// Ubicación del usuario (nombre del sitio)
-  String _ubicacionCiudad = "a";
-  String _ubicacionResto = "b";
+  String _ubicacionCiudad;
+  String _ubicacionResto;
 
   /// Uso de mapas para seleccionar ubicación
   Completer<GoogleMapController> _controller = Completer();
@@ -95,10 +99,14 @@ class _EditProfileState extends State<EditProfile> {
         Marker(markerId: MarkerId("Home"), position: _userPosition);
     _emailController.text = _user.email;
     _sexController.text = _user.sexo;
-    _yearController.text = _user.edad.toString();
+    _selectedDate = _user.nacimiento;
     _sexo = _user.sexo;
     _displayImage = _user.profileImage;
     _loadCoordinates();
+  }
+
+  String _nacimientoString(DateTime fecha) {
+    return '${fecha.day} / ${fecha.month} / ${fecha.year}';
   }
 
   void _loadCoordinates() async {
@@ -138,6 +146,7 @@ class _EditProfileState extends State<EditProfile> {
           email: _emailController.text,
           locationLat: _user.locationLat,
           locationLng: _user.locationLng,
+          nacimiento: _selectedDate,
           image: _displayImage);
       UsuarioRequest.editUser(_user).then((_) {
           showInSnackBar("Datos actualizados correctamente", _colorStatusBarGood);
@@ -439,7 +448,7 @@ class _EditProfileState extends State<EditProfile> {
                       labelText: 'Contraseña antigua',
                     ),
                     controller: _oldPassController,
-                    keyboardType: TextInputType.emailAddress,
+                    keyboardType: TextInputType.text,
                   ),
                 ],
               )),
@@ -461,14 +470,14 @@ class _EditProfileState extends State<EditProfile> {
                       labelText: 'Nueva contraseña',
                     ),
                     controller: _newPassController,
-                    keyboardType: TextInputType.emailAddress,
+                    keyboardType: TextInputType.text,
                   ),
                   new TextFormField(
                     decoration: const InputDecoration(
                       labelText: 'Repetir nueva contraseña',
                     ),
                     controller: _newPassRepController,
-                    keyboardType: TextInputType.emailAddress,
+                    keyboardType: TextInputType.text,
                   ),
                 ],
               )),
@@ -539,18 +548,23 @@ class _EditProfileState extends State<EditProfile> {
         Expanded(
           flex: 8,
           child: Container(
-              margin: EdgeInsets.only(left: 15, bottom: 30),
-              //color: Colors.red, // util para ajustar margenes
-              child: Column(children: <Widget>[
-                new TextFormField(
-                  decoration: const InputDecoration(
-                    hintText: 'Edad',
-                    labelText: 'Edad',
-                  ),
-                  controller: _yearController,
-                  keyboardType: TextInputType.emailAddress,
-                )
-              ])),
+              margin: EdgeInsets.only(left: 15),
+              child: RaisedButton(
+                color: Colors.grey[600],
+                onPressed: () async {
+                  DateTime picked = await showDatePicker(
+                    context: context,
+                    initialDate: _selectedDate ?? DateTime.now(),
+                    firstDate: DateTime(1900, 1),
+                    lastDate: DateTime.now()
+                  );
+                  setState((){
+                    _selectedDate = picked;
+                  });
+                },
+                child: Text(_selectedDate == null ? 'Seleccionar fecha...' : _nacimientoString(_selectedDate), style: _styleButton, textAlign: TextAlign.left,),
+              )
+            ),
         ),
         Expanded(
           flex: 2,
@@ -559,9 +573,7 @@ class _EditProfileState extends State<EditProfile> {
               //color: Colors.red, // util para ajustar margenes
               child: Column(children: <Widget>[
                 new FlatButton(
-                    onPressed: () {
-                      _yearController.clear();
-                    },
+                    onPressed: () => setState(() => _selectedDate = null),
                     shape: new RoundedRectangleBorder(
                         borderRadius: new BorderRadius.circular(30.0)),
                     child: new Icon(Icons.delete))
@@ -604,9 +616,13 @@ class _EditProfileState extends State<EditProfile> {
                 ),
                 wEmail,
                 wSex,
+                Container(
+                  margin: EdgeInsets.only(left: 15.0, top: 5.0),
+                  child: Text('Fecha de nacimiento', style: _styleAgeTitle),
+                ),
                 wAge,
                 Container(
-                  margin: EdgeInsets.only(bottom: 20),
+                  margin: EdgeInsets.symmetric(vertical: 20.0),
                   child: SizedBox(
                     width: double.infinity,
                     child: RaisedButton(

@@ -1,6 +1,4 @@
-import 'package:date_format/date_format.dart';
 import 'package:selit/class/image_class.dart';
-import 'package:selit/util/storage.dart';
 
 /// Datos de usuario registrado, ya sea para mostrarlos en el perfil
 /// o para cualquier otro uso. Puede tener campos nulos aunque sean
@@ -12,8 +10,7 @@ class UsuarioClass {
   String apellidos;
   String sexo;
   String email;
-  int edad;
-  DateTime nacimiento;
+  DateTime nacimiento; // TODO no usado en la aplicación móvil. Borarrlo?
   double numeroEstrellas;
   int reviews;
   String token;
@@ -27,7 +24,6 @@ class UsuarioClass {
       this.apellidos,
       this.sexo,
       this.email,
-      this.edad,
       this.numeroEstrellas,
       this.reviews,
       this.token,
@@ -35,11 +31,13 @@ class UsuarioClass {
       this.locationLat,
       this.locationLng,
       this.profileImage})
-      : assert(edad == null || edad > 0,
-            'Un usuario no puede tener edad negativa'),
-        assert(reviews == null || reviews > 0,
+      : assert(reviews == null || reviews > 0,
             'Un usuario no puede tener número de reviews negativo'),
-        assert(sexo == null || sexo == "hombre" || sexo == "mujer" || sexo == "otro",
+        assert(
+            sexo == null ||
+                sexo == "hombre" ||
+                sexo == "mujer" ||
+                sexo == "otro",
             'Un usuario debe tener sexo "hombre", "mujer" u "otro".'),
         assert(
             numeroEstrellas == null ||
@@ -51,8 +49,7 @@ class UsuarioClass {
             userId: json['idUsuario'],
             nombre: json['first_name'],
             apellidos: json['last_name'],
-            edad: 18,
-            reviews: 30,
+            reviews: 30, // TODO esperar a que se implemente en la API
             numeroEstrellas: json['rating'],
             sexo: json["gender"],
             email: json["email"],
@@ -70,6 +67,7 @@ class UsuarioClass {
       String email,
       double locationLat,
       double locationLng,
+      DateTime nacimiento,
       ImageClass image}) {
     this.nombre = nombre;
     this.apellidos = apellidos;
@@ -77,7 +75,12 @@ class UsuarioClass {
     this.email = email;
     this.locationLat = locationLat;
     this.locationLng = locationLng;
+    this.nacimiento = nacimiento;
     this.profileImage = image;
+  }
+
+  String _nacimientoString(DateTime fecha) {
+    return '${fecha.year}-${fecha.month.toString().padLeft(2, '0')}-${fecha.day.toString().padLeft(2, '0')}';
   }
 
   Map<String, dynamic> toJsonEdit() => {
@@ -85,7 +88,7 @@ class UsuarioClass {
         "first_name": nombre,
         "last_name": apellidos,
         "gender": sexo,
-        "rating": numeroEstrellas, // TODO
+        "birth_date": _nacimientoString(nacimiento),
         "location": {
           "lat": locationLat,
           "lng": locationLng,
