@@ -23,8 +23,16 @@ class _ItemDetails extends State<ItemDetails> {
 
   ItemClass _item;
 
+  List<ImageProvider> _images = [];
+
   // Constructor
-  _ItemDetails(this._item);
+  _ItemDetails(this._item) {
+    if (_item.media.isNotEmpty) {
+      for (var imagen in _item.media) {
+        _images.add(imagen.image.image);
+      }
+    }
+  }
 
   static final _styleTitle = TextStyle(
       fontSize: 20.0, color: Colors.black, fontWeight: FontWeight.bold);
@@ -184,7 +192,8 @@ class _ItemDetails extends State<ItemDetails> {
 
   @override
   Widget build(BuildContext context) {
-    FlutterStatusbarcolor.setStatusBarColor(Theme.of(context).primaryColor.withAlpha(200));
+    FlutterStatusbarcolor.setStatusBarColor(
+        Theme.of(context).primaryColor.withAlpha(200));
     final ThemeData theme = Theme.of(context);
     final TextStyle titleStyle =
         theme.textTheme.headline.copyWith(color: Colors.white);
@@ -211,24 +220,12 @@ class _ItemDetails extends State<ItemDetails> {
                               children: <Widget>[
                                 new Container(
                                   child: new Carousel(
-                                    images: [
-                                      new AssetImage(
-                                        'assets/img/login_logo.png',
-                                        // package: destination.assetPackage,
-                                      ),
-                                      new AssetImage(
-                                        'assets/img/profile_default.jpg',
-                                        // package: destination.assetPackage,
-                                      ),
-                                      new AssetImage(
-                                        'assets/img/login_logo.png',
-                                        // package: destination.assetPackage,
-                                      ),
-                                      new AssetImage(
-                                        'assets/img/profile_default.jpg',
-                                        // package: destination.assetPackage,
-                                      ),
-                                    ],
+                                    images: _images.length > 0
+                                        ? _images
+                                        : [
+                                            AssetImage(
+                                                'assets/img/login_logo.png')
+                                          ],
                                     boxFit: BoxFit.scaleDown,
                                     showIndicator: true,
                                     autoplay: false,
