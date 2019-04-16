@@ -125,4 +125,19 @@ class UsuarioRequest {
       throw(APIConfig.getErrorString(response));
     }
   }
+
+  static Future<void> delete( int userId) async {
+    http.Response response = await http.delete(
+      '${APIConfig.BASE_URL}/users/$userId',
+      headers: {
+        HttpHeaders.contentTypeHeader: ContentType.json.toString(),
+        HttpHeaders.authorizationHeader: await Storage.loadToken(),
+      },
+    );
+
+    if (response.statusCode != 200) {
+      throw(APIConfig.getErrorString(response));
+    }
+  }
+
 }

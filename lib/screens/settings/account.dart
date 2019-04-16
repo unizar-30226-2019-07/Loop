@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:selit/util/storage.dart';
+import 'package:selit/util/api/usuario_request.dart';
 
 // Vista temporal con varios botones que llevan a diferentes vistas
 // de forma que se pueda acceder a ellas de alguna forma
@@ -15,6 +16,73 @@ class _AccountState extends State<Account> {
       fontSize: 22.0, color: Colors.grey[800], fontWeight: FontWeight.bold);
 
   final TextEditingController _passController = new TextEditingController();
+
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+
+  final Color _colorStatusBarGood = Colors.blue.withOpacity(0.5);
+  final Color _colorStatusBarBad = Colors.red.withOpacity(0.5);
+
+  void showInSnackBar(String value, Color alfa) {
+    FocusScope.of(context).requestFocus(new FocusNode());
+    _scaffoldKey.currentState?.removeCurrentSnackBar();
+    _scaffoldKey.currentState.showSnackBar(new SnackBar(
+      content: new Text(
+        value,
+        textAlign: TextAlign.center,
+        style: TextStyle(color: Colors.white, fontSize: 16.0),
+      ),
+      backgroundColor: alfa,
+      duration: Duration(seconds: 3),
+    ));
+  }
+
+  void _showDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: new Text("¿Seguro que desea eliminar su cuenta?"),
+          content: new Text("Al eliminar su cuenta se borrará del sistema toda su información."),
+          actions: <Widget>[
+            new FlatButton(
+              child: new Text("CANCELAR"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            new FlatButton(
+              child: new Text("ACEPTAR"),
+              onPressed: () {
+                Navigator.of(context).pop();
+                cambioPass();
+              },
+            )
+          ],
+        );
+      },
+    );
+  }
+
+
+  void cambioPass() async {
+    if (_passController.text.length <= 0) {
+      showInSnackBar("Completa todos los campos", Colors.yellow);
+      
+    } else {
+      int miId = await Storage.loadUserId();
+      UsuarioRequest.delete(miId)
+          .then((_) {
+        showInSnackBar(
+            "Cuenta eliminada correctamente", _colorStatusBarGood);
+      }).catchError((error) {
+        if (error == "Unauthorized" ||
+            error == "Forbidden" ||
+            error == "Not Found") {
+          showInSnackBar("Acción no autorizada", _colorStatusBarBad);
+        }
+      });
+    }
+  }
 
 Widget _buildForm() {
 
@@ -81,7 +149,7 @@ Widget _buildForm() {
                       child: const Text('Eliminar cuenta',
                           style: TextStyle(color: Colors.white)),
                       onPressed: () async {
-                        
+                        _showDialog();
                       },
                     )),
             ),
@@ -111,6 +179,7 @@ Widget _buildForm() {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+       key: _scaffoldKey,
         appBar: AppBar(
           title: Text('Cuenta'),
         ),
