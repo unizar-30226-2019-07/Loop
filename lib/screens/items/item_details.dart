@@ -28,19 +28,13 @@ class _ItemDetails extends State<ItemDetails> {
   _ItemDetails(this._item);
 
   static final _styleTitle = TextStyle(
-      fontSize: 20.0,
-      color: Colors.black,
-      fontWeight: FontWeight.bold);
+      fontSize: 20.0, color: Colors.black, fontWeight: FontWeight.bold);
 
   static final styleTagWhite = TextStyle(
-      fontSize: 18.0,
-      color: Colors.white,
-      fontWeight: FontWeight.bold);
+      fontSize: 18.0, color: Colors.white, fontWeight: FontWeight.bold);
 
   static final styleTagBlack = TextStyle(
-      fontSize: 22.0,
-      color: Colors.black,
-      fontWeight: FontWeight.bold);
+      fontSize: 22.0, color: Colors.black, fontWeight: FontWeight.bold);
 
   static IconData _filledFavorite = Icons.favorite;
   static IconData _emptyFavorite = Icons.favorite_border;
@@ -53,11 +47,10 @@ class _ItemDetails extends State<ItemDetails> {
 
   void _favoritePressed() {
     setState(() {
-      if(_esFavorito){
+      if (_esFavorito) {
         _favorite = Icons.favorite_border;
         _esFavorito = false;
-      }
-      else{
+      } else {
         _favorite = Icons.favorite;
         _esFavorito = true;
       }
@@ -88,12 +81,13 @@ class _ItemDetails extends State<ItemDetails> {
         // return object of type Dialog
         return AlertDialog(
           title: new Text("¿Seguro que quiere eliminar el producto?",
-            style: TextStyle(
+              style: TextStyle(
                   fontSize: 18.0,
                   color: Colors.black,
                   fontWeight: FontWeight.bold)),
-          content: new Text("Si pulsa \"Eliminar\" el producto se eliminará. Los cambios no pueden deshacerse.",
-            style: TextStyle(
+          content: new Text(
+              "Si pulsa \"Eliminar\" el producto se eliminará. Los cambios no pueden deshacerse.",
+              style: TextStyle(
                   fontSize: 15.0,
                   color: Colors.black,
                   fontWeight: FontWeight.bold)),
@@ -101,28 +95,32 @@ class _ItemDetails extends State<ItemDetails> {
             // usually buttons at the bottom of the dialog
             new FlatButton(
               child: new Text("CANCELAR",
-                style: TextStyle(fontSize: 16.0,
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold)),
+                  style: TextStyle(
+                      fontSize: 16.0,
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold)),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             new FlatButton(
               child: new Text("ELIMINAR",
-                style: TextStyle(fontSize: 16.0,
-                  color: Colors.red,
-                  fontWeight: FontWeight.bold)),
+                  style: TextStyle(
+                      fontSize: 16.0,
+                      color: Colors.red,
+                      fontWeight: FontWeight.bold)),
               onPressed: () {
                 ItemRequest.delete(_item).then((_) {
-                    showInSnackBar("Datos actualizados correctamente", _colorStatusBarGood);
-                    Navigator.of(context).pop();
-                    Navigator.of(context).pop();
+                  showInSnackBar(
+                      "Datos actualizados correctamente", _colorStatusBarGood);
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pop();
                 }).catchError((error) {
                   if (error == "Unauthorized" || error == "Forbidden") {
                     showInSnackBar("Acción no autorizada", _colorStatusBarBad);
                   } else {
-                    showInSnackBar("No hay conexión a internet", _colorStatusBarBad);
+                    showInSnackBar(
+                        "No hay conexión a internet", _colorStatusBarBad);
                   }
                 });
               },
@@ -131,50 +129,51 @@ class _ItemDetails extends State<ItemDetails> {
         );
       },
     );
-}
+  }
 
-  Widget _buildEditButton(){
+  Widget _buildEditButton() {
     return Row(
-    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-    children: <Widget>[
-      new RaisedButton(
-        padding: const EdgeInsets.all(8.0),
-        textColor: Colors.white,
-        color: Colors.blue,
-        onPressed: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => EditItem(item: _item)));
-        } ,
-        child: new Text('Editar producto',
-                style: TextStyle(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: <Widget>[
+        new RaisedButton(
+          padding: const EdgeInsets.all(8.0),
+          textColor: Colors.white,
+          color: Colors.blue,
+          onPressed: () {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => EditItem(item: _item)));
+          },
+          child: new Text('Editar producto',
+              style: TextStyle(
                   fontSize: 18.0,
                   color: Colors.white,
                   fontWeight: FontWeight.bold)),
-      ),
-      new RaisedButton(
-        onPressed: () => _showDialogDeleteProduct(),
-        textColor: Colors.white,
-        color: Colors.red,
-        padding: const EdgeInsets.all(8.0),
-        child: new Text('Eliminar producto',
-                style: TextStyle(
+        ),
+        new RaisedButton(
+          onPressed: () => _showDialogDeleteProduct(),
+          textColor: Colors.white,
+          color: Colors.red,
+          padding: const EdgeInsets.all(8.0),
+          child: new Text('Eliminar producto',
+              style: TextStyle(
                   fontSize: 18.0,
                   color: Colors.white,
                   fontWeight: FontWeight.bold)),
-      ),
-    ],
+        ),
+      ],
     );
   }
 
   final _blendColor = Color.alphaBlend(Color(0x552B2B2B), Color(0xFFC0392B));
 
-  void _leerIdUsuario() async{
-    int idItem = _item.owner.userId; 
+  void _leerIdUsuario() async {
+    int idItem = _item.owner.userId;
     int miId = await Storage.loadUserId();
-      if(miId == idItem){
-        setState(() {
-          _buildEditConditional = _buildEditButton();
-        });
-      }
+    if (miId == idItem) {
+      setState(() {
+        _buildEditConditional = _buildEditButton();
+      });
+    }
   }
 
   @override
@@ -252,9 +251,8 @@ class _ItemDetails extends State<ItemDetails> {
                           fontWeight: FontWeight.bold,
                           color: Colors.black87),
                     )),
-                Container(
-                  child: _buildEditConditional),
-                //_leerIdUsuario() == true ?_buildEditButton() : null, 
+                Container(child: _buildEditConditional),
+                //_leerIdUsuario() == true ?_buildEditButton() : null,
                 Container(
                     padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0.0),
                     child: DefaultTextStyle(
@@ -263,7 +261,8 @@ class _ItemDetails extends State<ItemDetails> {
                           mainAxisSize: MainAxisSize.max,
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
-                            Row(                                // three line description
+                            Row(
+                              // three line description
                               mainAxisSize: MainAxisSize.max,
                               //mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: <Widget>[
@@ -304,8 +303,7 @@ class _ItemDetails extends State<ItemDetails> {
                     padding: const EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 15.0),
                     alignment: Alignment.topLeft,
                     child: Text(_item?.description ?? '---',
-                        style:
-                            TextStyle(fontSize: 15.0, color: Colors.black))),
+                        style: TextStyle(fontSize: 15.0, color: Colors.black))),
                 Container(
                     padding: const EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 20.0),
                     alignment: Alignment.centerLeft,
@@ -325,8 +323,10 @@ class _ItemDetails extends State<ItemDetails> {
                     child: InkWell(
                       onTap: () => Navigator.of(context)
                           .pushNamed('/profile', arguments: _item.owner.userId),
-                      splashColor:
-                          Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
+                      splashColor: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withOpacity(0.05),
                       highlightColor: Colors.transparent,
                       child: Row(
                         mainAxisSize: MainAxisSize.max,
@@ -341,36 +341,49 @@ class _ItemDetails extends State<ItemDetails> {
                           ),
                           Expanded(
                             child: Container(
-                              padding: EdgeInsets.all(8.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Container(
-                                    child: Text(_item.owner.nombre + ' ' + _item.owner.apellidos,
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: descriptionStyle.copyWith(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black),
+                                padding: EdgeInsets.all(8.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    Container(
+                                      child: Text(
+                                        _item.owner.nombre +
+                                            ' ' +
+                                            _item.owner.apellidos,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: descriptionStyle.copyWith(
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black),
+                                      ),
                                     ),
-                                  ),
-                                  Container(child: StarRating(starRating: _item.owner?.numeroEstrellas ?? 5, starColor: Colors.black, profileView: false, starSize: 18.0,)), 
-                                  Container(
-                                    padding: EdgeInsets.only(top: 3.0),
-                                    child: Row(
-                                      children: <Widget>[
-                                        Icon(Icons.location_on),
-                                        Text('A ${_item.distance.toStringAsFixed(1)} km'),
-                                      ],
-                                  ),)
-                            ],)
-                            ),
+                                    Container(
+                                        child: StarRating(
+                                      starRating:
+                                          _item.owner?.numeroEstrellas ?? 5,
+                                      starColor: Colors.black,
+                                      profileView: false,
+                                      starSize: 18.0,
+                                    )),
+                                    Container(
+                                      padding: EdgeInsets.only(top: 3.0),
+                                      child: Row(
+                                        children: <Widget>[
+                                          Icon(Icons.location_on),
+                                          Text(
+                                              'A ${_item.distance.toStringAsFixed(1)} km'),
+                                        ],
+                                      ),
+                                    )
+                                  ],
+                                )),
                           )
                         ],
                       ),
                     ),
                   ),
-      )])))),
+                )
+              ])))),
     );
   }
 }
