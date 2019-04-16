@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:selit/class/usuario_class.dart';
 import 'package:selit/util/storage.dart';
 import 'package:selit/util/api/usuario_request.dart';
+import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 
 /// Pantalla de carga hasta que se puede decidir si existe un
 /// usuario registrado en la aplicación (existe un token) y ese token
@@ -78,7 +79,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
 
   @override
   Widget build(BuildContext context) {
-
+    FlutterStatusbarcolor.setStatusBarColor(Colors.transparent);
     return Scaffold(
         body: Container(
             decoration: BoxDecoration(

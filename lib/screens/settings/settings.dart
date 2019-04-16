@@ -7,7 +7,7 @@ import 'package:selit/util/storage.dart';
 class Settings extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    FlutterStatusbarcolor.setStatusBarColor(Theme.of(context).primaryColor);
+    FlutterStatusbarcolor.setStatusBarColor(Colors.transparent);
     return Scaffold(
         appBar: AppBar(
           leading: Container(),
