@@ -66,6 +66,7 @@ class _ProfileState extends State<Profile> {
   bool _itemsEnVentaEmpty = false; // diferenciar entre cargando y no hay
   List<ItemClass> _itemsVendidos = <ItemClass>[];
   bool _itemsVendidosEmpty = false; // diferenciar entre cargando y no hay
+  bool _cancelled; // evitar bug al pedir objetos y cambiar de pantalla
 
   /// Usuario a mostrar en el perfil (null = placeholder)
   static UsuarioClass _user;
@@ -86,25 +87,34 @@ class _ProfileState extends State<Profile> {
     });
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+    _cancelled = true;
+  }
+
   Future<void> _loadProfile(int _userId) async {
     // Mostrar usuario placeholder mientras carga el real
+    _cancelled = false;
     if (_user == null) {
       String token = await Storage.loadToken();
       await UsuarioRequest.getUserById(_userId).then((realUser) {
-        setState(() {
-          realUser.token = token;
-          _user = realUser;
-        });
+        if (!_cancelled) {
+          setState(() {
+            realUser.token = token;
+            _user = realUser;
+          });
+        }
       }).catchError((error) {
         print('Error al cargar el perfil de usuario: $error');
       });
     }
-    if (_ubicacionCiudad == null && _ubicacionResto == null) {
+    if (_user?.locationLat != null && _user?.locationLng != null) {
       // Se obtienen sus valores de ubicación
       final coordinates = new Coordinates(_user.locationLat, _user.locationLng);
       var addresses =
           await Geocoder.local.findAddressesFromCoordinates(coordinates);
-      if (addresses.length > 0) {
+      if (addresses.length > 0 && !_cancelled) {
         setState(() {
           _ubicacionCiudad = addresses.first.locality;
           _ubicacionResto = addresses.first.countryName;
@@ -120,25 +130,29 @@ class _ProfileState extends State<Profile> {
       // Cargar los objetos en venta y vendidos para el usuario
       ItemRequest.getItemsFromUser(userId: _user.userId, status: "en venta")
           .then((itemsVenta) {
-        setState(() {
-          if (itemsVenta.isEmpty) {
-            _itemsEnVentaEmpty = true;
-          } else {
-            _itemsEnVenta = itemsVenta;
-          }
-        });
+        if (!_cancelled) {
+          setState(() {
+            if (itemsVenta.isEmpty) {
+              _itemsEnVentaEmpty = true;
+            } else {
+              _itemsEnVenta = itemsVenta;
+            }
+          });
+        }
       }).catchError((error) {
         print('Error al cargar los productos en venta de usuario: $error');
       });
       ItemRequest.getItemsFromUser(userId: _user.userId, status: "vendido")
           .then((itemsVendidos) {
-        setState(() {
-          if (itemsVendidos.isEmpty) {
-            _itemsVendidosEmpty = true;
-          } else {
-            _itemsVendidos = itemsVendidos;
-          }
-        });
+        if (!_cancelled) {
+          setState(() {
+            if (itemsVendidos.isEmpty) {
+              _itemsVendidosEmpty = true;
+            } else {
+              _itemsVendidos = itemsVendidos;
+            }
+          });
+        }
       }).catchError((error) {
         print('Error al cargar los productos vendidos de usuario: $error');
       });

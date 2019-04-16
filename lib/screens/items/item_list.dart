@@ -50,6 +50,9 @@ class _ItemListState extends State<ItemList> {
   /// Color más oscuro que el rojo principal
   final _blendColor = Color.alphaBlend(Color(0x552B2B2B), Color(0xFFC0392B));
 
+  // Evitar bug al cambiar de pagina antes de tiempo
+  bool _cancelled;
+
   /// Controlador de filtros, medio de comunicación entre ItemList e ItemListDrawer
   /// Para mas información, ver [FilterListClass]
   FilterListClass _filterManager;
@@ -115,7 +118,14 @@ class _ItemListState extends State<ItemList> {
     super.initState();
     _filterManager = new FilterListClass(_updateFilters);
     _items = <ItemClass>[];
+    _cancelled = false;
     _loadItems(0); // Cargar los primeros ITEMS_PER_PAGE objetos
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _cancelled = true;
   }
 
   // Última página de items que se ha pedido (para evitar repetir)
@@ -145,7 +155,9 @@ class _ItemListState extends State<ItemList> {
         // Evitar mostrar más items si se ha llegado al fin de la lista
         if (receivedItems.length < ITEMS_PER_PAGE) lastPetitionPage++;
         // Mostrar los items en la lista
-        setState(() => _items.addAll(receivedItems));
+        if (!_cancelled) {
+          setState(() => _items.addAll(receivedItems));
+        }
       }).catchError((error) {
         print("Error al obtener la lista de objetos: $error");
       });
