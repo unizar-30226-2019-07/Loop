@@ -114,6 +114,7 @@ class _ItemListState extends State<ItemList> {
   void initState() {
     super.initState();
     _filterManager = new FilterListClass(_updateFilters);
+    _items = <ItemClass>[];
     _loadItems(0); // Cargar los primeros ITEMS_PER_PAGE objetos
   }
 

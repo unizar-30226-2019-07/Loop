@@ -114,10 +114,12 @@ class _EditProfileState extends State<EditProfile> {
       final coordinates = new Coordinates(_user.locationLat, _user.locationLng);
       var addresses =
           await Geocoder.local.findAddressesFromCoordinates(coordinates);
-      setState(() {
-        _ubicacionCiudad = addresses.first.locality;
-        _ubicacionResto = addresses.first.countryName;
-      });
+      if (addresses.length > 0) {
+        setState(() {
+          _ubicacionCiudad = addresses.first.locality;
+          _ubicacionResto = addresses.first.countryName;
+        });
+      }
     }
   }
 
@@ -215,6 +217,7 @@ class _EditProfileState extends State<EditProfile> {
         GoogleMap(
           mapType: MapType.normal,
           initialCameraPosition: _cameraPosition,
+          myLocationEnabled: true,
           onCameraMove: (controller) => _selectedPosition = controller.target,
           onMapCreated: (GoogleMapController controller) {
             if (!_controller.isCompleted) {
@@ -233,7 +236,7 @@ class _EditProfileState extends State<EditProfile> {
               GoogleMapController mapController = await _controller.future;
               CameraPosition zoomPosition = CameraPosition(
                 target: _cameraPosition.target,
-                zoom: 18
+                zoom: 17
               );
               mapController.animateCamera(
                   CameraUpdate.newCameraPosition(zoomPosition));
@@ -242,7 +245,7 @@ class _EditProfileState extends State<EditProfile> {
               children: <Widget>[
                 Container(
                   margin: EdgeInsets.only(right: 5),
-                  child: Icon(Icons.my_location, color: Colors.blue[600]),
+                  child: Icon(Icons.location_on, color: Colors.blue[600]),
                 ),
                 Text('Volver', style: _styleLocationButton),
               ],

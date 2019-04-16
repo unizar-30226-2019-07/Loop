@@ -88,7 +88,7 @@ class UsuarioClass {
         "first_name": nombre,
         "last_name": apellidos,
         "gender": sexo,
-        "birth_date": _nacimientoString(nacimiento),
+        "birth_date": nacimiento != null ? _nacimientoString(nacimiento) : null,
         "location": {
           "lat": locationLat,
           "lng": locationLng,

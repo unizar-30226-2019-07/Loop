@@ -82,6 +82,8 @@ class UsuarioRequest {
       throw ("Unknown Error");
     }
 
+    Map josn = usuario.toJsonEdit();
+    print(josn.toString());
     print("Edición de usuario: ${json.jsonEncode(usuario.toJsonEdit())}");
 
     http.Response response = await http
