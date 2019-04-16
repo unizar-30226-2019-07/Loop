@@ -103,5 +103,21 @@ class ItemClass {
     "currency": currency,
     "media": List.generate(media.length, (i) => media[i].toJson()), 
   };
+
+    Map<String, dynamic> toJsonEdit() => {
+    "type": type,
+    "title": title,
+    "owner_id": owner.userId,
+    "description": description,
+    "location": {
+      "lat": locationLat,
+      "lng": locationLng,
+    },
+    "category": category,
+    "price": price,
+    "currency": currency,
+    "status": status,
+    "media": List.generate(media.length, (i) => media[i].toJson()), 
+  };
   
 }
