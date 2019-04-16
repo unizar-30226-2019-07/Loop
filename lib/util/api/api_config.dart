@@ -22,6 +22,9 @@ class APIConfig {
     String error;
     if (response?.statusCode != null) {
       error = _errorCodes[response.statusCode];
+      if (error == null) {
+        print("Error desconocido: ${json.jsonDecode(response?.body)['message']}");
+      }
     }
     return error ?? "Unknown Error";
   }

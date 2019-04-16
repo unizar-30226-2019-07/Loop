@@ -39,6 +39,8 @@ class UsuarioClass {
             'Un usuario no puede tener edad negativa'),
         assert(reviews == null || reviews > 0,
             'Un usuario no puede tener número de reviews negativo'),
+        assert(sexo == null || sexo == "hombre" || sexo == "mujer" || sexo == "otro",
+            'Un usuario debe tener sexo "hombre", "mujer" u "otro".'),
         assert(
             numeroEstrellas == null ||
                 numeroEstrellas >= 0 && numeroEstrellas <= 5,
@@ -80,7 +82,8 @@ class UsuarioClass {
         "email": email,
         "first_name": nombre,
         "last_name": apellidos,
-        "gender": sexo,
+        "gender": "hombre",
+        "rating": numeroEstrellas, // TODO
         "location": {
           "lat": locationLat,
           "lng": locationLng,

@@ -138,27 +138,16 @@ class _EditProfileState extends State<EditProfile> {
           locationLat: _user.locationLat,
           locationLng: _user.locationLng,
           image: _displayImage);
-      edit(_user).then((response) {
-        final Color legit = Colors.blue.withOpacity(0.5);
-        final Color fake = Colors.red.withOpacity(0.5);
-        if (response.statusCode == 200) {
-          print(response.body);
-          showInSnackBar("Datos actualizados correctamente", legit);
-        } else if (response.statusCode == 401) {
-          print(response.statusCode);
-          print(response.body);
-          showInSnackBar("No autorizado", fake);
-        } else if (response.statusCode == 402) {
-          print(response.statusCode);
-          print(response.body);
-          showInSnackBar("Prohibido", fake);
-        } else {
-          print(response.statusCode);
-          print(response.body);
-          showInSnackBar("No encontrado", fake);
-        }
+      UsuarioRequest.editUser(_user).then((_) {
+          showInSnackBar("Datos actualizados correctamente", _colorStatusBarGood);
       }).catchError((error) {
-        print('error : $error');
+        if (error == "Unauthorized" || error == "Forbidden") {
+          showInSnackBar("Acción no autorizada", _colorStatusBarBad);
+        } else if (error == "Not Found") {
+          showInSnackBar("Usuario no encontrado", _colorStatusBarBad);
+        } else {
+          showInSnackBar("No hay conexión a Internet", _colorStatusBarBad);
+        }
       });
     }
   }
@@ -382,7 +371,6 @@ class _EditProfileState extends State<EditProfile> {
                         labelText: 'Apellidos',
                       ),
                       controller: _surnameController,
-                      keyboardType: TextInputType.datetime,
                     ),
                   ),
                 ],
