@@ -14,6 +14,7 @@ import 'package:selit/screens/settings/account.dart';
 
 class Routes {
   final routes = <String, dynamic>{
+    '/': (settings) => _buildRoute(settings, new LoadingScreen()),
     '/settings': (settings) => _buildRoute(settings, new Settings()),
     '/account': (settings) => _buildRoute(settings, new Account()),
     '/profile': (settings) =>
@@ -44,20 +45,19 @@ class Routes {
 
   Routes() {
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
-    .then((_) {
+        .then((_) {
       runApp(new MaterialApp(
-      title: 'Selit!',
-      onGenerateRoute: _getRoute,
-      initialRoute: '/',
-      theme: ThemeData(
-        primaryColor: Color(0xFFC0392B),
-        primaryColorLight: Color(0xFFC11328),
-        primaryColorDark: Color(0xFF9A0F1F),
-        fontFamily: 'Nunito',
-      ),
-      home: LoadingScreen(),
-    ));
+        title: 'Selit!',
+        onGenerateRoute: _getRoute,
+        initialRoute: '/',
+        theme: ThemeData(
+          primaryColor: Color(0xFFC0392B),
+          primaryColorLight: Color(0xFFC11328),
+          primaryColorDark: Color(0xFF9A0F1F),
+          fontFamily: 'Nunito',
+        ),
+        home: LoadingScreen(),
+      ));
     });
-    
   }
 }

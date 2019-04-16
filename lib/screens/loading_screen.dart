@@ -63,10 +63,10 @@ class _LoadingScreenState extends State<LoadingScreen> {
       Navigator.of(context).pop();
       if (legit) {
         print('Redirect a principal');
-        Navigator.of(context).pushNamed('/principal');
+        Navigator.of(context).pushReplacementNamed('/principal');
       } else {
         print('Redirect a login');
-        Navigator.of(context).pushNamed('/login-page');
+        Navigator.of(context).pushReplacementNamed('/login-page');
       }
     }).timeout(TIMEOUT, onTimeout: () {
       _showErrorDialog(context);
