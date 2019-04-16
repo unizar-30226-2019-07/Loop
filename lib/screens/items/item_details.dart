@@ -27,12 +27,10 @@ class _ItemDetails extends State<ItemDetails> {
 
   // Constructor
   _ItemDetails(this._item) {
-    if (_item.media.isEmpty != true) {
-
+    if (_item.media.isNotEmpty) {
       for (var imagen in _item.media) {
         _images.add(imagen.image.image);
       }
-
     }
   }
 
@@ -53,8 +51,6 @@ class _ItemDetails extends State<ItemDetails> {
   final Color _colorStatusBarBad = Colors.red.withOpacity(0.5);
 
   IconData _favorite = Icons.favorite_border;
-
-  
 
   void _favoritePressed() {
     setState(() {
@@ -196,7 +192,8 @@ class _ItemDetails extends State<ItemDetails> {
 
   @override
   Widget build(BuildContext context) {
-    FlutterStatusbarcolor.setStatusBarColor(Theme.of(context).primaryColor.withAlpha(200));
+    FlutterStatusbarcolor.setStatusBarColor(
+        Theme.of(context).primaryColor.withAlpha(200));
     final ThemeData theme = Theme.of(context);
     final TextStyle titleStyle =
         theme.textTheme.headline.copyWith(color: Colors.white);
@@ -225,7 +222,10 @@ class _ItemDetails extends State<ItemDetails> {
                                   child: new Carousel(
                                     images: _images.length > 0
                                         ? _images
-                                        : [AssetImage('assets/img/imagenotfound.png') ],
+                                        : [
+                                            AssetImage(
+                                                'assets/img/login_logo.png')
+                                          ],
                                     boxFit: BoxFit.scaleDown,
                                     showIndicator: true,
                                     autoplay: false,
