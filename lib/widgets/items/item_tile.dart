@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:selit/class/item_class.dart';
-import 'dart:convert';
 
 /// Tile de objeto para la visualizacion en 1 columna
 class ItemTile extends StatelessWidget {

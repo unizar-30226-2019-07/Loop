@@ -19,7 +19,6 @@ class _LoadingScreenState extends State<LoadingScreen> {
 
   /// Devuelve true si existe un token guardado y es válido (es decir,
   /// hay un usuario que ha iniciado sesión en la aplicación)
-  /// TODO quitar los print cuando se vea necesario
   Future<bool> _checkForLoggedUser(BuildContext context) async {
     bool legitUser = false;
     String token = await Storage.loadToken();

@@ -94,18 +94,6 @@ class UsuarioRequest {
       throw (APIConfig.getErrorString(response));
     }
   }
-  //TODO: Los signos aparecen bien pero luego al envíar a la base no se reconocen.
-  /*
-        if (perfil.sexo == null || perfil.sexo == 'otro'){
-          perfil.sexo = '⚲';
-        }
-        else if (perfil.sexo == 'mujer'){
-          perfil.sexo = '♀'; 
-        }
-        else{
-          perfil.sexo = '♂'; 
-        }
-      */
 
   /// Obtención de lista de usuarios
   static Future<List<UsuarioClass>> getUsers() async {
