@@ -32,6 +32,7 @@ dependencies:
   carousel_pro: ^0.0.13
   location: ^2.3.3
   percent_indicator: "^1.0.14"
+  google_maps_flutter: ^0.5.7
   flutter:
     sdk: flutter
     

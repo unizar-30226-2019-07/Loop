@@ -28,7 +28,7 @@ class _ItemListDrawerState extends State<ItemListDrawer> {
   static final _styleFilterButton =
       TextStyle(fontSize: 18.0, color: Colors.black);
 
-  /// Títulos "¿Qué estás buscando?" (también para el alertdialog)
+  /// Títulos "¿Qué estás buscando?"
   static final _styleTitle = TextStyle(
       fontSize: 22.0, color: Colors.white, fontWeight: FontWeight.bold);
 
