@@ -26,7 +26,7 @@ class ItemList extends StatefulWidget {
 
 class _ItemListState extends State<ItemList> {
   /// Número de items que se cargan cada vez en la lista
-  static const int ITEMS_PER_PAGE = 50; // TODO volver a poner 10 cuando la API tenga paginación
+  static const int ITEMS_PER_PAGE = 10;
 
   /// Lista de items a mostrar en la vista
   List<ItemClass> _items = <ItemClass>[];

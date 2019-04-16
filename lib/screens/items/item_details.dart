@@ -360,12 +360,10 @@ class _ItemDetails extends State<ItemDetails> {
                                     child: Row(
                                       children: <Widget>[
                                         Icon(Icons.location_on),
-                                        Text(_item.distance.toStringAsFixed(0) + ' km'),
+                                        Text('A ${_item.distance.toStringAsFixed(1)} km'),
                                       ],
                                   ),)
-                                  
                             ],)
-
                             ),
                           )
                         ],

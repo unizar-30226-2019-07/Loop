@@ -43,6 +43,8 @@ class _ProfileState extends State<Profile> {
   /// Color más oscuro que el rojo principal
   final _blendColor = Color.alphaBlend(Color(0x552B2B2B), Color(0xFFC0392B));
 
+  final _sexSymbol = {"hombre": ' ♂', "mujer": ' ♀', "otro": ' ⚲'};
+
   /// Controlador tabs "en venta" y "vendido"
   PageController _pageController = PageController(initialPage: 0);
 
@@ -66,13 +68,21 @@ class _ProfileState extends State<Profile> {
 
   /// Usuario a mostrar en el perfil (null = placeholder)
   static UsuarioClass _user;
+  int _loggedUserId;
 
   /// Ubicación del usuario
   String _ubicacionCiudad;
   String _ubicacionResto;
 
   _ProfileState(int _userId) {
+    _user = null;
+    _ubicacionCiudad = null;
+    _ubicacionResto = null;
     _loadProfile(_userId).then((_) => _loadProfileItems());
+    Storage.loadUserId().then((id) {
+      print(id);
+      setState(() => _loggedUserId = id);
+    });
   }
 
   Future<void> _loadProfile(int _userId) async {
@@ -93,10 +103,12 @@ class _ProfileState extends State<Profile> {
       final coordinates = new Coordinates(_user.locationLat, _user.locationLng);
       var addresses =
           await Geocoder.local.findAddressesFromCoordinates(coordinates);
-      setState(() {
-        _ubicacionCiudad = addresses.first.locality;
-        _ubicacionResto = addresses.first.countryName;
-      });
+      if (addresses.length > 0) {
+        setState(() {
+          _ubicacionCiudad = addresses.first.locality;
+          _ubicacionResto = addresses.first.countryName;
+        });
+      }
     }
   }
 
@@ -105,7 +117,6 @@ class _ProfileState extends State<Profile> {
       print('ERROR: Intentando cargar objetos de un usuario sin ID');
     } else {
       // Cargar los objetos en venta y vendidos para el usuario
-      // TODO excepción al terminar de cargar los objetos cuando se ha cambiado de pantalla
       ItemRequest.getItemsFromUser(userId: _user.userId, status: "en venta")
           .then((itemsVenta) {
         setState(() {
@@ -202,18 +213,29 @@ class _ProfileState extends State<Profile> {
             ),
             Container(
                 margin: EdgeInsets.only(top: 10),
-                child: StarRating(starRating: _user?.numeroEstrellas ?? 5, starColor: Colors.white, profileView: true,)),
-            Container(
-                margin: EdgeInsets.only(top: 5, bottom: 15),
-                alignment: Alignment.center,
-                child: Text('${_user?.reviews} reviews',
-                    style: _styleReviews, textAlign: _textAlignment))
+                child: _user?.numeroEstrellas == null
+                  ? Container(margin: EdgeInsets.only(top: 25))
+                  : StarRating(
+                    starRating: _user.numeroEstrellas,
+                    starColor: Colors.white,
+                    profileView: true,
+                  ),
+                ),
+            _user?.reviews == null
+              ? Container(margin: EdgeInsets.only(top: 40))
+              : Container(
+                  margin: EdgeInsets.only(top: 5, bottom: 15),
+                  alignment: Alignment.center,
+                  child: Text('${_user?.reviews} reviews',
+                      style: _styleReviews, textAlign: _textAlignment))
           ],
         ),
       ),
     );
 
-    Widget wEditProfile = _user == null
+    Widget wEditProfile = (_user?.userId == null ||
+            _loggedUserId == null ||
+            _user.userId != _loggedUserId)
         ? Container()
         : Container(
             margin: EdgeInsets.only(right: 15),
@@ -285,18 +307,20 @@ class _ProfileState extends State<Profile> {
                   alignment: Alignment.centerLeft,
                   padding: EdgeInsets.only(
                       top: wEditProfile == Container() ? 25 : 10),
-                  child: Text(_user?.nombre ?? '---',
+                  child: Text(_user?.nombre ?? '',
                       style: _styleNombre, textAlign: _textAlignment)),
               Container(
                   alignment: Alignment.centerLeft,
                   margin: EdgeInsets.only(top: 5),
-                  child: Text(_user?.apellidos ?? '---',
+                  child: Text(_user?.apellidos ?? '',
                       style: _styleNombre, textAlign: _textAlignment)),
               Container(
                   alignment: Alignment.centerLeft,
                   margin: EdgeInsets.only(
                       top: 10, bottom: wLocation == Container() ? 45 : 10),
-                  child: Text('${_user?.sexo}, ${_user?.edad} años',
+                  child: Text('${_user?.edad != null ? _user?.edad : ''}'
+                      '${_user?.edad != null ? ' años' : ''}'
+                      '${_user?.sexo != null ? _sexSymbol[_user.sexo] : ''}',
                       style: _styleSexoEdad, textAlign: _textAlignment)),
               wLocation
             ],
@@ -340,7 +364,8 @@ class _ProfileState extends State<Profile> {
           controller: _controllerEnVenta,
           padding: EdgeInsets.symmetric(horizontal: 15),
           itemCount: _itemsEnVenta.length,
-          itemBuilder: (context, index) => ItemTile(_itemsEnVenta[index], index % 2 == 0),
+          itemBuilder: (context, index) =>
+              ItemTile(_itemsEnVenta[index], index % 2 == 0),
         ),
       );
     }
@@ -377,7 +402,8 @@ class _ProfileState extends State<Profile> {
           controller: _controllerVendidos,
           padding: EdgeInsets.symmetric(horizontal: 15),
           itemCount: _itemsVendidos.length,
-          itemBuilder: (context, index) => ItemTile(_itemsVendidos[index], index % 2 == 0),
+          itemBuilder: (context, index) =>
+              ItemTile(_itemsVendidos[index], index % 2 == 0),
         ),
       );
     }
