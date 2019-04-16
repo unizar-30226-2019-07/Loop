@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:selit/class/image_class.dart';
 import 'package:selit/class/item_class.dart';
+import 'package:selit/screens/items/edit_item_2.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
@@ -9,17 +9,17 @@ import 'package:selit/class/usuario_class.dart';
 
 /// Primera pantalla del formulario de subida de un nuevo producto
 /// Incluye tiítulo, descripción, categoría y fotos
-class NewItem extends StatefulWidget {
-  final UsuarioClass user;
+class EditItem extends StatefulWidget {
+  final ItemClass item;
 
   /// UsuarioClass del usuario
-  NewItem({@required this.user});
+  EditItem({@required this.item});
 
   @override
-  _NewItemState createState() => new _NewItemState(user);
+  _EditItemState createState() => new _EditItemState(item);
 }
 
-class _NewItemState extends State<NewItem> {
+class _EditItemState extends State<EditItem> {
   final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
@@ -30,20 +30,27 @@ class _NewItemState extends State<NewItem> {
 
   ///Ficheros de galería
   List<File> _images = <File>[null, null, null, null, null];
+  int _imagen = 0;
 
   ///Lista opciones categoria
   List<String> _categorias = <String>['', 'Automocion', 'Ropa', 'Tecnología'];
   String _categoria = '';
 
-  static ItemClass _item;
+  ItemClass _item;
 
   //Prpietario del producto
   UsuarioClass _user;
 
   /// Constructor:
-  _NewItemState(UsuarioClass _user) {
-    this._user = _user;
+  _EditItemState(ItemClass item) {
+    this._user = item.owner;
+    this._item = item;
+    _titleController.text = _item.title;
+    _descriptionController.text = _item.description;
+    _categoria = _item.category;
+    print('Precio actual: ' + _item.price.toString());
   }
+
 
   /// Titulos
   static final _styleTitle = TextStyle(
@@ -56,15 +63,11 @@ class _NewItemState extends State<NewItem> {
       fontSize: 17.0, color: Colors.white, fontWeight: FontWeight.normal);
 
   ///Selección de foto 1 de galería
-  imageSelectorGallery(int index) async {
-    File selectedFile = await ImagePicker.pickImage(
+  imageSelectorGallery() async {
+    _images[_imagen] = await ImagePicker.pickImage(
       source: ImageSource.gallery,
     );
-    setState(() {
-      if (selectedFile != null) {
-        _images[index] = selectedFile;
-      }
-    });
+    setState(() {});
   }
 
   void showInSnackBar(String value, Color alfa) {
@@ -81,27 +84,17 @@ class _NewItemState extends State<NewItem> {
     ));
   }
 
-  void createItem() {
+  void editItem() {
     if (_titleController.text.length < 1 ||
         _descriptionController.text.length < 1 ||
         _categoria == '') {
       showInSnackBar("Rellena toodos los campos correctamente", Colors.yellow);
     } else {
-      // Quitar imágenes no usadas
-      _images.removeWhere((x) => x == null);
-      // Preparar item para pasar a newItem2
-      _item = ItemClass(
-          itemId: 0,
-          title: _titleController.text,
-          description: _descriptionController.text,
-          locationLat: _user.locationLat,
-          locationLng: _user.locationLng,
-          category: _categoria,
-          owner: _user,
-          media: List.generate(_images.length,
-            (i) => ImageClass.file(fileImage: _images[i])));
-
-      Navigator.of(context).pushNamed('/new-item2', arguments: _item);
+      print('Id de producto: ' + _item.itemId.toString());
+      _item.title =  _titleController.text;
+      _item.description =  _descriptionController.text;
+      _item.category =  _categoria;
+      Navigator.push(context, MaterialPageRoute(builder: (context) => EditItem2(item: _item)));
     }
   }
 
@@ -115,7 +108,7 @@ class _NewItemState extends State<NewItem> {
               child: Column(
             children: <Widget>[
               Row(children: <Widget>[
-                Text('Nuevo producto', style: _styleTitle)
+                Text('Editar producto', style: _styleTitle)
               ]),
               Padding(
                 padding: EdgeInsets.only(
@@ -258,7 +251,8 @@ class _NewItemState extends State<NewItem> {
                         ),
                         child: new FlatButton(
                             onPressed: () {
-                              imageSelectorGallery(index);
+                              _imagen = index;
+                              imageSelectorGallery();
                             },
                             shape: new RoundedRectangleBorder(
                                 borderRadius: new BorderRadius.circular(30.0)),
@@ -279,7 +273,7 @@ class _NewItemState extends State<NewItem> {
                         padding: const EdgeInsets.all(3.0),
                         decoration: new BoxDecoration(
                             image: new DecorationImage(
-                              image: FileImage(_images[index]),
+                              image: new AssetImage(_images[index].path),
                               fit: BoxFit.cover,
                             ),
                             borderRadius: BorderRadius.circular(15.0),
@@ -312,7 +306,7 @@ class _NewItemState extends State<NewItem> {
                       child: const Text('Siguiente',
                           style: TextStyle(color: Colors.white)),
                       onPressed: () {
-                        createItem();
+                        editItem();
                       },
                     )),
               ],

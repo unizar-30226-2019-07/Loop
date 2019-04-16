@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:geocoder/geocoder.dart';
 import 'package:selit/class/usuario_class.dart';
 import 'package:selit/class/item_class.dart';
 import 'package:selit/util/api/usuario_request.dart';
 import 'package:selit/util/api/item_request.dart';
 import 'package:selit/util/bubble_indication_painter.dart';
+import 'package:selit/util/storage.dart';
 import 'package:selit/widgets/items/item_tile.dart';
 import 'package:selit/widgets/star_rating.dart';
 import 'package:selit/widgets/profile_picture.dart';
+import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 
 /// Perfil de usuario: muestra sus datos, foto de perfil y
 /// dos listas: una con los productos en venta y otra con los vendidos
@@ -32,12 +35,25 @@ class _ProfileState extends State<Profile> {
       const TextStyle(fontSize: 15.0, color: Colors.white);
   static final _styleReviews =
       const TextStyle(fontSize: 15.0, color: Colors.white);
+  static final _styleEditProfile =
+      const TextStyle(fontSize: 16.0, color: Colors.white);
   static final _styleNothing =
       const TextStyle(fontSize: 20.0, color: Colors.grey);
   static final _textAlignment = TextAlign.left;
 
+  /// Color más oscuro que el rojo principal
+  final _blendColor = Color.alphaBlend(Color(0x552B2B2B), Color(0xFFC0392B));
+
+  final _sexSymbol = {"hombre": ' ♂', "mujer": ' ♀', "otro": ' ⚲'};
+
   /// Controlador tabs "en venta" y "vendido"
   PageController _pageController = PageController(initialPage: 0);
+
+  /// Controlador listas "en venta" y "vendido"
+  ScrollController _controllerEnVenta =
+      ScrollController(initialScrollOffset: 0, keepScrollOffset: false);
+  ScrollController _controllerVendidos =
+      ScrollController(initialScrollOffset: 0, keepScrollOffset: false);
 
   /// Color de "en venta" (necesario alternarlo entre blanco-negro)
   Color _tabColorLeft = Colors.black;
@@ -53,65 +69,104 @@ class _ProfileState extends State<Profile> {
 
   /// Usuario a mostrar en el perfil (null = placeholder)
   static UsuarioClass _user;
+  int _loggedUserId;
+
+  /// Ubicación del usuario
+  String _ubicacionCiudad;
+  String _ubicacionResto;
 
   _ProfileState(int _userId) {
+    _user = null;
+    _ubicacionCiudad = null;
+    _ubicacionResto = null;
     _loadProfile(_userId).then((_) => _loadProfileItems());
+    Storage.loadUserId().then((id) {
+      print(id);
+      setState(() => _loggedUserId = id);
+    });
   }
 
   Future<void> _loadProfile(int _userId) async {
     // Mostrar usuario placeholder mientras carga el real
     if (_user == null) {
+      String token = await Storage.loadToken();
       await UsuarioRequest.getUserById(_userId).then((realUser) {
         setState(() {
+          realUser.token = token;
           _user = realUser;
         });
+      }).catchError((error) {
+        print('Error al cargar el perfil de usuario: $error');
       });
+    }
+    if (_ubicacionCiudad == null && _ubicacionResto == null) {
+      // Se obtienen sus valores de ubicación
+      final coordinates = new Coordinates(_user.locationLat, _user.locationLng);
+      var addresses =
+          await Geocoder.local.findAddressesFromCoordinates(coordinates);
+      if (addresses.length > 0) {
+        setState(() {
+          _ubicacionCiudad = addresses.first.locality;
+          _ubicacionResto = addresses.first.countryName;
+        });
+      }
     }
   }
 
   void _loadProfileItems() {
-    if (_user?.user_id == null) {
+    if (_user?.userId == null) {
       print('ERROR: Intentando cargar objetos de un usuario sin ID');
     } else {
       // Cargar los objetos en venta y vendidos para el usuario
-      // TODO excepción al terminar de cargar los objetos cuando se ha cambiado de pantalla
-      ItemRequest.getItemsFromUser(userId: _user.user_id, status: "en venta")
+      ItemRequest.getItemsFromUser(userId: _user.userId, status: "en venta")
           .then((itemsVenta) {
-            setState(() {
-              if (itemsVenta.isEmpty) {
-                _itemsEnVentaEmpty = true;
-              } else {
-                _itemsEnVenta = itemsVenta;
-              }
-            });
-          });
-      ItemRequest.getItemsFromUser(userId: _user.user_id, status: "vendido")
+        setState(() {
+          if (itemsVenta.isEmpty) {
+            _itemsEnVentaEmpty = true;
+          } else {
+            _itemsEnVenta = itemsVenta;
+          }
+        });
+      }).catchError((error) {
+        print('Error al cargar los productos en venta de usuario: $error');
+      });
+      ItemRequest.getItemsFromUser(userId: _user.userId, status: "vendido")
           .then((itemsVendidos) {
-            setState(() {
-              if (itemsVendidos.isEmpty) {
-                _itemsVendidosEmpty = true;
-              } else {
-                _itemsVendidos = itemsVendidos;
-              }
-            });
-          });
+        setState(() {
+          if (itemsVendidos.isEmpty) {
+            _itemsVendidosEmpty = true;
+          } else {
+            _itemsVendidos = itemsVendidos;
+          }
+        });
+      }).catchError((error) {
+        print('Error al cargar los productos vendidos de usuario: $error');
+      });
     }
+  }
+
+  void _onPressedEditProfile() {
+    Navigator.of(context).pushNamed('/edit-profile', arguments: _user);
   }
 
   // Pulsación del boton "en venta"
   void _onPressedEnVenta() {
     _pageController.animateToPage(0,
         duration: Duration(milliseconds: 300), curve: Curves.decelerate);
-    setState(() {
-      _tabColorLeft = Colors.black;
-      _tabColorRight = Colors.white;
-    });
+    if (_controllerEnVenta.hasClients) {
+      _controllerEnVenta.animateTo(0,
+          duration: Duration(milliseconds: 150), curve: Curves.linear);
+    }
   }
 
   // Pulsación del boton "vendidos"
   void _onPressedVendidos() {
     _pageController.animateToPage(1,
         duration: Duration(milliseconds: 300), curve: Curves.decelerate);
+    if (_controllerVendidos.hasClients) {
+      _controllerVendidos.animateTo(0,
+          duration: Duration(milliseconds: 150), curve: Curves.linear);
+    }
   }
 
   /// Constructor para los botones "en venta" y "vendido"
@@ -149,74 +204,139 @@ class _ProfileState extends State<Profile> {
             Container(
               margin: EdgeInsets.only(top: 20),
               child: ClipOval(
+                // borde de 2 pixeles sobre la foto
                 child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                  ),
-                  child: ProfilePicture(_user?.urlPerfil),
+                  color: _blendColor,
+                  padding: EdgeInsets.all(2.0),
+                  child: ProfilePicture(_user?.profileImage),
                 ),
               ),
             ),
             Container(
-                margin: EdgeInsets.only(top: 10),
-                child: StarRating(starRating: _user?.numeroEstrellas ?? 5)),
-            Container(
-                margin: EdgeInsets.only(top: 5, bottom: 15),
-                alignment: Alignment.center,
-                child: Text('${_user?.reviews} reviews',
-                    style: _styleReviews, textAlign: _textAlignment))
+              margin: EdgeInsets.only(top: 10),
+              child: _user?.numeroEstrellas == null
+                  ? Container(margin: EdgeInsets.only(top: 25))
+                  : StarRating(
+                      starRating: _user.numeroEstrellas,
+                      starColor: Colors.white,
+                      profileView: true,
+                    ),
+            ),
+            _user?.reviews == null
+                ? Container(margin: EdgeInsets.only(top: 40))
+                : Container(
+                    margin: EdgeInsets.only(top: 5, bottom: 15),
+                    alignment: Alignment.center,
+                    child: Text('${_user?.reviews} reviews',
+                        style: _styleReviews, textAlign: _textAlignment))
           ],
         ),
       ),
     );
 
-    Widget wUserDataRight = Expanded(
-      flex: 6,
-      child: Container(
-          margin: EdgeInsets.only(left: 25, right: 10),
-          child: Column(
-            children: <Widget>[
-              Container(
-                  alignment: Alignment.topLeft,
-                  padding: EdgeInsets.only(top: 30),
-                  child: Text(_user?.nombre ?? '---',
-                      style: _styleNombre, textAlign: _textAlignment)),
-              Container(
-                  alignment: Alignment.topLeft,
-                  margin: EdgeInsets.only(top: 5),
-                  child: Text(_user?.apellidos ?? '---',
-                      style: _styleNombre, textAlign: _textAlignment)),
-              Container(
-                  alignment: Alignment.topLeft,
-                  margin: EdgeInsets.only(top: 10),
-                  child: Text('${_user?.sexo}, ${_user?.edad} años',
-                      style: _styleSexoEdad, textAlign: _textAlignment)),
-              Container(
-                alignment: Alignment.topLeft,
-                margin: EdgeInsets.only(top: 30),
-                child: Row(
+    Widget wEditProfile = (_user?.userId == null ||
+            _loggedUserId == null ||
+            _user.userId != _loggedUserId)
+        ? Container()
+        : Container(
+            margin: EdgeInsets.only(right: 15),
+            child: GestureDetector(
+                onTap: _onPressedEditProfile,
+                child: ClipRRect(
+                    borderRadius: BorderRadius.circular(4.0),
+                    child: Container(
+                        padding: EdgeInsets.all(2.0),
+                        color: _blendColor,
+                        alignment: Alignment.centerRight,
+                        width: 130.0,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: <Widget>[
+                            Container(
+                              margin: EdgeInsets.only(right: 5),
+                              child: Icon(Icons.edit,
+                                  color: Colors.white, size: 18.0),
+                            ),
+                            Container(
+                                margin: EdgeInsets.only(right: 10),
+                                child: Text('Editar perfil',
+                                    style: _styleEditProfile))
+                          ],
+                        )))));
+
+    Widget wLocation = _ubicacionCiudad == null || _ubicacionResto == null
+        ? Container()
+        : SizedBox(
+            width: double.infinity,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Row(
                   children: <Widget>[
                     Container(
-                      margin: EdgeInsets.all(2),
+                      margin: EdgeInsets.only(right: 5),
                       child: Icon(Icons.location_on, color: Colors.white),
                     ),
                     Text(
-                      _user?.ubicacionCiudad ?? '---',
+                      _ubicacionCiudad,
                       style: _styleUbicacion,
                       textAlign: _textAlignment,
                     ),
                   ],
                 ),
-              ),
+                Container(
+                  alignment: Alignment.topLeft,
+                  margin: EdgeInsets.only(left: 30),
+                  child: Text(
+                    _ubicacionResto,
+                    style: _styleUbicacion,
+                    textAlign: _textAlignment,
+                  ),
+                )
+              ],
+            ));
+
+    int edad;
+    if (_user?.nacimiento != null) {
+      DateTime now = DateTime.now();
+      edad = now.year - _user.nacimiento.year;
+      if (_user.nacimiento.month > now.month ||
+          (_user.nacimiento.month == now.month &&
+              _user.nacimiento.day >= now.day)) {
+                edad--; // no ha cumplido años este año
+              }
+    }
+
+    Widget wUserDataRight = Expanded(
+      flex: 6,
+      child: Container(
+          margin: EdgeInsets.only(left: 20, right: 10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: <Widget>[
+              wEditProfile,
               Container(
-                alignment: Alignment.topLeft,
-                margin: EdgeInsets.only(top: 5, left: 15, bottom: 15),
-                child: Text(
-                  _user?.ubicacionResto ?? '---',
-                  style: _styleUbicacion,
-                  textAlign: _textAlignment,
-                ),
-              )
+                  alignment: Alignment.centerLeft,
+                  padding: EdgeInsets.only(
+                      top: wEditProfile == Container() ? 25 : 10),
+                  child: Text(_user?.nombre ?? '',
+                      style: _styleNombre, textAlign: _textAlignment)),
+              Container(
+                  alignment: Alignment.centerLeft,
+                  margin: EdgeInsets.only(top: 5),
+                  child: Text(_user?.apellidos ?? '',
+                      style: _styleNombre, textAlign: _textAlignment)),
+              Container(
+                  alignment: Alignment.centerLeft,
+                  margin: EdgeInsets.only(
+                      top: 10, bottom: wLocation == Container() ? 45 : 10),
+                  child: Text(
+                      '${edad != null ? edad : ''}'
+                      '${edad != null ? ' años' : ''}'
+                      '${_user?.sexo != null ? _sexSymbol[_user.sexo] : ''}',
+                      style: _styleSexoEdad,
+                      textAlign: _textAlignment)),
+              wLocation
             ],
           )),
     );
@@ -226,23 +346,10 @@ class _ProfileState extends State<Profile> {
       child: Row(children: <Widget>[wUserDataLeft, wUserDataRight]),
     );
 
-    Widget wTopStack = Stack(children: <Widget>[
-      wUserData,
-      Positioned(
-        right: _user != null ? 10 : -50,
-        top: 40,
-        child: IconButton(
-          icon: Icon(Icons.edit, color: Colors.white),
-          onPressed: () {
-            Navigator.of(context).pushNamed('/edit-profile', arguments: _user);
-          },
-        ),
-      ),
-    ]);
-
     Widget wProductListSelling;
     if (_itemsEnVenta.isEmpty) {
-      if (_itemsEnVentaEmpty) {  // Efectivamente esta vacio, no esta cargando
+      if (_itemsEnVentaEmpty) {
+        // Efectivamente esta vacio, no esta cargando
         wProductListSelling = Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
@@ -253,7 +360,8 @@ class _ProfileState extends State<Profile> {
             )
           ],
         );
-      } else { // Todavia esta cargando
+      } else {
+        // Todavia esta cargando
         wProductListSelling = Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
@@ -267,16 +375,19 @@ class _ProfileState extends State<Profile> {
       wProductListSelling = Container(
         margin: EdgeInsets.only(top: 5),
         child: ListView.builder(
+          controller: _controllerEnVenta,
           padding: EdgeInsets.symmetric(horizontal: 15),
           itemCount: _itemsEnVenta.length,
-          itemBuilder: (context, index) => ItemTile(_itemsEnVenta[index]),
+          itemBuilder: (context, index) =>
+              ItemTile(_itemsEnVenta[index], index % 2 == 0),
         ),
       );
     }
 
     Widget wProductListSold;
     if (_itemsVendidos.isEmpty) {
-      if (_itemsVendidosEmpty) { // Efectivamente esta vacio, no esta cargando
+      if (_itemsVendidosEmpty) {
+        // Efectivamente esta vacio, no esta cargando
         wProductListSold = Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
@@ -287,7 +398,8 @@ class _ProfileState extends State<Profile> {
             )
           ],
         );
-      } else { // Todavia esta cargando
+      } else {
+        // Todavia esta cargando
         wProductListSold = Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
@@ -301,9 +413,11 @@ class _ProfileState extends State<Profile> {
       wProductListSold = Container(
         margin: EdgeInsets.only(top: 5),
         child: ListView.builder(
+          controller: _controllerVendidos,
           padding: EdgeInsets.symmetric(horizontal: 15),
           itemCount: _itemsVendidos.length,
-          itemBuilder: (context, index) => ItemTile(_itemsVendidos[index]),
+          itemBuilder: (context, index) =>
+              ItemTile(_itemsVendidos[index], index % 2 == 0),
         ),
       );
     }
@@ -356,7 +470,7 @@ class _ProfileState extends State<Profile> {
 
     return Column(
       children: <Widget>[
-        wTopStack,
+        wUserData,
         Expanded(
           child: wProductList,
         ),
@@ -366,6 +480,7 @@ class _ProfileState extends State<Profile> {
 
   @override
   Widget build(BuildContext context) {
+    FlutterStatusbarcolor.setStatusBarColor(Colors.transparent);
     return Scaffold(
       body: Stack(
         children: <Widget>[

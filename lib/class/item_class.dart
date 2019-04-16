@@ -1,12 +1,13 @@
 import 'package:selit/class/usuario_class.dart';
 import 'package:selit/class/image_class.dart';
+import 'package:intl/intl.dart';
 
 /// Objeto/producto en venta de la aplicación, almacena información
 /// sobre su descripción, su tipo de venta y el usuario vendedor (ver [UsuarioClass])
 /// Para ver más información acerca de las imágenes del producto, ver [ImageClass]
 class ItemClass {
   int itemId;
-  String type; // venta, subasta, TODO enum?
+  String type; // sale / auction
   String title;
   String description;
   DateTime published; // día/hora de publicación
@@ -16,11 +17,11 @@ class ItemClass {
   String category; // informática, automoción, etc
   double price; // precio en cualquier moneda
   String currency; // eur, usd, etc.
-  String status; // TODO enum?
+  String status; // en venta / vendido
   int numViews;
   int numLikes;
   UsuarioClass owner; // vendedor del item
-  List<ImageClass> images; // lista de 0+ imágenes
+  List<ImageClass> media; // lista de 0+ imágenes
 
   /// Constructor por defecto, comprobar que los atributos son correctos
   ItemClass(
@@ -39,10 +40,11 @@ class ItemClass {
       this.numViews,
       this.numLikes,
       this.owner,
-
-      this.images})
+      this.media})
       : assert(type == null || type == "sale" || type == "auction",
             'Tipo inválido para un item (venta/subasta)'),
+        assert(status == null || status == "en venta" || status == "vendido",
+            'Status inválido para un item (en venta/vendido)'),
         assert(distance == null || distance >= 0,
             'La distancia debe ser al menos 0'),
         assert(price == null || price >= 0, 'El precio debe ser al menos 0'),
@@ -51,14 +53,24 @@ class ItemClass {
         assert(numLikes == null || numLikes >= 0,
             'El número de likes debe ser al menos 0');
 
+  static List<ImageClass> _getImages(List<dynamic> json, String tokenHeader) {
+    List<ImageClass> images = List<ImageClass>();
+    if (json != null) {
+      json.forEach((imageJson) {
+        images.add(ImageClass.network(imageId: imageJson['idImagen'], tokenHeader: tokenHeader));
+      });
+    }
+    return images;
+  }
+
   /// Constructor a partir de JSON
-  ItemClass.fromJson(Map<String, dynamic> json)
+  ItemClass.fromJson(Map<String, dynamic> json, String tokenHeader)
       : this(
             itemId: json['id_producto'],
             type: json['type'],
             title: json['title'],
             description: json['description'],
-            published: DateTime.now() /* TODO */,
+            published: DateFormat("yyyy-MM-dd").parse(json['publicate_date']),
             locationLat: json['location']['lat'],
             locationLng: json['location']['lng'],
             distance: json['distance'],
@@ -68,8 +80,9 @@ class ItemClass {
             status: json['status'],
             numViews: json['nvis'],
             numLikes: json['nfav'],
-            owner: UsuarioClass.fromJson(json['owner']),
-            images: List<ImageClass>() /* TODO */);
+            owner: UsuarioClass.fromJson(json['owner'], tokenHeader),
+            media: _getImages(json['media'], tokenHeader)
+          );
 
   void update(String _type, double _price, String _currency) {
     this.type = _type;
@@ -80,7 +93,7 @@ class ItemClass {
   Map<String, dynamic> toJsonCreate() => {
     "type": type,
     "title": title,
-    "owner_id": owner.user_id,
+    "owner_id": owner.userId,
     "description": description,
     "location": {
       "lat": locationLat,
@@ -89,6 +102,23 @@ class ItemClass {
     "category": category,
     "price": price,
     "currency": currency,
+    "media": List.generate(media.length, (i) => media[i].toJson()), 
+  };
+
+    Map<String, dynamic> toJsonEdit() => {
+    "type": type,
+    "title": title,
+    "owner_id": owner.userId,
+    "description": description,
+    "location": {
+      "lat": locationLat,
+      "lng": locationLng,
+    },
+    "category": category,
+    "price": price,
+    "currency": currency,
+    "status": status,
+    "media": List.generate(media.length, (i) => media[i].toJson()), 
   };
   
 }

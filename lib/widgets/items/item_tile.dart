@@ -4,7 +4,8 @@ import 'package:selit/class/item_class.dart';
 /// Tile de objeto para la visualizacion en 1 columna
 class ItemTile extends StatelessWidget {
   final ItemClass _item;
-  ItemTile(this._item);
+  final bool _leftImage;
+  ItemTile(this._item, this._leftImage);
 
   static final _styleTitle =
       TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold);
@@ -18,6 +19,12 @@ class ItemTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Widget image = _item.media.isEmpty
+                    ? Container()
+                    : SizedBox.fromSize(
+                        size: Size(100.0, double.infinity),
+                        child: _item.media[0].image);
+
     return SafeArea(
       top: false,
       bottom: false,
@@ -44,15 +51,8 @@ class ItemTile extends StatelessWidget {
                   child: Row(
                     mainAxisSize: MainAxisSize.max,
                     children: <Widget>[
-                      // TODO si el producto no tiene imágenes, no mostrar ni Image ni SizedBox
-                      // Primera imágen del producto
-                      Image.network(
-                          'https://images.pexels.com/photos/1140991/pexels-photo-1140991.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260', // TODO sustituir por .images
-                          width: 100.0,
-                          height: double.infinity,
-                          fit: BoxFit.cover,
-                          color: Colors.white12, // filtro para blanquear
-                          colorBlendMode: BlendMode.srcOver),
+                      // Primera imágen del producto (izquierda)
+                      _leftImage ? image : Container(),
                       // Borde entre la imagen y el resto
                       SizedBox.fromSize(
                         size: Size(1.0, double.infinity),
@@ -101,7 +101,7 @@ class ItemTile extends StatelessWidget {
                                 size: Size(double.infinity, 20.0),
                                 child: Text(
                                   '${_item?.price} ${_item?.currency}',
-                                  textAlign: TextAlign.end,
+                                  textAlign: _leftImage || _item.media.isEmpty ? TextAlign.end : TextAlign.start,
                                   style: _stylePrice.copyWith(
                                       color: Theme.of(context).primaryColor),
                                 ),
@@ -110,18 +110,10 @@ class ItemTile extends StatelessWidget {
                           ),
                         ),
                       ),
+                      // Primera imágen del producto (derecha)
+                      _leftImage ? Container() : image,
                     ],
                   ),
-                  /*ListTile(
-                        title: Text(_item?.title ?? '---'),
-                        subtitle: Text(_item.description ?? '---', overflow: TextOverflow.ellipsis, textAlign: TextAlign.left,maxLines:5),
-                        trailing: Text('${_item?.price} ${_item?.currency}'),
-                        leading: Container(
-                          margin: EdgeInsets.only(left: 6.0, bottom: 15.0),
-                          child: Image.network('https://i.imgur.com/rqSvE0T.png', // TODO sustituir por .images
-                            width: 65.0, fit: BoxFit.fill)
-                        ),
-                      ),*/
                 ),
               ),
             ),

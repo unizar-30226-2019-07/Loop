@@ -8,45 +8,43 @@ import 'dart:io';
 
 /// Interacciones con la API relacionadas con usuarios
 class UsuarioRequest {
-
   /// Login de usuario por [email] y [password], devuelve un token si ha ido bien
   static Future<TokenClass> login(String email, String password) async {
-    http.Response response =
-        await http.post('${APIConfig.BASE_URL}/login', headers: {
+    http.Response response = await http.post('${APIConfig.BASE_URL}/login',
+        headers: {
           HttpHeaders.contentTypeHeader: ContentType.json.toString(),
-    }, body: json.jsonEncode({
-      "email": email,
-      "password": password,
-    }));
-    print("Resultado del login: Codigo ${response.statusCode}, body ${response.headers[HttpHeaders.authorizationHeader]}");
-    switch (response.statusCode) {
-      case 200: // Login OK
-        TokenClass receivedToken =
-            TokenClass(response.headers[HttpHeaders.authorizationHeader]);
-        Storage.saveToken(receivedToken.token);
-        return receivedToken;
-        break;
-      case 401: //Usuario rechazado
-        throw ("Unauthorized");
-      case 403:
-        throw ("Forbidden");
-      default:
-        throw ("Unknown");
+        },
+        body: json.jsonEncode({
+          "email": email,
+          "password": password,
+        }));
+
+    print("Resultado del login: Codigo ${response.statusCode},"
+        "body ${response.headers[HttpHeaders.authorizationHeader]}");
+
+    if (response.statusCode == 200) {
+      TokenClass receivedToken =
+          TokenClass(response.headers[HttpHeaders.authorizationHeader]);
+      Storage.saveToken(receivedToken.token);
+      UsuarioClass receivedUser = await UsuarioRequest.getUserById(0);
+      Storage.saveUserId(receivedUser.userId);
+      return receivedToken;
+    } else {
+      throw (APIConfig.getErrorString(response));
     }
   }
 
   /// Registro de usuario con ciertos campos de [UsuarioClass] con contraseña [password]
-  static Future<bool> signUp(UsuarioClass newUser, String password) async {
-    http.Response response =
-        await http.post('${APIConfig.BASE_URL}/users', headers: {
+  static Future<void> signUp(UsuarioClass newUser, String password) async {
+    http.Response response = await http.post('${APIConfig.BASE_URL}/users',
+        headers: {
           HttpHeaders.contentTypeHeader: ContentType.json.toString(),
-    }, body: json.jsonEncode(newUser.toJsonForSignUp()..addAll({"password": password})));
-    switch (response.statusCode) {
-      case 201: // Registro OK, recurso creado (201)
-        return true;
-        break;
-      default: // TODO casos de error
-        return false;
+        },
+        body: json.jsonEncode(
+            newUser.toJsonForSignUp()..addAll({"password": password})));
+
+    if (response.statusCode != 201) {
+      throw (APIConfig.getErrorString(response));
     }
   }
 
@@ -56,21 +54,46 @@ class UsuarioRequest {
     if (userId == 0) {
       print('GET /users/me');
       response = await http.get('${APIConfig.BASE_URL}/users/me', headers: {
-          HttpHeaders.contentTypeHeader: ContentType.json.toString(),
-          HttpHeaders.authorizationHeader: await Storage.loadToken(),
+        HttpHeaders.contentTypeHeader: ContentType.json.toString(),
+        HttpHeaders.authorizationHeader: await Storage.loadToken(),
       });
     } else {
       print('GET /users/$userId');
-      response = await http.get('${APIConfig.BASE_URL}/users/$userId', headers: {
-          HttpHeaders.contentTypeHeader: ContentType.json.toString(),
-          HttpHeaders.authorizationHeader: await Storage.loadToken(),
+      response =
+          await http.get('${APIConfig.BASE_URL}/users/$userId', headers: {
+        HttpHeaders.contentTypeHeader: ContentType.json.toString(),
+        HttpHeaders.authorizationHeader: await Storage.loadToken(),
       });
     }
-    switch (response.statusCode) {
-      case 200: // El usuario se ha devuelto bien
-        return UsuarioClass.fromJson(json.jsonDecode(response.body));
-      default:  // TODO casos de error
-        return null;
+
+    if (response.statusCode == 200) {
+      print('Recibido usuario: ${response.body}');
+      String token = await Storage.loadToken();
+      UsuarioClass perfil =
+          UsuarioClass.fromJson(json.jsonDecode(response.body), token);
+      return perfil;
+    } else {
+      throw (APIConfig.getErrorString(response));
+    }
+  }
+
+  static Future<void> editUser(UsuarioClass usuario) async {
+    if (usuario?.userId == null) {
+      throw ("Unknown Error");
+    }
+
+    Map josn = usuario.toJsonEdit();
+    print(josn.toString());
+    print("Edición de usuario: ${json.jsonEncode(usuario.toJsonEdit())}");
+
+    http.Response response = await http
+        .put('${APIConfig.BASE_URL}/users/${usuario.userId}', headers: {
+      HttpHeaders.contentTypeHeader: ContentType.json.toString(),
+      HttpHeaders.authorizationHeader: await Storage.loadToken(),
+    }, body: json.jsonEncode(usuario.toJsonEdit()));
+
+    if (response.statusCode != 200) {
+      throw (APIConfig.getErrorString(response));
     }
   }
 
@@ -80,16 +103,62 @@ class UsuarioRequest {
         await http.get('${APIConfig.BASE_URL}/users', headers: {
       HttpHeaders.authorizationHeader: await Storage.loadToken(),
     });
-    switch (response.statusCode) {
-      case 200:
-        List<UsuarioClass> users = new List<UsuarioClass>();
-        (json.jsonDecode(response.body) as List<dynamic>).forEach((userJson) {
-          users.add(UsuarioClass.fromJson(userJson));
-        });
-        return users;
-        break;
-      default:
-        throw ("Error al obtener la lista de usuarios, obtenido el código ${response?.statusCode}");
+
+    if (response.statusCode == 200) {
+      String token = await Storage.loadToken();
+      List<UsuarioClass> users = new List<UsuarioClass>();
+      (json.jsonDecode(response.body) as List<dynamic>).forEach((userJson) {
+        users.add(UsuarioClass.fromJson(userJson, token));
+      });
+      return users;
+    } else {
+      throw (APIConfig.getErrorString(response));
     }
   }
+
+  /// Cambio de contraseña
+  static Future<void> password(
+      String oldPassword, String newPassword, int userId) async {
+    String _paramsString = '?old=$oldPassword&new=$newPassword';
+
+    http.Response response = await http.post(
+      '${APIConfig.BASE_URL}/users/$userId/change_password$_paramsString',
+      headers: {
+        HttpHeaders.contentTypeHeader: ContentType.json.toString(),
+        HttpHeaders.authorizationHeader: await Storage.loadToken(),
+      },
+    );
+
+    if (response.statusCode != 200) {
+      throw (APIConfig.getErrorString(response));
+    }
+  }
+
+   /// Actulizar los datos del usuario con ID [userId]
+static Future<void> edit(UsuarioClass chain) async{
+  final response = await http.put('${APIConfig.BASE_URL}/users/${chain.userId}',
+      headers: {
+      HttpHeaders.contentTypeHeader: ContentType.json.toString(),
+      HttpHeaders.authorizationHeader: await Storage.loadToken(),
+      },
+
+      body: json.jsonEncode(chain.toJsonEdit())
+  );
+  return response;
+}
+
+  static Future<void> delete( int userId) async {
+    http.Response response = await http.delete(
+      '${APIConfig.BASE_URL}/users/$userId',
+      headers: {
+        HttpHeaders.contentTypeHeader: ContentType.json.toString(),
+        HttpHeaders.authorizationHeader: await Storage.loadToken(),
+      },
+    );
+
+    if (response.statusCode != 200) {
+      throw(APIConfig.getErrorString(response));
+    }
+  }
+
 }
