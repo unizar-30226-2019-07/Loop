@@ -20,10 +20,10 @@ class FilterListClass {
     'Solo subastas'
   ];
   static final List<String> orderNames = [
-    'Distancia (asc)',
-    'Distancia (desc)',
-    'Precio (asc)',
-    'Precio (desc)'
+    'Más cercanos',
+    'Más baratos',
+    'Más caros',
+    'Novedades'
   ];
   List<String> getCategoryNames() => categoryNames;
   List<String> getTypeNames() => typeNames;
@@ -182,9 +182,9 @@ class FilterListClass {
     // Ordenación
     final _sortList = [
       'distance ASC',
-      'distance DESC',
       'price ASC',
-      'price DESC'
+      'price DESC',
+      'published DESC'
     ];
     map.putIfAbsent("\$sort", () => _sortList[orderId]);
     return map;
