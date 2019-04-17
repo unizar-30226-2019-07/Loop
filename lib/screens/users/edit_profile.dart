@@ -449,6 +449,7 @@ class _EditProfileState extends State<EditProfile> {
                     decoration: const InputDecoration(
                       labelText: 'Contraseña antigua',
                     ),
+                    obscureText: true,
                     controller: _oldPassController,
                     keyboardType: TextInputType.text,
                   ),
@@ -471,6 +472,7 @@ class _EditProfileState extends State<EditProfile> {
                     decoration: const InputDecoration(
                       labelText: 'Nueva contraseña',
                     ),
+                    obscureText: true,
                     controller: _newPassController,
                     keyboardType: TextInputType.text,
                   ),
@@ -478,6 +480,7 @@ class _EditProfileState extends State<EditProfile> {
                     decoration: const InputDecoration(
                       labelText: 'Repetir nueva contraseña',
                     ),
+                    obscureText: true,
                     controller: _newPassRepController,
                     keyboardType: TextInputType.text,
                   ),
