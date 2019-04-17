@@ -333,12 +333,12 @@ class _ProfileState extends State<Profile> {
                   alignment: Alignment.centerLeft,
                   padding: EdgeInsets.only(
                       top: wEditProfile == Container() ? 25 : 10),
-                  child: Text(_user?.nombre ?? '',
+                  child: Text(_user?.nombre ?? '', overflow: TextOverflow.ellipsis,
                       style: _styleNombre, textAlign: _textAlignment)),
               Container(
                   alignment: Alignment.centerLeft,
                   margin: EdgeInsets.only(top: 5),
-                  child: Text(_user?.apellidos ?? '',
+                  child: Text(_user?.apellidos ?? '', overflow: TextOverflow.ellipsis,
                       style: _styleNombre, textAlign: _textAlignment)),
               Container(
                   alignment: Alignment.centerLeft,

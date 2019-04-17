@@ -203,8 +203,6 @@ class _EditProfileState extends State<EditProfile> {
         target: _userPosition,
         zoom: 15,
       );
-      _user.locationLat = newLat;
-      _user.locationLng = newLng;
       _positionMarker = Marker(markerId: MarkerId("Home"), position: _selectedPosition);
       _loadCoordinates();
     });
@@ -375,14 +373,15 @@ class _EditProfileState extends State<EditProfile> {
                     decoration: const InputDecoration(
                       labelText: 'Nombre',
                     ),
+                    maxLength: 50,
                     controller: _nameController,
                   ),
                   Container(
-                    margin: EdgeInsets.only(top: 15),
                     child: new TextFormField(
                       decoration: const InputDecoration(
                         labelText: 'Apellidos',
                       ),
+                      maxLength: 100,
                       controller: _surnameController,
                     ),
                   ),

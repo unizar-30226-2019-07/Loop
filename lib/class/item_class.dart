@@ -47,6 +47,10 @@ class ItemClass {
             'Status inválido para un item (en venta/vendido)'),
         assert(distance == null || distance >= 0,
             'La distancia debe ser al menos 0'),
+        assert(title == null || title.length <= 50,
+            'El título de un producto debe tener como máximo 50 caracteres'),
+        assert(description == null || description.length <= 300,
+            'La descripción de un producto debe tener como máximo 300 caracteres'),
         assert(price == null || price >= 0, 'El precio debe ser al menos 0'),
         assert(numViews == null || numViews >= 0,
             'El número de visitas debe ser al menos 0'),
@@ -57,7 +61,8 @@ class ItemClass {
     List<ImageClass> images = List<ImageClass>();
     if (json != null) {
       json.forEach((imageJson) {
-        images.add(ImageClass.network(imageId: imageJson['idImagen'], tokenHeader: tokenHeader));
+        images.add(ImageClass.network(
+            imageId: imageJson['idImagen'], tokenHeader: tokenHeader));
       });
     }
     return images;
@@ -70,7 +75,9 @@ class ItemClass {
             type: json['type'],
             title: json['title'],
             description: json['description'],
-            published: DateFormat("yyyy-MM-dd").parse(json['publicate_date']),
+            published: json['publicate_date'] == null
+                ? null
+                : DateFormat("yyyy-MM-dd").parse(json['publicate_date']),
             locationLat: json['location']['lat'],
             locationLng: json['location']['lng'],
             distance: json['distance'],
@@ -81,8 +88,7 @@ class ItemClass {
             numViews: json['nvis'],
             numLikes: json['nfav'],
             owner: UsuarioClass.fromJson(json['owner'], tokenHeader),
-            media: _getImages(json['media'], tokenHeader)
-          );
+            media: _getImages(json['media'], tokenHeader));
 
   void update({String type, double price, String currency}) {
     this.type = type;
@@ -91,34 +97,33 @@ class ItemClass {
   }
 
   Map<String, dynamic> toJsonCreate() => {
-    "type": type,
-    "title": title,
-    "owner_id": owner.userId,
-    "description": description,
-    "location": {
-      "lat": locationLat,
-      "lng": locationLng,
-    },
-    "category": category,
-    "price": price,
-    "currency": currency,
-    "media": List.generate(media.length, (i) => media[i].toJson()), 
-  };
+        "type": type,
+        "title": title,
+        "owner_id": owner.userId,
+        "description": description,
+        "location": {
+          "lat": locationLat,
+          "lng": locationLng,
+        },
+        "category": category,
+        "price": price,
+        "currency": currency,
+        "media": List.generate(media.length, (i) => media[i].toJson()),
+      };
 
-    Map<String, dynamic> toJsonEdit() => {
-    "type": type,
-    "title": title,
-    "owner_id": owner.userId,
-    "description": description,
-    "location": {
-      "lat": locationLat,
-      "lng": locationLng,
-    },
-    "category": category,
-    "price": price,
-    "currency": currency,
-    "status": status,
-    "media": List.generate(media.length, (i) => media[i].toJson()), 
-  };
-  
+  Map<String, dynamic> toJsonEdit() => {
+        "type": type,
+        "title": title,
+        "owner_id": owner.userId,
+        "description": description,
+        "location": {
+          "lat": locationLat,
+          "lng": locationLng,
+        },
+        "category": category,
+        "price": price,
+        "currency": currency,
+        "status": status,
+        "media": List.generate(media.length, (i) => media[i].toJson()),
+      };
 }

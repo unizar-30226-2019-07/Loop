@@ -176,6 +176,7 @@ class _EditItemState extends State<EditItem> {
                     decoration: const InputDecoration(
                       labelText: 'Título',
                     ),
+                    maxLength: 50,
                     controller: _titleController,
                   ),
                   Container(
@@ -184,6 +185,7 @@ class _EditItemState extends State<EditItem> {
                       decoration: const InputDecoration(
                         labelText: 'Descripción',
                       ),
+                      maxLength: 300,
                       controller: _descriptionController,
                       keyboardType: TextInputType.multiline,
                       maxLines: 3,

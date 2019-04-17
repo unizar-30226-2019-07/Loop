@@ -1,4 +1,5 @@
 import 'package:selit/class/image_class.dart';
+import 'package:intl/intl.dart';
 
 /// Datos de usuario registrado, ya sea para mostrarlos en el perfil
 /// o para cualquier otro uso. Puede tener campos nulos aunque sean
@@ -10,7 +11,7 @@ class UsuarioClass {
   String apellidos;
   String sexo;
   String email;
-  DateTime nacimiento; // TODO no usado en la aplicación móvil. Borarrlo?
+  DateTime nacimiento;
   double numeroEstrellas;
   int reviews;
   String token;
@@ -39,6 +40,12 @@ class UsuarioClass {
                 sexo == "mujer" ||
                 sexo == "otro",
             'Un usuario debe tener sexo "hombre", "mujer" u "otro".'),
+        assert(nombre == null || nombre.length <= 50,
+            'El nombre de un usuario debe tener como máximo 50 caracteres'),
+        assert(apellidos == null || apellidos.length <= 100,
+            'Los apellidos de un usuario deben tener como máximo 100 caracteres'),
+        assert(email == null || email.length <= 100,
+            'El email de un usuario debe tener como máximo 100 caracteres'),
         assert(
             numeroEstrellas == null ||
                 numeroEstrellas >= 0 && numeroEstrellas <= 5,
@@ -51,6 +58,9 @@ class UsuarioClass {
             apellidos: json['last_name'],
             reviews: 30, // TODO esperar a que se implemente en la API
             numeroEstrellas: json['rating'],
+            nacimiento: json['birth_date'] == null
+                ? null
+                : DateFormat("yyyy-MM-dd").parse(json['birth_date']),
             sexo: json["gender"],
             email: json["email"],
             locationLat: json['location']['lat'],
