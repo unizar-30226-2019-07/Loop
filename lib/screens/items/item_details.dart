@@ -90,14 +90,19 @@ class _ItemDetails extends State<ItemDetails> {
         _item?.owner?.locationLng != null) {
       final coordinates =
           new Coordinates(_item.owner.locationLat, _item.owner.locationLng);
-      var addresses =
+      try{
+        var addresses =
           await Geocoder.local.findAddressesFromCoordinates(coordinates);
-      if (addresses.length > 0) {
-        setState(() {
-          _ubicacionCompleta =
-              '${addresses.first.locality}, ${addresses.first.countryName}';
-        });
+        if (addresses.length > 0) {
+          setState(() {
+            _ubicacionCompleta =
+                '${addresses.first.locality}, ${addresses.first.countryName}';
+          });
+        }
+      }catch(e){
+        print('Error al obtener addresses: '+ e.toString());
       }
+      
     }
   }
 

@@ -112,7 +112,8 @@ class _ProfileState extends State<Profile> {
     if (_user?.locationLat != null && _user?.locationLng != null) {
       // Se obtienen sus valores de ubicación
       final coordinates = new Coordinates(_user.locationLat, _user.locationLng);
-      var addresses =
+      try{
+        var addresses =
           await Geocoder.local.findAddressesFromCoordinates(coordinates);
       if (addresses.length > 0 && !_cancelled) {
         setState(() {
@@ -120,6 +121,10 @@ class _ProfileState extends State<Profile> {
           _ubicacionResto = addresses.first.countryName;
         });
       }
+      }catch(e){
+        print('Error al obtener addresses: '+ e.toString());
+      }
+      
     }
   }
 
