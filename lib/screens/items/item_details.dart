@@ -51,8 +51,6 @@ class _ItemDetails extends State<ItemDetails> {
   Completer<GoogleMapController> _controller = Completer();
   String _ubicacionCompleta;
 
-  static IconData _filledFavorite = Icons.favorite;
-  static IconData _emptyFavorite = Icons.favorite_border;
   bool _esFavorito = false;
 
   final Color _colorStatusBarBad = Colors.red.withOpacity(0.5);
