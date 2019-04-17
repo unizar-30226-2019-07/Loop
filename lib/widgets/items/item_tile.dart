@@ -54,10 +54,12 @@ class ItemTile extends StatelessWidget {
                       // Primera imágen del producto (izquierda)
                       _leftImage ? image : Container(),
                       // Borde entre la imagen y el resto
-                      SizedBox.fromSize(
-                        size: Size(1.0, double.infinity),
-                        child: Container(color: Colors.grey[300]),
-                      ),
+                      _leftImage
+                        ? SizedBox.fromSize(
+                          size: Size(1.0, double.infinity),
+                          child: Container(color: Colors.grey[300]),
+                          )
+                        : Container(),
                       // Titulo, descripción, precio
                       Expanded(
                         child: Container(
@@ -110,6 +112,13 @@ class ItemTile extends StatelessWidget {
                           ),
                         ),
                       ),
+                      // Borde entre la imagen y el resto
+                      _leftImage
+                        ? Container()
+                        : SizedBox.fromSize(
+                          size: Size(1.0, double.infinity),
+                          child: Container(color: Colors.grey[300]),
+                          ),
                       // Primera imágen del producto (derecha)
                       _leftImage ? Container() : image,
                     ],
