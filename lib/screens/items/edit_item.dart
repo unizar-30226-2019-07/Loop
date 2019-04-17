@@ -92,13 +92,25 @@ class _EditItemState extends State<EditItem> {
         _categoria == '') {
       showInSnackBar("Rellena toodos los campos correctamente", Colors.yellow);
     } else {
-      // Quitar imágenes no usadas y las no-nuevas
-      _images.removeWhere((x) => x == null || x is ImageClass);
+      print('Id de producto: ' + _item.itemId.toString());
+      // Quitar imágenes no usadas
+      _images.removeWhere((x) => x == null);
       _item.title = _titleController.text;
       _item.description = _descriptionController.text;
       _item.category = _categoria;
-      _item.media.addAll(List.generate(
-          _images.length, (i) => ImageClass.file(fileImage: _images[i])));
+
+      List<ImageClass> _media = [];
+      int i = 0;
+      for (var imagen in _images) {
+        if (imagen is ImageClass) {
+          _media.add(imagen);
+        } else {
+          _media.add(ImageClass.file(fileImage: _images[i]));
+        }
+        i = i + 1;
+      }
+      _item.media = _media;
+
       Navigator.push(context,
           MaterialPageRoute(builder: (context) => EditItem2(item: _item)));
     }
@@ -280,7 +292,7 @@ class _EditItemState extends State<EditItem> {
                         decoration: new BoxDecoration(
                             image: new DecorationImage(
                               image: _images[index] is File
-                                  ? AssetImage(_images[index].path)
+                                  ? new AssetImage(_images[index].path)
                                   : _images[index].image.image,
                               fit: BoxFit.cover,
                             ),
