@@ -1,5 +1,6 @@
 import 'package:selit/class/usuario_class.dart';
 import 'package:selit/class/image_class.dart';
+import 'package:selit/class/items/filter_list_class.dart';
 import 'package:intl/intl.dart';
 
 /// Objeto/producto en venta de la aplicación, almacena información
@@ -45,6 +46,10 @@ class ItemClass {
             'Tipo inválido para un item (venta/subasta)'),
         assert(status == null || status == "en venta" || status == "vendido",
             'Status inválido para un item (en venta/vendido)'),
+        assert(
+            category == null ||
+                FilterListClass.categoryNames.containsKey(category),
+            'Categoría no válida para el item: $category'),
         assert(distance == null || distance >= 0,
             'La distancia debe ser al menos 0'),
         assert(title == null || title.length <= 50,

@@ -39,9 +39,9 @@ class _ItemListDrawerState extends State<ItemListDrawer> {
 
   /// Texto de los botones del alertdialog, para cuando esta seleccionado y no
   static final _styleDialogButtonsUnselected =
-      TextStyle(fontSize: 20.0, color: Colors.white);
+      TextStyle(fontSize: 18.0, color: Colors.white);
   static final _styleDialogButtonsSelected =
-      TextStyle(fontSize: 20.0, color: Colors.black);
+      TextStyle(fontSize: 18.0, color: Colors.black);
 
   FilterListClass _filterManager;
 
@@ -67,9 +67,9 @@ class _ItemListDrawerState extends State<ItemListDrawer> {
   }
 
   /// Seleccionar nueva categoría
-  void _updateCategoria(int index) {
-    print('Categoria: $index');
-    setState(() => _filterManager.addFilter(newCategoryId: index));
+  void _updateCategoria(int catId) {
+    print('Categoria: $catId');
+    setState(() => _filterManager.addFilter(newCategoryId: catId));
   }
 
   /// Seleccionar nuevo tipo: venta, subasta o ambas
@@ -93,7 +93,7 @@ class _ItemListDrawerState extends State<ItemListDrawer> {
     List<Widget> buttonOptions = [];
     for (var i = 0; i < items.length; i++) {
       buttonOptions.add(SizedBox.fromSize(
-          size: Size(double.infinity, 50.0),
+          size: Size(double.infinity, 40.0),
           child: Container(
               margin: EdgeInsets.all(2),
               child: FlatButton(
@@ -152,6 +152,7 @@ class _ItemListDrawerState extends State<ItemListDrawer> {
       valueIndicatorColor: Colors.grey[50], // indicador de xx €
       valueIndicatorTextStyle: TextStyle(color: Colors.black),
       activeTickMarkColor: Colors.transparent,
+      inactiveTickMarkColor: _blendColor,
     );
 
     // Mostrar el precio como "40 €"
@@ -250,12 +251,12 @@ class _ItemListDrawerState extends State<ItemListDrawer> {
                   ),
                   Divider(color: Colors.grey[300]),
                   _buildRadioButton(
-                      _filterManager.getCategoryNames(),
+                      <String>['Todas las categorías']..addAll(FilterListClass.categoryNames.values),
                       _filterManager.categoryId,
                       'Selecciona una categoría',
                       _updateCategoria),
                   _buildRadioButton(
-                      _filterManager.getTypeNames(),
+                      FilterListClass.typeNames,
                       _filterManager.typeId,
                       'Selecciona el tipo',
                       _updateTipoVenta),
@@ -273,7 +274,7 @@ class _ItemListDrawerState extends State<ItemListDrawer> {
                     margin: EdgeInsets.only(top: 15.0, bottom: 5.0),
                     child: Text('Ordenar por', style: _styleTitle),
                   ),
-                  _buildRadioButton(_filterManager.getOrderNames(),
+                  _buildRadioButton(FilterListClass.orderNames,
                       _filterManager.orderId, 'Ordenar por', _updateOrdenacion),
                 ],
               ),

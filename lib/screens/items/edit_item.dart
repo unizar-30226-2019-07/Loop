@@ -5,6 +5,7 @@ import 'package:selit/screens/items/edit_item_2.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
+import 'package:selit/class/items/filter_list_class.dart';
 import 'package:selit/class/image_class.dart';
 
 /// Primera pantalla del formulario de subida de un nuevo producto
@@ -33,7 +34,8 @@ class _EditItemState extends State<EditItem> {
   int _imagen = 0;
 
   ///Lista opciones categoria
-  List<String> _categorias = <String>['', 'Automocion', 'Ropa', 'Tecnología'];
+  List<String> _categorias = <String>['']
+    ..addAll(FilterListClass.categoryNames.values.toList());
   String _categoria = '';
 
   ItemClass _item;
@@ -43,7 +45,7 @@ class _EditItemState extends State<EditItem> {
     this._item = item;
     _titleController.text = _item.title;
     _descriptionController.text = _item.description;
-    _categoria = _item.category;
+    _categoria = FilterListClass.categoryNames[_item.category];
     // Rellenar con las ImageClass del item
     _images = [];
     _images.addAll(_item.media);
@@ -97,7 +99,9 @@ class _EditItemState extends State<EditItem> {
       List nonNull = List.from(_images.where((x) => x != null));
       _item.title = _titleController.text;
       _item.description = _descriptionController.text;
-      _item.category = _categoria;
+      _item.category = FilterListClass.categoryNames.keys
+          .where((k) => FilterListClass.categoryNames[k] == _categoria)
+          .first;
 
       List<ImageClass> _media = [];
       int i = 0;

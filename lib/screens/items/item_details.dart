@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:selit/class/item_class.dart';
 import 'package:carousel_pro/carousel_pro.dart';
+import 'package:selit/class/items/filter_list_class.dart';
 import 'package:selit/screens/items/edit_item.dart';
 import 'package:selit/util/storage.dart';
 import 'package:selit/util/api/item_request.dart';
@@ -395,14 +396,13 @@ class _ItemDetails extends State<ItemDetails> {
                     alignment: Alignment.topLeft,
                     child: Text(_item?.description ?? '',
                         style: TextStyle(fontSize: 15.0, color: Colors.black))),
-                // TODO mostrar nombre bueno de categoría en lugar del recibido de la BD
                 _item.category == null
                     ? Container()
                     : Container(
                         padding:
                             const EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 20.0),
                         alignment: Alignment.centerLeft,
-                        child: Text('Categoría: ' + _item.category,
+                        child: Text('Categoría: ' + FilterListClass.categoryNames[_item.category],
                             style: TextStyle(
                                 fontSize: 17.0, color: Colors.grey[600]))),
                 Divider(),

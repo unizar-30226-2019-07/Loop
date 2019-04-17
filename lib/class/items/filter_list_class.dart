@@ -2,18 +2,19 @@
 /// Contiene todos los filtros posibles a aplicar sobre el listado de objetos
 class FilterListClass {
   /// Nombres de categorías empleados por la API
-  static final List<String> categoryAPINames = [
-    '',
-    'Automocion',
-    'Informatica'
-  ];
-
-  // Nombres a mostrar en el menú del drawer y burbujas de filtros
-  static final List<String> categoryNames = [
-    'Todas las categorías',
-    'Automoción',
-    'Informática'
-  ];
+  /// Mapa (nombre de API) -> (nombre en la aplicación)
+  // TODO actualizar cuando se refleje en la base de datos
+  static final Map<String, String> categoryNames = {
+    'Automocion': 'Automoción',
+    'Automoción': 'Automoción con tilde', // en la BD hay de las dos
+    'Informatica': 'Informática',
+    'Ropa': 'Moda',
+    'Deporte': 'Deporte y ocio',
+    'Videojuegos': 'Videojuegos',
+    'Libros': 'Libros y música',
+    'Hogar': 'Hogar y jardín',
+    'Foto': 'Foto y audio',
+  };
   static final List<String> typeNames = [
     'Venta y subasta',
     'Solo ventas',
@@ -25,9 +26,6 @@ class FilterListClass {
     'Más caros',
     'Novedades'
   ];
-  List<String> getCategoryNames() => categoryNames;
-  List<String> getTypeNames() => typeNames;
-  List<String> getOrderNames() => orderNames;
 
   // Valores para los sliders de precio y distancia
   // El valor seleccionado no es el mismo que el mostrado
@@ -135,7 +133,7 @@ class FilterListClass {
     List<Map<String, dynamic>> filters = new List<Map<String, dynamic>>();
     if (categoryId != 0) {
       filters.add(
-          {'name': '${categoryNames[categoryId]}', 'callback': resetCategory});
+          {'name': '${categoryNames.values.toList()[categoryId - 1]}', 'callback': resetCategory});
     }
     if (typeId != 0) {
       filters.add({'name': '${typeNames[typeId]}', 'callback': resetType});
@@ -178,7 +176,7 @@ class FilterListClass {
     map.putIfAbsent("distance", () => (distanceRange[maxDistanceIndex] ~/ 1000).toString());
     // Categoria
     if (categoryId != 0)
-      map.putIfAbsent("category", () => categoryAPINames[categoryId]);
+      map.putIfAbsent("category", () => categoryNames.keys.toList()[categoryId - 1]);
     // Ordenación
     final _sortList = [
       'distance ASC',

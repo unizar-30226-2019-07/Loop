@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:selit/class/image_class.dart';
 import 'package:selit/class/item_class.dart';
+import 'package:selit/class/items/filter_list_class.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
@@ -32,7 +33,8 @@ class _NewItemState extends State<NewItem> {
   List<File> _images = <File>[null, null, null, null, null];
 
   ///Lista opciones categoria
-  List<String> _categorias = <String>['', 'Automocion', 'Ropa', 'Tecnología'];
+  List<String> _categorias = <String>['']
+    ..addAll(FilterListClass.categoryNames.values.toList());
   String _categoria = '';
 
   static ItemClass _item;
@@ -98,7 +100,9 @@ class _NewItemState extends State<NewItem> {
           description: _descriptionController.text,
           locationLat: _user.locationLat,
           locationLng: _user.locationLng,
-          category: _categoria,
+          category: FilterListClass.categoryNames.keys
+              .where((k) => FilterListClass.categoryNames[k] == _categoria)
+              .first,
           owner: _user,
           media: List.generate(
               nonNull.length, (i) => ImageClass.file(fileImage: nonNull[i])));
