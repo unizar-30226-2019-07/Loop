@@ -55,8 +55,7 @@ class _NewItemState extends State<NewItem> {
   static final _styleSubTitle = TextStyle(
       fontSize: 17.0, color: Colors.grey, fontWeight: FontWeight.normal);
 
-  static final _styleButton = TextStyle(
-      fontSize: 19.0, color: Colors.white);
+  static final _styleButton = TextStyle(fontSize: 19.0, color: Colors.white);
 
   ///Selección de foto 1 de galería
   imageSelectorGallery(int index) async {
@@ -91,7 +90,7 @@ class _NewItemState extends State<NewItem> {
       showInSnackBar("Rellena todos los campos correctamente", Colors.yellow);
     } else {
       // Quitar imágenes no usadas
-      _images.removeWhere((x) => x == null);
+      List nonNull = List.from(_images.where((x) => x != null));
       // Preparar item para pasar a newItem2
       _item = ItemClass(
           itemId: 0,
@@ -101,8 +100,8 @@ class _NewItemState extends State<NewItem> {
           locationLng: _user.locationLng,
           category: _categoria,
           owner: _user,
-          media: List.generate(_images.length,
-            (i) => ImageClass.file(fileImage: _images[i])));
+          media: List.generate(
+              nonNull.length, (i) => ImageClass.file(fileImage: nonNull[i])));
 
       Navigator.of(context).pushNamed('/new-item2', arguments: _item);
     }
@@ -234,9 +233,9 @@ class _NewItemState extends State<NewItem> {
           top: 17,
         ),
         child: Text(
-          'Imágenes',
+          'Imágenes (mantén pulsado para borrar)',
           style: new TextStyle(
-            fontSize: 16.8,
+            fontSize: 15,
             color: Colors.grey[600],
           ),
         ));
@@ -277,16 +276,30 @@ class _NewItemState extends State<NewItem> {
                               ],
                             )),
                       )
-                    : new Container(
-                        margin: const EdgeInsets.all(7.0),
-                        padding: const EdgeInsets.all(3.0),
-                        decoration: new BoxDecoration(
-                            image: new DecorationImage(
-                              image: FileImage(_images[index]),
-                              fit: BoxFit.cover,
+                    : FlatButton(
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        padding: EdgeInsets.all(0),
+                        onPressed: () =>
+                            null, // necesario para efecto de InkResponse
+                        child: GestureDetector(
+                          onLongPress: () =>
+                              setState(() => _images[index] = null),
+                          child: InkWell(
+                            splashColor: Colors.black,
+                            child: new Container(
+                              margin: const EdgeInsets.all(7.0),
+                              padding: const EdgeInsets.all(3.0),
+                              decoration: new BoxDecoration(
+                                  image: new DecorationImage(
+                                    image: FileImage(_images[index]),
+                                    fit: BoxFit.cover,
+                                  ),
+                                  borderRadius: BorderRadius.circular(15.0),
+                                  border:
+                                      new Border.all(color: Colors.grey[600])),
                             ),
-                            borderRadius: BorderRadius.circular(15.0),
-                            border: new Border.all(color: Colors.grey[600])),
+                          ),
+                        ),
                       ),
               ),
         ));
@@ -310,9 +323,9 @@ class _NewItemState extends State<NewItem> {
                     margin: EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 30.0),
                     child: RaisedButton(
                       color: Theme.of(context).primaryColor,
-                      padding: EdgeInsets.symmetric(vertical: 7.0, horizontal: 20.0),
-                      child: Text('Siguiente',
-                          style: _styleButton),
+                      padding:
+                          EdgeInsets.symmetric(vertical: 7.0, horizontal: 20.0),
+                      child: Text('Siguiente', style: _styleButton),
                       onPressed: () {
                         createItem();
                       },

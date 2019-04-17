@@ -169,20 +169,19 @@ class _NewItemState2 extends State<NewItem2> {
                       borderRadius: BorderRadius.circular(15.0),
                       border: new Border.all(color: Colors.grey[600])),
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Row(children: <Widget>[
-                        Padding(
-                          padding: EdgeInsets.only(
-                            left: 11,
-                            top: 25,
+                          Padding(
+                            padding: EdgeInsets.only(
+                              left: 11,
+                              top: 25,
+                            ),
+                            child: Text(_item.title,
+                                overflow: TextOverflow.ellipsis,
+                                style: new TextStyle(
+                                    fontSize: 22.0, fontWeight: FontWeight.bold)),
                           ),
-                          child: Text(_item.title,
-                              style: new TextStyle(
-                                  fontSize: 22.0, fontWeight: FontWeight.bold)),
-                        )
-                      ]),
-                      Row(children: <Widget>[
-                        Padding(
+                          Padding(
                             padding: EdgeInsets.only(
                               left: 11,
                               top: 10,
@@ -194,7 +193,7 @@ class _NewItemState2 extends State<NewItem2> {
                               child: Text(
                                 _item.description,
                                 overflow: TextOverflow.ellipsis,
-                                textAlign: TextAlign.justify,
+                                textAlign: TextAlign.left,
                                 maxLines: 7,
                                 style: new TextStyle(
                                   fontSize: 15.0,
@@ -202,7 +201,7 @@ class _NewItemState2 extends State<NewItem2> {
                                 ),
                               ),
                             ))
-                      ]),
+                        
                     ],
                   ),
                 ),

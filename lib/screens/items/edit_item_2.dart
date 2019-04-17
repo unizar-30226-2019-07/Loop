@@ -173,40 +173,38 @@ class _EditItemState2 extends State<EditItem2> {
                       borderRadius: BorderRadius.circular(15.0),
                       border: new Border.all(color: Colors.grey[600])),
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Row(children: <Widget>[
-                        Padding(
+                      Padding(
+                        padding: EdgeInsets.only(
+                          left: 11,
+                          top: 25,
+                        ),
+                        child: Text(_item.title,
+                            overflow: TextOverflow.ellipsis,
+                            style: new TextStyle(
+                                fontSize: 22.0, fontWeight: FontWeight.bold)),
+                      ),
+                      Padding(
                           padding: EdgeInsets.only(
                             left: 11,
-                            top: 25,
+                            top: 10,
                           ),
-                          child: Text(_item.title,
+                          child: Container(
+                            constraints: new BoxConstraints(
+                                maxWidth:
+                                    MediaQuery.of(context).size.width - 95),
+                            child: Text(
+                              _item.description,
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.left,
+                              maxLines: 7,
                               style: new TextStyle(
-                                  fontSize: 22.0, fontWeight: FontWeight.bold)),
-                        )
-                      ]),
-                      Row(children: <Widget>[
-                        Padding(
-                            padding: EdgeInsets.only(
-                              left: 11,
-                              top: 10,
-                            ),
-                            child: Container(
-                              constraints: new BoxConstraints(
-                                  maxWidth:
-                                      MediaQuery.of(context).size.width - 95),
-                              child: Text(
-                                _item.description,
-                                overflow: TextOverflow.ellipsis,
-                                textAlign: TextAlign.justify,
-                                maxLines: 7,
-                                style: new TextStyle(
-                                  fontSize: 15.0,
-                                  color: Colors.grey[600],
-                                ),
+                                fontSize: 15.0,
+                                color: Colors.grey[600],
                               ),
-                            ))
-                      ]),
+                            ),
+                          ))
                     ],
                   ),
                 ),

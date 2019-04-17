@@ -94,18 +94,18 @@ class _EditItemState extends State<EditItem> {
     } else {
       print('Id de producto: ' + _item.itemId.toString());
       // Quitar imágenes no usadas
-      _images.removeWhere((x) => x == null);
+      List nonNull = List.from(_images.where((x) => x != null));
       _item.title = _titleController.text;
       _item.description = _descriptionController.text;
       _item.category = _categoria;
 
       List<ImageClass> _media = [];
       int i = 0;
-      for (var imagen in _images) {
+      for (var imagen in nonNull) {
         if (imagen is ImageClass) {
           _media.add(imagen);
         } else {
-          _media.add(ImageClass.file(fileImage: _images[i]));
+          _media.add(ImageClass.file(fileImage: nonNull[i]));
         }
         i = i + 1;
       }
@@ -242,9 +242,9 @@ class _EditItemState extends State<EditItem> {
           top: 17,
         ),
         child: Text(
-          'Imágenes',
+          'Imágenes (mantén pulsado para borrar)',
           style: new TextStyle(
-            fontSize: 16.8,
+            fontSize: 15,
             color: Colors.grey[600],
           ),
         ));
@@ -286,18 +286,31 @@ class _EditItemState extends State<EditItem> {
                               ],
                             )),
                       )
-                    : new Container(
-                        margin: const EdgeInsets.all(7.0),
-                        padding: const EdgeInsets.all(3.0),
-                        decoration: new BoxDecoration(
-                            image: new DecorationImage(
-                              image: _images[index] is File
-                                  ? new AssetImage(_images[index].path)
-                                  : _images[index].image.image,
-                              fit: BoxFit.cover,
+                    : FlatButton(
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        padding: EdgeInsets.all(0),
+                        onPressed: () => null, // para efecto de InkResponse
+                        child: GestureDetector(
+                          onLongPress: () =>
+                              setState(() => _images[index] = null),
+                          child: InkWell(
+                            splashColor: Colors.black,
+                            child: new Container(
+                              margin: const EdgeInsets.all(7.0),
+                              padding: const EdgeInsets.all(3.0),
+                              decoration: new BoxDecoration(
+                                  image: new DecorationImage(
+                                    image: _images[index] is File
+                                        ? new AssetImage(_images[index].path)
+                                        : _images[index].image.image,
+                                    fit: BoxFit.cover,
+                                  ),
+                                  borderRadius: BorderRadius.circular(15.0),
+                                  border:
+                                      new Border.all(color: Colors.grey[600])),
                             ),
-                            borderRadius: BorderRadius.circular(15.0),
-                            border: new Border.all(color: Colors.grey[600])),
+                          ),
+                        ),
                       ),
               ),
         ));
