@@ -112,28 +112,33 @@ class _ProfileState extends State<Profile> {
     if (_user?.locationLat != null && _user?.locationLng != null) {
       // Se obtienen sus valores de ubicación
       final coordinates = new Coordinates(_user.locationLat, _user.locationLng);
-      try{
+      try {
         var addresses =
-          await Geocoder.local.findAddressesFromCoordinates(coordinates);
-      if (addresses.length > 0 && !_cancelled) {
-        setState(() {
-          _ubicacionCiudad = addresses.first.locality;
-          _ubicacionResto = addresses.first.countryName;
-        });
+            await Geocoder.local.findAddressesFromCoordinates(coordinates);
+        if (addresses.length > 0 && !_cancelled) {
+          setState(() {
+            _ubicacionCiudad = addresses.first.locality;
+            _ubicacionResto = addresses.first.countryName;
+          });
+        }
+      } catch (e) {
+        print('Error al obtener addresses: ' + e.toString());
       }
-      }catch(e){
-        print('Error al obtener addresses: '+ e.toString());
-      }
-      
     }
   }
 
-  void _loadProfileItems() {
+  void _loadProfileItems() async {
     if (_user?.userId == null) {
       print('ERROR: Intentando cargar objetos de un usuario sin ID');
     } else {
+      double userLat = await Storage.loadLat();
+      double userLng = await Storage.loadLng();
       // Cargar los objetos en venta y vendidos para el usuario
-      ItemRequest.getItemsFromUser(userId: _user.userId, status: "en venta")
+      ItemRequest.getItemsFromUser(
+              userId: _user.userId,
+              userLat: userLat,
+              userLng: userLng,
+              status: "en venta")
           .then((itemsVenta) {
         if (!_cancelled) {
           setState(() {
@@ -147,7 +152,11 @@ class _ProfileState extends State<Profile> {
       }).catchError((error) {
         print('Error al cargar los productos en venta de usuario: $error');
       });
-      ItemRequest.getItemsFromUser(userId: _user.userId, status: "vendido")
+      ItemRequest.getItemsFromUser(
+              userId: _user.userId,
+              userLat: userLat,
+              userLng: userLng,
+              status: "vendido")
           .then((itemsVendidos) {
         if (!_cancelled) {
           setState(() {
@@ -322,8 +331,8 @@ class _ProfileState extends State<Profile> {
       if (_user.nacimiento.month > now.month ||
           (_user.nacimiento.month == now.month &&
               _user.nacimiento.day >= now.day)) {
-                edad--; // no ha cumplido años este año
-              }
+        edad--; // no ha cumplido años este año
+      }
     }
 
     Widget wUserDataRight = Expanded(
@@ -338,13 +347,17 @@ class _ProfileState extends State<Profile> {
                   alignment: Alignment.centerLeft,
                   padding: EdgeInsets.only(
                       top: wEditProfile == Container() ? 25 : 10),
-                  child: Text(_user?.nombre ?? '', overflow: TextOverflow.ellipsis,
-                      style: _styleNombre, textAlign: _textAlignment)),
+                  child: Text(_user?.nombre ?? '',
+                      overflow: TextOverflow.ellipsis,
+                      style: _styleNombre,
+                      textAlign: _textAlignment)),
               Container(
                   alignment: Alignment.centerLeft,
                   margin: EdgeInsets.only(top: 5),
-                  child: Text(_user?.apellidos ?? '', overflow: TextOverflow.ellipsis,
-                      style: _styleNombre, textAlign: _textAlignment)),
+                  child: Text(_user?.apellidos ?? '',
+                      overflow: TextOverflow.ellipsis,
+                      style: _styleNombre,
+                      textAlign: _textAlignment)),
               Container(
                   alignment: Alignment.centerLeft,
                   margin: EdgeInsets.only(

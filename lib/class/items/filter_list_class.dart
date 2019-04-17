@@ -175,7 +175,7 @@ class FilterListClass {
     map.putIfAbsent("priceFrom", () => priceRange[minPriceIndex].toString());
     map.putIfAbsent("priceTo", () => priceRange[maxPriceIndex].toString());
     // Distancia
-    map.putIfAbsent("distance", () => distanceRange[maxDistanceIndex].toString());
+    map.putIfAbsent("distance", () => (distanceRange[maxDistanceIndex] ~/ 1000).toString());
     // Categoria
     if (categoryId != 0)
       map.putIfAbsent("category", () => categoryAPINames[categoryId]);

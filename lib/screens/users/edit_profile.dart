@@ -42,18 +42,18 @@ class _EditProfileState extends State<EditProfile> {
 
   static final _styleTitle = TextStyle(
       fontSize: 22.0, color: Colors.black, fontWeight: FontWeight.bold);
-  static final _styleText = TextStyle(
-      fontSize: 17.0, color: Colors.black);
-  static final _styleButton = TextStyle(
-      fontSize: 19.0, color: Colors.white);
+  static final _styleText = TextStyle(fontSize: 17.0, color: Colors.black);
+  static final _styleButton = TextStyle(fontSize: 19.0, color: Colors.white);
   static final _styleAgeTitle = TextStyle(
       fontSize: 14.0, color: Colors.grey[600], fontWeight: FontWeight.bold);
 
   /// Texto del título del alertdialog
   static final _styleDialogTitle = TextStyle(
       fontSize: 19.0, color: Colors.black, fontWeight: FontWeight.w600);
-  static final _styleDialogAccept =
-      TextStyle(fontSize: 19.0, color: Colors.white, fontWeight: FontWeight.bold); // color rojo
+  static final _styleDialogAccept = TextStyle(
+      fontSize: 19.0,
+      color: Colors.white,
+      fontWeight: FontWeight.bold); // color rojo
   static final _styleDialogCancel = TextStyle(
       fontSize: 19.0, color: Colors.grey[600], fontWeight: FontWeight.bold);
   static final _styleLocationButton = TextStyle(
@@ -91,6 +91,7 @@ class _EditProfileState extends State<EditProfile> {
     _nameController.text = _user.nombre;
     _surnameController.text = _user.apellidos;
     _userPosition = LatLng(_user.locationLat, _user.locationLng);
+    _selectedPosition = LatLng(_user.locationLat, _user.locationLng);
     _cameraPosition = CameraPosition(
       target: _userPosition,
       zoom: 15,
@@ -110,21 +111,20 @@ class _EditProfileState extends State<EditProfile> {
   }
 
   void _loadCoordinates() async {
-    if (_user?.locationLat != null && _user?.locationLng != null) {
-      final coordinates = new Coordinates(_user.locationLat, _user.locationLng);
-      try{
+    if (_selectedPosition?.latitude != null && _selectedPosition?.longitude != null) {
+      final coordinates = new Coordinates(_selectedPosition.latitude, _selectedPosition.longitude);
+      try {
         var addresses =
-          await Geocoder.local.findAddressesFromCoordinates(coordinates);
-      if (addresses.length > 0) {
-        setState(() {
-          _ubicacionCiudad = addresses.first.locality;
-          _ubicacionResto = addresses.first.countryName;
-        });
+            await Geocoder.local.findAddressesFromCoordinates(coordinates);
+        if (addresses.length > 0) {
+          setState(() {
+            _ubicacionCiudad = addresses.first.locality;
+            _ubicacionResto = addresses.first.countryName;
+          });
+        }
+      } catch (e) {
+        print('Error al obtener addresses: ' + e.toString());
       }
-      }catch(e){
-        print('Error al obtener addresses: '+ e.toString());
-      }
-      
     }
   }
 
@@ -143,20 +143,25 @@ class _EditProfileState extends State<EditProfile> {
   }
 
   void updateUser() {
-    if (_nameController.text.length < 1 || _surnameController.text.length < 1 || _emailController.text.length < 1) {
+    if (_nameController.text.length < 1 ||
+        _surnameController.text.length < 1 ||
+        _emailController.text.length < 1) {
       showInSnackBar("Rellena todos los campos correctamente", Colors.yellow);
     } else {
+      double newLat = _selectedPosition.latitude;
+      double newLng = _selectedPosition.longitude;
       _user.update(
           nombre: _nameController.text,
           apellidos: _surnameController.text,
           sexo: _sexo,
           email: _emailController.text,
-          locationLat: _user.locationLat,
-          locationLng: _user.locationLng,
+          locationLat: newLat,
+          locationLng: newLng,
           nacimiento: _selectedDate,
           image: _displayImage);
+      Storage.saveLocation(newLat, newLng);
       UsuarioRequest.editUser(_user).then((_) {
-          showInSnackBar("Datos actualizados correctamente", _colorStatusBarGood);
+        showInSnackBar("Datos actualizados correctamente", _colorStatusBarGood);
       }).catchError((error) {
         if (error == "Unauthorized" || error == "Forbidden") {
           showInSnackBar("Acción no autorizada", _colorStatusBarBad);
@@ -200,7 +205,7 @@ class _EditProfileState extends State<EditProfile> {
   /// Actualizar SOLO LOCALMENTE la ubicación de usuario
   /// para guardar cambios deberá pulsar el boton de "Guardar Cambios"
   void _updateLocation() {
-    try{
+    try {
       double newLat = _selectedPosition.latitude;
       double newLng = _selectedPosition.longitude;
       setState(() {
@@ -209,12 +214,13 @@ class _EditProfileState extends State<EditProfile> {
           target: _userPosition,
           zoom: 15,
         );
-        _positionMarker = Marker(markerId: MarkerId("Home"), position: _selectedPosition);
+        _positionMarker =
+            Marker(markerId: MarkerId("Home"), position: _selectedPosition);
         _loadCoordinates();
       });
-    }catch(e){
+    } catch (e) {
       print('Error al guardar las coordenadas seleccionadas: ' + e.toString());
-    } 
+    }
   }
 
   /// Cuadro de diálogo para seleccionar ubicación de usuario
@@ -241,12 +247,10 @@ class _EditProfileState extends State<EditProfile> {
             materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
             onPressed: () async {
               GoogleMapController mapController = await _controller.future;
-              CameraPosition zoomPosition = CameraPosition(
-                target: _cameraPosition.target,
-                zoom: 17
-              );
-              mapController.animateCamera(
-                  CameraUpdate.newCameraPosition(zoomPosition));
+              CameraPosition zoomPosition =
+                  CameraPosition(target: _cameraPosition.target, zoom: 17);
+              mapController
+                  .animateCamera(CameraUpdate.newCameraPosition(zoomPosition));
             },
             child: Row(
               children: <Widget>[
@@ -293,8 +297,7 @@ class _EditProfileState extends State<EditProfile> {
                 _updateLocation();
                 Navigator.of(context).pop();
               },
-              child: Text('Aceptar',
-                  style: _styleDialogAccept)),
+              child: Text('Aceptar', style: _styleDialogAccept)),
           FlatButton(
               padding: EdgeInsets.symmetric(horizontal: 15.0),
               onPressed: () => Navigator.of(context).pop(),
@@ -360,9 +363,8 @@ class _EditProfileState extends State<EditProfile> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
                         Container(
-                          margin: EdgeInsets.only(right: 5),
-                          child: Icon(Icons.edit)
-                        ),
+                            margin: EdgeInsets.only(right: 5),
+                            child: Icon(Icons.edit)),
                         Text('Editar foto'),
                       ],
                     ),
@@ -401,27 +403,27 @@ class _EditProfileState extends State<EditProfile> {
     );
 
     Widget wLocationInfo = _ubicacionCiudad == null || _ubicacionResto == null
-      ? Container()
-      : Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: <Widget>[
-            Container(
-              margin: EdgeInsets.only(right: 5),
-              child: Icon(Icons.location_on),
-            ),
-            Text('$_ubicacionCiudad, $_ubicacionResto', style: _styleText)
-          ],
-        );
+        ? Container()
+        : Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              Container(
+                margin: EdgeInsets.only(right: 5),
+                child: Icon(Icons.location_on),
+              ),
+              Text('$_ubicacionCiudad, $_ubicacionResto', style: _styleText)
+            ],
+          );
 
     Widget wLocationButton = Container(
-      margin: EdgeInsets.only(top: 10.0),
-      child: SizedBox(
-        width: double.infinity,
-        child: RaisedButton(
-          padding: EdgeInsets.symmetric(vertical: 7.0, horizontal: 20.0),
-          color: Colors.grey[600],
-          child: Text('Abrir mapa', style: _styleButton),
-          onPressed: _openLocationDialog)));
+        margin: EdgeInsets.only(top: 10.0),
+        child: SizedBox(
+            width: double.infinity,
+            child: RaisedButton(
+                padding: EdgeInsets.symmetric(vertical: 7.0, horizontal: 20.0),
+                color: Colors.grey[600],
+                child: Text('Abrir mapa', style: _styleButton),
+                onPressed: _openLocationDialog)));
 
     Widget wEmail = Row(
       children: <Widget>[
@@ -567,18 +569,22 @@ class _EditProfileState extends State<EditProfile> {
                 color: Colors.grey[600],
                 onPressed: () async {
                   DateTime picked = await showDatePicker(
-                    context: context,
-                    initialDate: _selectedDate ?? DateTime.now(),
-                    firstDate: DateTime(1900, 1),
-                    lastDate: DateTime.now()
-                  );
-                  setState((){
+                      context: context,
+                      initialDate: _selectedDate ?? DateTime.now(),
+                      firstDate: DateTime(1900, 1),
+                      lastDate: DateTime.now());
+                  setState(() {
                     _selectedDate = picked;
                   });
                 },
-                child: Text(_selectedDate == null ? 'Seleccionar fecha...' : _nacimientoString(_selectedDate), style: _styleButton, textAlign: TextAlign.left,),
-              )
-            ),
+                child: Text(
+                  _selectedDate == null
+                      ? 'Seleccionar fecha...'
+                      : _nacimientoString(_selectedDate),
+                  style: _styleButton,
+                  textAlign: TextAlign.left,
+                ),
+              )),
         ),
         Expanded(
           flex: 2,
@@ -638,14 +644,14 @@ class _EditProfileState extends State<EditProfile> {
                 Container(
                   margin: EdgeInsets.symmetric(vertical: 20.0),
                   child: SizedBox(
-                    width: double.infinity,
-                    child: RaisedButton(
-                      padding: EdgeInsets.symmetric(vertical: 7.0, horizontal: 20.0),
-                      color: Theme.of(context).primaryColor,
-                      child: Text('Guardar cambios', style: _styleButton),
-                      onPressed: updateUser,
-                    )
-                  ),
+                      width: double.infinity,
+                      child: RaisedButton(
+                        padding: EdgeInsets.symmetric(
+                            vertical: 7.0, horizontal: 20.0),
+                        color: Theme.of(context).primaryColor,
+                        child: Text('Guardar cambios', style: _styleButton),
+                        onPressed: updateUser,
+                      )),
                 ),
                 Divider(),
                 Padding(
@@ -662,14 +668,14 @@ class _EditProfileState extends State<EditProfile> {
                 Container(
                   margin: EdgeInsets.only(top: 10.0, bottom: 40.0),
                   child: SizedBox(
-                    width: double.infinity,
-                    child: RaisedButton(
-                      padding: EdgeInsets.symmetric(vertical: 7.0, horizontal: 20.0),
-                      color: Theme.of(context).primaryColor,
-                      child: Text('Cambiar contraseña', style: _styleButton),
-                      onPressed: cambioPass,
-                    )
-                  ),
+                      width: double.infinity,
+                      child: RaisedButton(
+                        padding: EdgeInsets.symmetric(
+                            vertical: 7.0, horizontal: 20.0),
+                        color: Theme.of(context).primaryColor,
+                        child: Text('Cambiar contraseña', style: _styleButton),
+                        onPressed: cambioPass,
+                      )),
                 ),
               ],
             )));
@@ -677,7 +683,8 @@ class _EditProfileState extends State<EditProfile> {
 
   @override
   Widget build(BuildContext context) {
-    FlutterStatusbarcolor.setStatusBarColor(Theme.of(context).primaryColor.withAlpha(200));
+    FlutterStatusbarcolor.setStatusBarColor(
+        Theme.of(context).primaryColor.withAlpha(200));
     return Scaffold(key: _scaffoldKey, body: _buildForm());
   }
 }

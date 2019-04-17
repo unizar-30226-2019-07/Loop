@@ -5,6 +5,7 @@ import 'package:selit/screens/items/item_list_drawer.dart';
 import 'package:selit/widgets/items/item_tile.dart';
 import 'package:selit/widgets/items/item_tile_vertical.dart';
 import 'package:selit/util/api/item_request.dart';
+import 'package:selit/util/storage.dart';
 import 'package:selit/class/item_class.dart';
 import 'package:selit/class/items/filter_list_class.dart';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
@@ -145,9 +146,11 @@ class _ItemListState extends State<ItemList> {
   /// Ejemplo: página 0 -> items del 0 al 9 (10 items en total)
   void _getItemsData(int pageNum) async {
     // Petición de items
+    double lat = await Storage.loadLat();
+    double lng = await Storage.loadLng();
     ItemRequest.getItems(
-      lat: 0.0,
-      lng: 0.0,
+      lat: lat,
+      lng: lng,
       filters: _filterManager,
       size: ITEMS_PER_PAGE,
       page: pageNum).then((List<ItemClass> receivedItems) {

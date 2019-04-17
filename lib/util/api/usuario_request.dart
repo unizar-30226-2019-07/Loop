@@ -28,6 +28,7 @@ class UsuarioRequest {
       Storage.saveToken(receivedToken.token);
       UsuarioClass receivedUser = await UsuarioRequest.getUserById(0);
       Storage.saveUserId(receivedUser.userId);
+      Storage.saveLocation(receivedUser.locationLat, receivedUser.locationLng);
       return receivedToken;
     } else {
       throw (APIConfig.getErrorString(response));

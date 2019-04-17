@@ -1,4 +1,5 @@
 import 'package:selit/class/item_class.dart';
+import 'package:selit/class/usuario_class.dart';
 import 'package:selit/util/api/api_config.dart';
 import 'package:selit/util/storage.dart';
 import 'package:selit/class/items/filter_list_class.dart';
@@ -23,7 +24,7 @@ class ItemRequest {
     if (size != null) _params.putIfAbsent("\$size", () => size.toString());
     if (page != null) _params.putIfAbsent("\$page", () => page.toString());
 
-    String _otherParameters = '?lat=$lat&lng=$lng&distance=1000';
+    String _otherParameters = '?lat=$lat&lng=$lng';
     _params.forEach((key, value) => _otherParameters += '&$key=$value');
 
     print("Parametros: $_otherParameters");
@@ -54,10 +55,10 @@ class ItemRequest {
   /// Por ahora se piden todos los items del usuario a la vez,
   /// sin cargar por páginas
   static Future<List<ItemClass>> getItemsFromUser(
-      {@required int userId, @required String status}) async {
+      {@required int userId, @required double userLat, @required double userLng, @required String status}) async {
+
     // TODO workaround para ignorar la distancia de los objetos
-    // TODO incluir (lat, lng) del user para cálculo correcto de distancias
-    String _paramsString = '?lat=0.0&lng=0.0&distance=99999999.9';
+    String _paramsString = '?lat=$userLat&lng=$userLng&distance=99999999.9';
     // Si status no es ni "en venta" ni "vendido", default a "en venta"
     String _statusParam = status == "vendido" ? status : "en venta";
     _paramsString += "&owner=$userId&status=$_statusParam";
