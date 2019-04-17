@@ -287,9 +287,9 @@ class _ItemDetails extends State<ItemDetails> {
         _item?.owner?.userId != null) {
       // Generar un numero ""aleatorio"" a partir del ID de usuario
       // No es la mejor opción para mover la ubicación, pero por ahora sirve
-      // Mover +/- 0.002 la latitud y longitud
-      double randomLat = (100 - ((_item.owner.userId * 37 + 48) % 200)) / 100000;
-      double randomLng = (100 - ((_item.owner.userId * 83 + 21) % 200)) / 100000;
+      // Mover +/- 0.004 la latitud y longitud
+      double randomLat = (200 - ((_item.owner.userId * 37 + 48) % 400)) / 50000;
+      double randomLng = (200 - ((_item.owner.userId * 83 + 21) % 400)) / 50000;
       print('Con ID ${_item.owner.userId} se mueve ($randomLat, $randomLng)');
       LatLng movedLL = LatLng(_item.owner.locationLat + randomLat,
           _item.owner.locationLng + randomLng);
