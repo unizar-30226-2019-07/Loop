@@ -39,7 +39,7 @@ class Settings extends StatelessWidget {
                   onPressed: () {
                     Storage.deleteToken();
                     print("Sesión cerrada");
-                    //Navigator.pushReplacementNamed(context, "/login-page");
+                    Navigator.pushReplacementNamed(context, "/login-page");
                   },
                 ),
               ),
