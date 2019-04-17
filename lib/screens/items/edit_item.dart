@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 import 'package:selit/class/usuario_class.dart';
+import 'package:selit/class/image_class.dart';
 
 /// Primera pantalla del formulario de subida de un nuevo producto
 /// Incluye tiítulo, descripción, categoría y fotos
@@ -29,7 +30,7 @@ class _EditItemState extends State<EditItem> {
       new TextEditingController();
 
   ///Ficheros de galería
-  List<File> _images = <File>[null, null, null, null, null];
+  List<dynamic> _images = <dynamic>[null, null, null, null, null];
   int _imagen = 0;
 
   ///Lista opciones categoria
@@ -49,8 +50,15 @@ class _EditItemState extends State<EditItem> {
     _descriptionController.text = _item.description;
     _categoria = _item.category;
     print('Precio actual: ' + _item.price.toString());
-  }
 
+    if (_item.media.isNotEmpty) {
+      int i = 0;
+      for (var imagen in _item.media) {
+        _images[i] = imagen;
+        i = i + 1;
+      }
+    }
+  }
 
   /// Titulos
   static final _styleTitle = TextStyle(
@@ -91,10 +99,26 @@ class _EditItemState extends State<EditItem> {
       showInSnackBar("Rellena toodos los campos correctamente", Colors.yellow);
     } else {
       print('Id de producto: ' + _item.itemId.toString());
-      _item.title =  _titleController.text;
-      _item.description =  _descriptionController.text;
-      _item.category =  _categoria;
-      Navigator.push(context, MaterialPageRoute(builder: (context) => EditItem2(item: _item)));
+      // Quitar imágenes no usadas
+      _images.removeWhere((x) => x == null);
+      _item.title = _titleController.text;
+      _item.description = _descriptionController.text;
+      _item.category = _categoria;
+
+      List<ImageClass> _media = [];
+      int i = 0;
+      for (var imagen in _images) {
+        if (imagen is ImageClass) {
+          _media.add(imagen);
+        } else {
+          _media.add(ImageClass.file(fileImage: _images[i]));
+        }
+        i = i + 1;
+      }
+      _item.media = _media;
+
+      Navigator.push(context,
+          MaterialPageRoute(builder: (context) => EditItem2(item: _item)));
     }
   }
 
@@ -273,7 +297,9 @@ class _EditItemState extends State<EditItem> {
                         padding: const EdgeInsets.all(3.0),
                         decoration: new BoxDecoration(
                             image: new DecorationImage(
-                              image: new AssetImage(_images[index].path),
+                              image: _images[index] is File
+                                  ? new AssetImage(_images[index].path)
+                                  : _images[index].image.image,
                               fit: BoxFit.cover,
                             ),
                             borderRadius: BorderRadius.circular(15.0),
