@@ -90,7 +90,7 @@ class _EditItemState extends State<EditItem> {
     if (_titleController.text.length < 1 ||
         _descriptionController.text.length < 1 ||
         _categoria == '') {
-      showInSnackBar("Rellena toodos los campos correctamente", Colors.yellow);
+      showInSnackBar("Rellena todos los campos correctamente", Colors.yellow);
     } else {
       print('Id de producto: ' + _item.itemId.toString());
       // Quitar imágenes no usadas

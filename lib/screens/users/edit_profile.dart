@@ -112,7 +112,8 @@ class _EditProfileState extends State<EditProfile> {
   void _loadCoordinates() async {
     if (_user?.locationLat != null && _user?.locationLng != null) {
       final coordinates = new Coordinates(_user.locationLat, _user.locationLng);
-      var addresses =
+      try{
+        var addresses =
           await Geocoder.local.findAddressesFromCoordinates(coordinates);
       if (addresses.length > 0) {
         setState(() {
@@ -120,6 +121,10 @@ class _EditProfileState extends State<EditProfile> {
           _ubicacionResto = addresses.first.countryName;
         });
       }
+      }catch(e){
+        print('Error al obtener addresses: '+ e.toString());
+      }
+      
     }
   }
 
@@ -195,17 +200,21 @@ class _EditProfileState extends State<EditProfile> {
   /// Actualizar SOLO LOCALMENTE la ubicación de usuario
   /// para guardar cambios deberá pulsar el boton de "Guardar Cambios"
   void _updateLocation() {
-    double newLat = _selectedPosition.latitude;
-    double newLng = _selectedPosition.longitude;
-    setState(() {
-      _userPosition = LatLng(newLat, newLng);
-      _cameraPosition = CameraPosition(
-        target: _userPosition,
-        zoom: 15,
-      );
-      _positionMarker = Marker(markerId: MarkerId("Home"), position: _selectedPosition);
-      _loadCoordinates();
-    });
+    try{
+      double newLat = _selectedPosition.latitude;
+      double newLng = _selectedPosition.longitude;
+      setState(() {
+        _userPosition = LatLng(newLat, newLng);
+        _cameraPosition = CameraPosition(
+          target: _userPosition,
+          zoom: 15,
+        );
+        _positionMarker = Marker(markerId: MarkerId("Home"), position: _selectedPosition);
+        _loadCoordinates();
+      });
+    }catch(e){
+      print('Error al guardar las coordenadas seleccionadas: ' + e.toString());
+    } 
   }
 
   /// Cuadro de diálogo para seleccionar ubicación de usuario
