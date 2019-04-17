@@ -56,6 +56,7 @@ class ItemRequest {
   static Future<List<ItemClass>> getItemsFromUser(
       {@required int userId, @required String status}) async {
     // TODO workaround para ignorar la distancia de los objetos
+    // TODO incluir (lat, lng) del user para cálculo correcto de distancias
     String _paramsString = '?lat=0.0&lng=0.0&distance=99999999.9';
     // Si status no es ni "en venta" ni "vendido", default a "en venta"
     String _statusParam = status == "vendido" ? status : "en venta";
@@ -101,6 +102,7 @@ class ItemRequest {
   /// Actualizar producto
   static Future<void> edit(ItemClass item) async {
     int _productId = item.itemId;
+    print(json.jsonEncode(item.toJsonEdit()));
     final response = await http.put(
       '${APIConfig.BASE_URL}/products/$_productId',
       headers: {

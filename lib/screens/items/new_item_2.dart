@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
@@ -25,10 +24,6 @@ class _NewItemState2 extends State<NewItem2> {
   final TextEditingController _priceController = new TextEditingController();
   final TextEditingController _limitController = new TextEditingController();
 
-  //Ficheros de galería
-  File _galleryFile1;
-  File _galleryFile2;
-
   //Lista opciones divisa
   List<String> _divisas = <String>['', 'EUR', 'USD'];
   String _divisa = '';
@@ -40,11 +35,7 @@ class _NewItemState2 extends State<NewItem2> {
   ItemClass _item;
 
   /// Constructor:
-  _NewItemState2(ItemClass _item) {
-    this._item = _item;
-    _galleryFile1 = null;
-    _galleryFile2 = null;
-  }
+  _NewItemState2(this._item);
 
   final Color _colorStatusBarGood = Colors.blue.withOpacity(0.5);
   final Color _colorStatusBarBad = Colors.red.withOpacity(0.5);
@@ -54,10 +45,13 @@ class _NewItemState2 extends State<NewItem2> {
       fontSize: 22.0, color: Colors.white, fontWeight: FontWeight.bold);
 
   static final _styleSubTitleB = TextStyle(
-      fontSize: 17.0, color: Colors.white, fontWeight: FontWeight.bold);
+      fontSize: 17.0, color: Colors.grey, fontWeight: FontWeight.bold);
 
   static final _styleSubTitle = TextStyle(
       fontSize: 17.0, color: Colors.white, fontWeight: FontWeight.normal);
+
+  static final _styleButton = TextStyle(
+      fontSize: 19.0, color: Colors.white);
 
   ///Selector de fecha
   DateTime selectedDate = DateTime.now();
@@ -89,18 +83,20 @@ class _NewItemState2 extends State<NewItem2> {
   }
 
   void createItem() {
+    double formattedPrice = double.tryParse(_priceController.text.replaceAll(',', '.'));
     if (_priceController.text.length < 1 ||
+        formattedPrice == null ||
         _tipoPrecio == '' ||
         _divisa == '') {
       showInSnackBar("Rellena todos los campos correctamente", Colors.yellow);
     } else {
       ///TODO cambiar sale por __tipoPrecio cuando estén implementadas las subastas
-      _item.update("sale", double.parse(_priceController.text.replaceAll(',', '.')), _divisa);
+      _item.update(type: "sale", price: formattedPrice, currency: _divisa);
 
       ItemRequest.create(_item).then((_) {
-          showInSnackBar("Datos actualizados correctamente", _colorStatusBarGood);
-          Navigator.of(context).pop();
-          Navigator.of(context).pop();
+        showInSnackBar("Datos actualizados correctamente", _colorStatusBarGood);
+        Navigator.of(context).pop();
+        Navigator.of(context).pop();
       }).catchError((error) {
         if (error == "Unauthorized" || error == "Forbidden") {
           showInSnackBar("Acción no autorizada", _colorStatusBarBad);
@@ -263,7 +259,8 @@ class _NewItemState2 extends State<NewItem2> {
                       labelText: 'Precio',
                     ),
                     controller: _priceController,
-                    keyboardType: TextInputType.numberWithOptions(signed: false, decimal: true),
+                    keyboardType: TextInputType.numberWithOptions(
+                        signed: false, decimal: true),
                   ),
                 ],
               )),
@@ -322,7 +319,8 @@ class _NewItemState2 extends State<NewItem2> {
                       labelText: 'Límite',
                     ),
                     controller: _limitController,
-                    keyboardType: TextInputType.numberWithOptions(signed: false, decimal: true),
+                    keyboardType: TextInputType.numberWithOptions(
+                        signed: false, decimal: true),
                   ),
                 ],
               )),
@@ -359,14 +357,13 @@ class _NewItemState2 extends State<NewItem2> {
                       wTipoPrecio,
                       Divider(),
                       wPrecio,
-                      Divider(),
                       new Container(
-                          padding: const EdgeInsets.only(
-                              left: 10.0, top: 20.0, right: 10),
-                          child: new RaisedButton(
-                            color: Color(0xffc0392b),
-                            child: const Text('Subir producto',
-                                style: TextStyle(color: Colors.white)),
+                        margin: EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 30.0),
+                        child: RaisedButton(
+                          color: Theme.of(context).primaryColor,
+                          padding: EdgeInsets.symmetric(vertical: 7.0, horizontal: 20.0),
+                          child: Text('Subir producto',
+                          style: _styleButton),
                             onPressed: () async {
                               createItem();
                             },
@@ -383,12 +380,13 @@ class _NewItemState2 extends State<NewItem2> {
                       wLimite,
                       Divider(),
                       new Container(
-                          padding: const EdgeInsets.only(
-                              left: 10.0, top: 20.0, right: 10),
-                          child: new RaisedButton(
-                            color: Color(0xffc0392b),
-                            child: const Text('Subir producto',
-                                style: TextStyle(color: Colors.white)),
+                          margin: EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 30.0),
+                          child: RaisedButton(
+                            color: Theme.of(context).primaryColor,
+                            padding: EdgeInsets.symmetric(
+                                vertical: 7.0, horizontal: 20.0),
+                            child: Text('Subir producto',
+                                style: _styleButton),
                             onPressed: () async {
                               createItem();
                             },
@@ -402,15 +400,15 @@ class _NewItemState2 extends State<NewItem2> {
     FlutterStatusbarcolor.setStatusBarColor(Colors.transparent);
     return Scaffold(
       key: _scaffoldKey,
-      resizeToAvoidBottomInset: true,
+      resizeToAvoidBottomInset: false,
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-              begin: Alignment(0.15, -1.60),
-              end: Alignment(-0.15, 1.0),
+              begin: Alignment(0.10, -1.0),
+              end: Alignment(-0.10, 1.0),
               stops: [
-                0.4,
-                0.4
+                0.23,
+                0.23
               ],
               colors: [
                 Theme.of(context).primaryColor,

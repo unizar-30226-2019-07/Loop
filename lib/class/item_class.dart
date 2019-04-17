@@ -84,10 +84,10 @@ class ItemClass {
             media: _getImages(json['media'], tokenHeader)
           );
 
-  void update(String _type, double _price, String _currency) {
-    this.type = _type;
-    this.price = _price;
-    this.currency = _currency;
+  void update({String type, double price, String currency}) {
+    this.type = type;
+    this.price = price;
+    this.currency = currency;
   }
 
   Map<String, dynamic> toJsonCreate() => {

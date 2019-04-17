@@ -53,7 +53,10 @@ class _NewItemState extends State<NewItem> {
       fontSize: 17.0, color: Colors.white, fontWeight: FontWeight.bold);
 
   static final _styleSubTitle = TextStyle(
-      fontSize: 17.0, color: Colors.white, fontWeight: FontWeight.normal);
+      fontSize: 17.0, color: Colors.grey, fontWeight: FontWeight.normal);
+
+  static final _styleButton = TextStyle(
+      fontSize: 19.0, color: Colors.white);
 
   ///Selección de foto 1 de galería
   imageSelectorGallery(int index) async {
@@ -85,7 +88,7 @@ class _NewItemState extends State<NewItem> {
     if (_titleController.text.length < 1 ||
         _descriptionController.text.length < 1 ||
         _categoria == '') {
-      showInSnackBar("Rellena toodos los campos correctamente", Colors.yellow);
+      showInSnackBar("Rellena todos los campos correctamente", Colors.yellow);
     } else {
       // Quitar imágenes no usadas
       _images.removeWhere((x) => x == null);
@@ -303,14 +306,13 @@ class _NewItemState extends State<NewItem> {
                 Divider(),
                 wImgTitle,
                 wImg,
-                Divider(),
                 new Container(
-                    padding:
-                        const EdgeInsets.only(left: 10.0, top: 20.0, right: 10),
-                    child: new RaisedButton(
-                      color: Color(0xffc0392b),
-                      child: const Text('Siguiente',
-                          style: TextStyle(color: Colors.white)),
+                    margin: EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 30.0),
+                    child: RaisedButton(
+                      color: Theme.of(context).primaryColor,
+                      padding: EdgeInsets.symmetric(vertical: 7.0, horizontal: 20.0),
+                      child: Text('Siguiente',
+                          style: _styleButton),
                       onPressed: () {
                         createItem();
                       },
@@ -324,15 +326,15 @@ class _NewItemState extends State<NewItem> {
     FlutterStatusbarcolor.setStatusBarColor(Colors.transparent);
     return Scaffold(
       key: _scaffoldKey,
-      resizeToAvoidBottomInset: true,
+      resizeToAvoidBottomInset: false,
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-              begin: Alignment(0.15, -1.60),
-              end: Alignment(-0.15, 1.0),
+              begin: Alignment(0.10, -1.0),
+              end: Alignment(-0.10, 1.0),
               stops: [
-                0.4,
-                0.4
+                0.23,
+                0.23
               ],
               colors: [
                 Theme.of(context).primaryColor,

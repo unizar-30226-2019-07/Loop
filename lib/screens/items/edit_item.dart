@@ -5,7 +5,7 @@ import 'package:selit/screens/items/edit_item_2.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
-import 'package:selit/class/usuario_class.dart';
+import 'package:selit/class/image_class.dart';
 
 /// Primera pantalla del formulario de subida de un nuevo producto
 /// Incluye tiítulo, descripción, categoría y fotos
@@ -29,7 +29,7 @@ class _EditItemState extends State<EditItem> {
       new TextEditingController();
 
   ///Ficheros de galería
-  List<File> _images = <File>[null, null, null, null, null];
+  List _images;
   int _imagen = 0;
 
   ///Lista opciones categoria
@@ -38,19 +38,19 @@ class _EditItemState extends State<EditItem> {
 
   ItemClass _item;
 
-  //Prpietario del producto
-  UsuarioClass _user;
-
   /// Constructor:
   _EditItemState(ItemClass item) {
-    this._user = item.owner;
     this._item = item;
     _titleController.text = _item.title;
     _descriptionController.text = _item.description;
     _categoria = _item.category;
+    // Rellenar con las ImageClass del item
+    _images = [];
+    _images.addAll(_item.media);
+    // Rellenar lo que falte con null
+    for (int i = _item.media.length; i < 5; i++) _images.add(null);
     print('Precio actual: ' + _item.price.toString());
   }
-
 
   /// Titulos
   static final _styleTitle = TextStyle(
@@ -60,7 +60,9 @@ class _EditItemState extends State<EditItem> {
       fontSize: 17.0, color: Colors.white, fontWeight: FontWeight.bold);
 
   static final _styleSubTitle = TextStyle(
-      fontSize: 17.0, color: Colors.white, fontWeight: FontWeight.normal);
+      fontSize: 17.0, color: Colors.grey, fontWeight: FontWeight.normal);
+
+  static final _styleButton = TextStyle(fontSize: 19.0, color: Colors.white);
 
   ///Selección de foto 1 de galería
   imageSelectorGallery() async {
@@ -90,11 +92,15 @@ class _EditItemState extends State<EditItem> {
         _categoria == '') {
       showInSnackBar("Rellena toodos los campos correctamente", Colors.yellow);
     } else {
-      print('Id de producto: ' + _item.itemId.toString());
-      _item.title =  _titleController.text;
-      _item.description =  _descriptionController.text;
-      _item.category =  _categoria;
-      Navigator.push(context, MaterialPageRoute(builder: (context) => EditItem2(item: _item)));
+      // Quitar imágenes no usadas y las no-nuevas
+      _images.removeWhere((x) => x == null || x is ImageClass);
+      _item.title = _titleController.text;
+      _item.description = _descriptionController.text;
+      _item.category = _categoria;
+      _item.media.addAll(List.generate(
+          _images.length, (i) => ImageClass.file(fileImage: _images[i])));
+      Navigator.push(context,
+          MaterialPageRoute(builder: (context) => EditItem2(item: _item)));
     }
   }
 
@@ -273,7 +279,9 @@ class _EditItemState extends State<EditItem> {
                         padding: const EdgeInsets.all(3.0),
                         decoration: new BoxDecoration(
                             image: new DecorationImage(
-                              image: new AssetImage(_images[index].path),
+                              image: _images[index] is File
+                                  ? AssetImage(_images[index].path)
+                                  : _images[index].image.image,
                               fit: BoxFit.cover,
                             ),
                             borderRadius: BorderRadius.circular(15.0),
@@ -299,12 +307,12 @@ class _EditItemState extends State<EditItem> {
                 wImg,
                 Divider(),
                 new Container(
-                    padding:
-                        const EdgeInsets.only(left: 10.0, top: 20.0, right: 10),
-                    child: new RaisedButton(
-                      color: Color(0xffc0392b),
-                      child: const Text('Siguiente',
-                          style: TextStyle(color: Colors.white)),
+                    margin: EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 30.0),
+                    child: RaisedButton(
+                      color: Theme.of(context).primaryColor,
+                      padding:
+                          EdgeInsets.symmetric(vertical: 7.0, horizontal: 20.0),
+                      child: Text('Siguiente', style: _styleButton),
                       onPressed: () {
                         editItem();
                       },
@@ -318,15 +326,15 @@ class _EditItemState extends State<EditItem> {
     FlutterStatusbarcolor.setStatusBarColor(Colors.transparent);
     return Scaffold(
       key: _scaffoldKey,
-      resizeToAvoidBottomInset: true,
+      resizeToAvoidBottomInset: false,
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-              begin: Alignment(0.15, -1.60),
-              end: Alignment(-0.15, 1.0),
+              begin: Alignment(0.10, -1.0),
+              end: Alignment(-0.10, 1.0),
               stops: [
-                0.4,
-                0.4
+                0.23,
+                0.23
               ],
               colors: [
                 Theme.of(context).primaryColor,
