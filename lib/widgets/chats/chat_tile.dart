@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:selit/class/chat_class.dart';
-import 'package:selit/class/image_class.dart';
 import 'package:selit/screens/chat/chat.dart';
 import 'package:selit/widgets/profile_picture.dart';
 
@@ -48,18 +47,14 @@ class ChatTile extends StatelessWidget {
                     borderRadius: BorderRadius.circular(10.0),
                     side: BorderSide(color: Colors.grey[300], width: 1.0)),
                 child: InkWell(
-                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ChatScreen())),
+                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ChatScreen(_chat))),
                   splashColor:
                       Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
                   highlightColor: Colors.transparent,
                   child: Row(
                     mainAxisSize: MainAxisSize.max,
                     children: <Widget>[
-                      image, /*
-                      SizedBox.fromSize(
-                          size: Size(1.0, double.infinity),
-                          child: Container(color: Colors.grey[300]),
-                          ),*/
+                      image,
                       Expanded(
                         child: Container(
                           padding: EdgeInsets.symmetric(

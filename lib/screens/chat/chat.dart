@@ -8,6 +8,8 @@ import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:selit/widgets/profile_picture.dart';
+import 'package:selit/class/chat_class.dart';
 import 'package:selit/screens/chat/message_list.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:image_picker/image_picker.dart';
@@ -19,9 +21,13 @@ var currentUserEmail;
 var _scaffoldContext;
 
 class ChatScreen extends StatefulWidget {
+  final ChatClass chat;
+
+  ChatScreen(this.chat);
+
   @override
   ChatScreenState createState() {
-    return new ChatScreenState();
+    return new ChatScreenState(chat);
   }
 }
 
@@ -31,11 +37,37 @@ class ChatScreenState extends State<ChatScreen> {
   bool _isComposingMessage = false;
   final reference = FirebaseDatabase.instance.reference().child('messages');
 
+  ChatClass _chat;
+
+  ChatScreenState(ChatClass chat) {
+    this._chat = chat;
+  }
+
+  static final _styleTitle =
+    TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold);
+
   @override
   Widget build(BuildContext context) {
+    Widget image = _chat.usuario.profileImage == null
+                    ? Container()
+                    : Container(
+                        padding: const EdgeInsets.all(3.0),
+                        child: SizedBox.fromSize(
+                          size: Size(50.0, double.infinity),
+                          child: ProfilePicture(_chat.usuario.profileImage)));
     return new Scaffold(
         appBar: new AppBar(
-          title: new Text("Chat"),
+          title: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                image,
+                Container(
+                    padding: const EdgeInsets.all(3.0), 
+                    child: Text(_chat.usuario.nombre + ' ' + _chat.usuario.apellidos,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                      style: _styleTitle))
+            ],),
           elevation:
               Theme.of(context).platform == TargetPlatform.iOS ? 0.0 : 4.0,
         

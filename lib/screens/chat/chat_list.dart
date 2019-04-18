@@ -4,6 +4,7 @@ import 'package:selit/class/chat_class.dart';
 import 'package:selit/util/api/usuario_request.dart';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 
+
 class ChatList extends StatefulWidget {
   @override
   ChatListState createState() {
