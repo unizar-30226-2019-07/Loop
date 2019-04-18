@@ -108,3 +108,4 @@ build/
 *.lock
 *.pbxproj
 ios/Runner.xcodeproj/project.pbxproj
+android/app/google-services.json
