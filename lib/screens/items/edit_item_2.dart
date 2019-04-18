@@ -396,35 +396,36 @@ class _EditItemState2 extends State<EditItem2> {
 
   @override
   Widget build(BuildContext context) {
-    FlutterStatusbarcolor.setStatusBarColor(Colors.transparent);
+    FlutterStatusbarcolor.setStatusBarColor(Theme.of(context).primaryColor);
     return Scaffold(
       key: _scaffoldKey,
-      resizeToAvoidBottomInset: false,
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-              begin: Alignment(0.10, -1.0),
-              end: Alignment(-0.10, 1.0),
-              stops: [
-                0.23,
-                0.23
-              ],
-              colors: [
-                Theme.of(context).primaryColor,
-                Colors.grey[100],
-              ]),
-        ),
-        child: SafeArea(
-          child: Column(
-            children: <Widget>[
-              _buildBottomMenu(),
-              Expanded(
-                child: Container(
-                  child: _buildForm(),
-                ),
+      resizeToAvoidBottomInset: true,
+      body: SafeArea(
+        child: Column(
+          children: <Widget>[
+            Container(
+              decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                      begin: Alignment(0.01, -1.0),
+                      end: Alignment(-0.01, 1.0),
+                      stops: [
+                        0.93,
+                        0.93
+                      ],
+                      colors: [
+                        Theme.of(context).primaryColor,
+                        Colors.grey[100],
+                      ]),
               ),
-            ],
-          ),
+              child: _buildBottomMenu(),
+            ),
+            Expanded(
+              child: Container(
+                color: Colors.grey[100],
+                child: _buildForm(),
+              ),
+            ),
+          ],
         ),
       ),
     );
