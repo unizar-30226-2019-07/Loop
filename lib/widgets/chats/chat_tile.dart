@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:selit/class/chat_class.dart';
+import 'package:selit/class/image_class.dart';
 import 'package:selit/screens/chat/chat.dart';
+import 'package:selit/widgets/profile_picture.dart';
 
 class ChatTile extends StatelessWidget {
 
-  ChatTile();
+  final ChatClass _chat;
+
+  ChatTile(this._chat);
 
   static final _styleTitle =
       TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold);
@@ -15,24 +20,30 @@ class ChatTile extends StatelessWidget {
 
   static const double height = 75.0;
 
+  
+
   @override
   Widget build(BuildContext context) {
-    //Widget image = ;
-
+    Widget image = _chat.usuario.profileImage == null
+                    ? Container()
+                    : Container(
+                        padding: const EdgeInsets.all(3.0),
+                        child: SizedBox.fromSize(
+                          size: Size(60.0, double.infinity),
+                          child: ProfilePicture(_chat.usuario.profileImage)));
     return SafeArea(
       top: false,
       bottom: false,
       child: Padding(
-        padding: const EdgeInsets.all(2.0),
+        padding: const EdgeInsets.only(left: 2.0, right: 2.0),
         child: Column(
           children: <Widget>[
-            //SectionTitle(title: 'Tappable'),
             SizedBox(
               height: height,
               child: Card(
                 // This ensures that the Card's children (including the ink splash) are clipped correctly.
                 clipBehavior: Clip.antiAlias,
-                elevation: 2.0,
+                elevation: 1.0,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10.0),
                     side: BorderSide(color: Colors.grey[300], width: 1.0)),
@@ -44,7 +55,11 @@ class ChatTile extends StatelessWidget {
                   child: Row(
                     mainAxisSize: MainAxisSize.max,
                     children: <Widget>[
-                      
+                      image, /*
+                      SizedBox.fromSize(
+                          size: Size(1.0, double.infinity),
+                          child: Container(color: Colors.grey[300]),
+                          ),*/
                       Expanded(
                         child: Container(
                           padding: EdgeInsets.symmetric(
@@ -53,7 +68,7 @@ class ChatTile extends StatelessWidget {
                             mainAxisSize: MainAxisSize.max,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
-                              Text('Nombre de usuario',
+                              Text(_chat.usuario.nombre + ' ' + _chat.usuario.apellidos,
                                   overflow: TextOverflow.ellipsis,
                                   maxLines: 1,
                                   style: _styleTitle),

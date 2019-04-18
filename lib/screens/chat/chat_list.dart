@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:selit/widgets/chats/chat_tile.dart';
 import 'package:selit/class/chat_class.dart';
+import 'package:selit/util/api/usuario_request.dart';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 
 class ChatList extends StatefulWidget {
@@ -17,14 +18,53 @@ class ChatListState extends State<ChatList> {
   List<ChatClass> _chats = <ChatClass>[];
   
 
-    @override
+  @override
   void initState() {
     super.initState();
     _chats = <ChatClass>[];
 
     // Añadir 2 chats para debug
-    _chats.add(new ChatClass());
-    _chats.add(new ChatClass());
+    _loadDebugChats();
+  }
+
+
+  /*
+   * Función debug para mostrar dos conversacion con el usuario 1
+   * y dos para el 88.
+   */
+  Future<void> _loadDebugChats() async {
+    await UsuarioRequest.getUserById(1).then((user) { //Obtener usuario 1
+      setState(() {
+        _chats.add(new ChatClass(usuario: user));
+        _chats.add(new ChatClass(usuario: user));
+      });
+    }).catchError((error) {
+      print('Error al cargar el perfil de usuario: $error');
+    });
+    await UsuarioRequest.getUserById(88).then((user) { //Obtener usuario 1
+      setState(() {
+        _chats.add(new ChatClass(usuario: user));
+        _chats.add(new ChatClass(usuario: user));
+      });
+    }).catchError((error) {
+      print('Error al cargar el perfil de usuario: $error');
+    });
+    await UsuarioRequest.getUserById(1).then((user) { //Obtener usuario 1
+      setState(() {
+        _chats.add(new ChatClass(usuario: user));
+        _chats.add(new ChatClass(usuario: user));
+      });
+    }).catchError((error) {
+      print('Error al cargar el perfil de usuario: $error');
+    });
+    await UsuarioRequest.getUserById(88).then((user) { //Obtener usuario 1
+      setState(() {
+        _chats.add(new ChatClass(usuario: user));
+        _chats.add(new ChatClass(usuario: user));
+      });
+    }).catchError((error) {
+      print('Error al cargar el perfil de usuario: $error');
+    });
   }
 
   Widget _buildChatList(){
@@ -32,7 +72,7 @@ class ChatListState extends State<ChatList> {
       padding: EdgeInsets.symmetric(horizontal: 5.0),
       itemCount: _chats.length,
       itemBuilder: (context, index) {
-        return ChatTile();
+        return ChatTile(_chats[index]);
       },
     );
   }
