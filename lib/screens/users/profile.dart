@@ -5,6 +5,7 @@ import 'package:selit/class/item_class.dart';
 import 'package:selit/util/api/usuario_request.dart';
 import 'package:selit/util/api/item_request.dart';
 import 'package:selit/util/bubble_indication_painter.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:selit/util/storage.dart';
 import 'package:selit/widgets/items/item_tile.dart';
 import 'package:selit/widgets/star_rating.dart';
@@ -44,7 +45,11 @@ class _ProfileState extends State<Profile> {
   /// Color más oscuro que el rojo principal
   final _blendColor = Color.alphaBlend(Color(0x552B2B2B), Color(0xFFC0392B));
 
-  final _sexSymbol = {"hombre": ' ♂', "mujer": ' ♀', "otro": ' ⚲'};
+  final _sexSymbol = {
+    "hombre": FontAwesomeIcons.mars,
+    "mujer": FontAwesomeIcons.venus,
+    "otro": FontAwesomeIcons.neuter
+  };
 
   /// Controlador tabs "en venta" y "vendido"
   PageController _pageController = PageController(initialPage: 0);
@@ -359,15 +364,19 @@ class _ProfileState extends State<Profile> {
                       style: _styleNombre,
                       textAlign: _textAlignment)),
               Container(
-                  alignment: Alignment.centerLeft,
-                  margin: EdgeInsets.only(
-                      top: 10, bottom: wLocation == Container() ? 45 : 10),
-                  child: Text(
-                      '${edad != null ? edad : ''}'
-                      '${edad != null ? ' años' : ''}'
-                      '${_user?.sexo != null ? _sexSymbol[_user.sexo] : ''}',
-                      style: _styleSexoEdad,
-                      textAlign: _textAlignment)),
+                alignment: Alignment.centerLeft,
+                margin: EdgeInsets.only(
+                    top: 10, bottom: wLocation == Container() ? 45 : 10),
+                child: Row(children: <Widget>[
+                  Text(edad != null ? '$edad años' : '',
+                      style: _styleSexoEdad, textAlign: _textAlignment),
+                  Container(
+                      margin: EdgeInsets.only(left: 5.0),
+                      child: _sexSymbol.containsKey(_user?.sexo)
+                          ? Icon(_sexSymbol[_user.sexo], color: Colors.white, size: 18.0)
+                          : Container())
+                ]),
+              ),
               wLocation
             ],
           )),
@@ -539,13 +548,17 @@ class _ProfileState extends State<Profile> {
         ],
       ),
       // Botón para añadir nuevos items
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.of(context).pushNamed('/new-item', arguments: _user);
-        },
-        backgroundColor: Theme.of(context).primaryColor,
-        child: Icon(Icons.add, size: 30.0),
-      ),
+      floatingActionButton: (_user?.userId == null ||
+              _loggedUserId == null ||
+              _user.userId != _loggedUserId)
+          ? Container()
+          : FloatingActionButton(
+              onPressed: () {
+                Navigator.of(context).pushNamed('/new-item', arguments: _user);
+              },
+              backgroundColor: Theme.of(context).primaryColor,
+              child: Icon(Icons.add, size: 30.0),
+            ),
     );
   }
 }
