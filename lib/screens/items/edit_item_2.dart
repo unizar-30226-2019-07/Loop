@@ -6,17 +6,17 @@ import 'package:selit/util/api/item_request.dart';
 
 /// Segunda pantalla del formulario de subida de un nuevo producto
 /// Incluye selección de precio fijo o subasta  sus características
-class NewItem2 extends StatefulWidget {
+class EditItem2 extends StatefulWidget {
   final ItemClass item;
 
   /// UsuarioClass del usuario a editar
-  NewItem2({@required this.item});
+  EditItem2({@required this.item});
 
   @override
-  _NewItemState2 createState() => new _NewItemState2(item);
+  _EditItemState2 createState() => new _EditItemState2(item);
 }
 
-class _NewItemState2 extends State<NewItem2> {
+class _EditItemState2 extends State<EditItem2> {
   final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
@@ -34,13 +34,16 @@ class _NewItemState2 extends State<NewItem2> {
 
   ItemClass _item;
 
-  /// Constructor:
-  _NewItemState2(this._item) {
-    _buttonFunction = createItem;
-  }
-
   final Color _colorStatusBarGood = Colors.blue.withOpacity(0.5);
   final Color _colorStatusBarBad = Colors.red.withOpacity(0.5);
+
+  /// Constructor:
+  _EditItemState2(ItemClass item) {
+    this._item = item;
+    _priceController.text = item.price.toString();
+    _divisa = item.currency;
+    _buttonFunction = createItem;
+  }
 
   /// Titulos
   static final _styleTitle = TextStyle(
@@ -104,7 +107,7 @@ class _NewItemState2 extends State<NewItem2> {
         ));
       },
     );
-    // Subir producto
+    // Editar producto
     double formattedPrice =
         double.tryParse(_priceController.text.replaceAll(',', '.'));
     if (_priceController.text.length < 1 ||
@@ -113,10 +116,11 @@ class _NewItemState2 extends State<NewItem2> {
         _divisa == '') {
       showInSnackBar("Rellena todos los campos correctamente", Colors.yellow);
     } else {
-      ///TODO cambiar sale por __tipoPrecio cuando estén implementadas las subastas
+      //TODO cambiar sale por __tipoPrecio cuando estén implementadas las subastas
       _item.update(type: "sale", price: formattedPrice, currency: _divisa);
 
-      ItemRequest.create(_item).then((_) {
+      ItemRequest.edit(_item).then((_) {
+        print('Item actualizado');
         showInSnackBar("Datos actualizados correctamente", _colorStatusBarGood);
         Navigator.of(context).pop();
         Navigator.of(context).pop();
@@ -125,10 +129,8 @@ class _NewItemState2 extends State<NewItem2> {
         if (error == "Unauthorized" || error == "Forbidden") {
           showInSnackBar("Acción no autorizada", _colorStatusBarBad);
         } else {
-          print("Error: $error");
           showInSnackBar("No hay conexión a internet", _colorStatusBarBad);
         }
-        _buttonFunction = createItem;
         Navigator.of(context).pop();
       });
     }
@@ -146,7 +148,7 @@ class _NewItemState2 extends State<NewItem2> {
               child: Column(
             children: <Widget>[
               Row(children: <Widget>[
-                Text('Nuevo producto', style: _styleTitle)
+                Text('Editar producto', style: _styleTitle)
               ]),
               Padding(
                 padding: EdgeInsets.only(
@@ -285,8 +287,7 @@ class _NewItemState2 extends State<NewItem2> {
                       labelText: 'Precio',
                     ),
                     controller: _priceController,
-                    keyboardType: TextInputType.numberWithOptions(
-                        signed: false, decimal: true),
+                    keyboardType: TextInputType.number,
                   ),
                 ],
               )),
@@ -345,8 +346,7 @@ class _NewItemState2 extends State<NewItem2> {
                       labelText: 'Límite',
                     ),
                     controller: _limitController,
-                    keyboardType: TextInputType.numberWithOptions(
-                        signed: false, decimal: true),
+                    keyboardType: TextInputType.emailAddress,
                   ),
                 ],
               )),
@@ -383,14 +383,18 @@ class _NewItemState2 extends State<NewItem2> {
                       wTipoPrecio,
                       Divider(),
                       wPrecio,
+                      Divider(),
                       new Container(
                           margin: EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 30.0),
                           child: RaisedButton(
                             color: Theme.of(context).primaryColor,
                             padding: EdgeInsets.symmetric(
                                 vertical: 7.0, horizontal: 20.0),
-                            child: Text('Subir producto', style: _styleButton),
-                            onPressed: _buttonFunction,
+                            child:
+                                Text('Modificar producto', style: _styleButton),
+                            onPressed: () async {
+                              createItem();
+                            },
                           )),
                     ],
                   )
@@ -402,17 +406,15 @@ class _NewItemState2 extends State<NewItem2> {
                       wPrecio,
                       Divider(),
                       wLimite,
-                      Divider(),
                       new Container(
                           margin: EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 30.0),
                           child: RaisedButton(
                             color: Theme.of(context).primaryColor,
                             padding: EdgeInsets.symmetric(
                                 vertical: 7.0, horizontal: 20.0),
-                            child: Text('Subir producto', style: _styleButton),
-                            onPressed: () async {
-                              createItem();
-                            },
+                            child:
+                                Text('Modificar producto', style: _styleButton),
+                            onPressed: _buttonFunction,
                           )),
                     ],
                   )));

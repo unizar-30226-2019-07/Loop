@@ -2,6 +2,10 @@
 # Created by https://www.gitignore.io/api/flutter,visualstudiocode
 # Edit at https://www.gitignore.io/?templates=flutter,visualstudiocode
 
+android/app/src/main/AndroidManifest.xml
+ios/Runner/AppDelegate.m
+ios/Runner/AppDelegate.swift
+
 ios/Runner.xcodeproj
 ios/Runner.xcworkspace
 

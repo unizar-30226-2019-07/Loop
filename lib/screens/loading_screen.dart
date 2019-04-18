@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:selit/class/usuario_class.dart';
 import 'package:selit/util/storage.dart';
 import 'package:selit/util/api/usuario_request.dart';
+import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 
 /// Pantalla de carga hasta que se puede decidir si existe un
 /// usuario registrado en la aplicación (existe un token) y ese token
@@ -18,7 +19,6 @@ class _LoadingScreenState extends State<LoadingScreen> {
 
   /// Devuelve true si existe un token guardado y es válido (es decir,
   /// hay un usuario que ha iniciado sesión en la aplicación)
-  /// TODO quitar los print cuando se vea necesario
   Future<bool> _checkForLoggedUser(BuildContext context) async {
     bool legitUser = false;
     String token = await Storage.loadToken();
@@ -31,6 +31,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
         Storage.deleteToken();
       } else {
         print('LOADING: Usuario registrado');
+        print (token);
         legitUser = true;
       }
     }
@@ -62,10 +63,10 @@ class _LoadingScreenState extends State<LoadingScreen> {
       Navigator.of(context).pop();
       if (legit) {
         print('Redirect a principal');
-        Navigator.of(context).pushNamed('/principal');
+        Navigator.of(context).pushReplacementNamed('/principal');
       } else {
         print('Redirect a login');
-        Navigator.of(context).pushNamed('/login-page');
+        Navigator.of(context).pushReplacementNamed('/login-page');
       }
     }).timeout(TIMEOUT, onTimeout: () {
       _showErrorDialog(context);
@@ -77,7 +78,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
 
   @override
   Widget build(BuildContext context) {
-
+    FlutterStatusbarcolor.setStatusBarColor(Colors.transparent);
     return Scaffold(
         body: Container(
             decoration: BoxDecoration(

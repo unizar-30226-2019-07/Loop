@@ -5,8 +5,10 @@ import 'package:selit/screens/items/item_list_drawer.dart';
 import 'package:selit/widgets/items/item_tile.dart';
 import 'package:selit/widgets/items/item_tile_vertical.dart';
 import 'package:selit/util/api/item_request.dart';
+import 'package:selit/util/storage.dart';
 import 'package:selit/class/item_class.dart';
 import 'package:selit/class/items/filter_list_class.dart';
+import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 import 'dart:async';
 
 /// Listado de productos en venta, junto con una barra de búsqueda y una pantalla
@@ -26,7 +28,7 @@ class ItemList extends StatefulWidget {
 
 class _ItemListState extends State<ItemList> {
   /// Número de items que se cargan cada vez en la lista
-  static const int ITEMS_PER_PAGE = 30; // TODO volver a poner 10 cuando la API tenga paginación
+  static const int ITEMS_PER_PAGE = 10;
 
   /// Lista de items a mostrar en la vista
   List<ItemClass> _items = <ItemClass>[];
@@ -49,17 +51,27 @@ class _ItemListState extends State<ItemList> {
   /// Color más oscuro que el rojo principal
   final _blendColor = Color.alphaBlend(Color(0x552B2B2B), Color(0xFFC0392B));
 
+  // Evitar bug al cambiar de pagina antes de tiempo
+  bool _cancelled;
+
   /// Controlador de filtros, medio de comunicación entre ItemList e ItemListDrawer
   /// Para mas información, ver [FilterListClass]
   FilterListClass _filterManager;
 
+  /// Actualizar la lista de items de la página con los filtros de FilterListClass
+  void _updateList() {
+      _items = [];
+      lastPetitionPage = -1;
+      _loadItems(0);
+  }
+
   /// Lista de filtros (burbujas) para la parte superior de la pantalla
-  Widget _filterList;
+  Widget _filterList = Container();
 
   /// Actualizar lista de filtros [_filterList] (función callback para FilterListClass)
   void _updateFilters() {
     List<Map<String, dynamic>> _filters = _filterManager.getFiltersList();
-
+    _updateList(); // nueva peticion con los nuevos filtros
     setState(() {
       _filterList = Container(
           margin: EdgeInsets.symmetric(vertical: 7.0),
@@ -106,7 +118,15 @@ class _ItemListState extends State<ItemList> {
   void initState() {
     super.initState();
     _filterManager = new FilterListClass(_updateFilters);
+    _items = <ItemClass>[];
+    _cancelled = false;
     _loadItems(0); // Cargar los primeros ITEMS_PER_PAGE objetos
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _cancelled = true;
   }
 
   // Última página de items que se ha pedido (para evitar repetir)
@@ -126,16 +146,24 @@ class _ItemListState extends State<ItemList> {
   /// Ejemplo: página 0 -> items del 0 al 9 (10 items en total)
   void _getItemsData(int pageNum) async {
     // Petición de items
-    List<ItemClass> receivedItems = await ItemRequest.getItems(
-        lat: 0.0,
-        lng: 0.0,
-        filters: _filterManager,
-        size: ITEMS_PER_PAGE,
-        page: pageNum);
-    // Evitar mostrar más items si se ha llegado al fin de la lista
-    if (receivedItems.length < ITEMS_PER_PAGE) lastPetitionPage++;
-    // Mostrar los items en la lista
-    setState(() => _items.addAll(receivedItems));
+    double lat = await Storage.loadLat();
+    double lng = await Storage.loadLng();
+    ItemRequest.getItems(
+      lat: lat,
+      lng: lng,
+      filters: _filterManager,
+      size: ITEMS_PER_PAGE,
+      page: pageNum).then((List<ItemClass> receivedItems) {
+        print("Recibidos ${receivedItems.length} items");
+        // Evitar mostrar más items si se ha llegado al fin de la lista
+        if (receivedItems.length < ITEMS_PER_PAGE) lastPetitionPage++;
+        // Mostrar los items en la lista
+        if (!_cancelled) {
+          setState(() => _items.addAll(receivedItems));
+        }
+      }).catchError((error) {
+        print("Error al obtener la lista de objetos: $error");
+      });
   }
 
   static Timer queryTimer;
@@ -146,9 +174,6 @@ class _ItemListState extends State<ItemList> {
     if (queryTimer != null) queryTimer.cancel();
     queryTimer = new Timer(const Duration(milliseconds: 500), () {
       _filterManager.addFilter(newSearchQuery: value);
-      _items = []; // TODO no pedir items aqui
-      lastPetitionPage = -1;
-      _loadItems(0);
     });
   }
 
@@ -200,7 +225,6 @@ class _ItemListState extends State<ItemList> {
 
   /// Lista horizontal de filtros + modo de ordenación
   Widget _buildFilters() {
-    _updateFilters();
     return _filterList;
   }
 
@@ -276,7 +300,7 @@ class _ItemListState extends State<ItemList> {
           itemBuilder: (context, index) {
             _loadItems(index ~/
                 ITEMS_PER_PAGE + 1); // número de página que está viendo el usuario
-            return ItemTile(_items[index]);
+            return ItemTile(_items[index], index % 2 == 0);
           },
         );
       } else {
@@ -298,6 +322,7 @@ class _ItemListState extends State<ItemList> {
 
   @override
   Widget build(BuildContext context) {
+    FlutterStatusbarcolor.setStatusBarColor(Colors.transparent);
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: Container(

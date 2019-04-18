@@ -1,26 +1,26 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:selit/class/image_class.dart';
 import 'package:selit/class/item_class.dart';
-import 'package:selit/class/items/filter_list_class.dart';
+import 'package:selit/screens/items/edit_item_2.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
-import 'package:selit/class/usuario_class.dart';
+import 'package:selit/class/items/filter_list_class.dart';
+import 'package:selit/class/image_class.dart';
 
 /// Primera pantalla del formulario de subida de un nuevo producto
 /// Incluye tiítulo, descripción, categoría y fotos
-class NewItem extends StatefulWidget {
-  final UsuarioClass user;
+class EditItem extends StatefulWidget {
+  final ItemClass item;
 
   /// UsuarioClass del usuario
-  NewItem({@required this.user});
+  EditItem({@required this.item});
 
   @override
-  _NewItemState createState() => new _NewItemState(user);
+  _EditItemState createState() => new _EditItemState(item);
 }
 
-class _NewItemState extends State<NewItem> {
+class _EditItemState extends State<EditItem> {
   final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
@@ -30,21 +30,28 @@ class _NewItemState extends State<NewItem> {
       new TextEditingController();
 
   ///Ficheros de galería
-  List<File> _images = <File>[null, null, null, null, null];
+  List _images;
+  int _imagen = 0;
 
   ///Lista opciones categoria
   List<String> _categorias = <String>['']
     ..addAll(FilterListClass.categoryNames.values.toList());
   String _categoria = '';
 
-  static ItemClass _item;
-
-  //Prpietario del producto
-  UsuarioClass _user;
+  ItemClass _item;
 
   /// Constructor:
-  _NewItemState(UsuarioClass _user) {
-    this._user = _user;
+  _EditItemState(ItemClass item) {
+    this._item = item;
+    _titleController.text = _item.title;
+    _descriptionController.text = _item.description;
+    _categoria = FilterListClass.categoryNames[_item.category];
+    // Rellenar con las ImageClass del item
+    _images = [];
+    _images.addAll(_item.media);
+    // Rellenar lo que falte con null
+    for (int i = _item.media.length; i < 5; i++) _images.add(null);
+    print('Precio actual: ' + _item.price.toString());
   }
 
   /// Titulos
@@ -60,15 +67,11 @@ class _NewItemState extends State<NewItem> {
   static final _styleButton = TextStyle(fontSize: 19.0, color: Colors.white);
 
   ///Selección de foto 1 de galería
-  imageSelectorGallery(int index) async {
-    File selectedFile = await ImagePicker.pickImage(
+  imageSelectorGallery() async {
+    _images[_imagen] = await ImagePicker.pickImage(
       source: ImageSource.gallery,
     );
-    setState(() {
-      if (selectedFile != null) {
-        _images[index] = selectedFile;
-      }
-    });
+    setState(() {});
   }
 
   void showInSnackBar(String value, Color alfa) {
@@ -85,29 +88,35 @@ class _NewItemState extends State<NewItem> {
     ));
   }
 
-  void createItem() {
+  void editItem() {
     if (_titleController.text.length < 1 ||
         _descriptionController.text.length < 1 ||
         _categoria == '') {
       showInSnackBar("Rellena todos los campos correctamente", Colors.yellow);
     } else {
+      print('Id de producto: ' + _item.itemId.toString());
       // Quitar imágenes no usadas
       List nonNull = List.from(_images.where((x) => x != null));
-      // Preparar item para pasar a newItem2
-      _item = ItemClass(
-          itemId: 0,
-          title: _titleController.text,
-          description: _descriptionController.text,
-          locationLat: _user.locationLat,
-          locationLng: _user.locationLng,
-          category: FilterListClass.categoryNames.keys
-              .where((k) => FilterListClass.categoryNames[k] == _categoria)
-              .first,
-          owner: _user,
-          media: List.generate(
-              nonNull.length, (i) => ImageClass.file(fileImage: nonNull[i])));
+      _item.title = _titleController.text;
+      _item.description = _descriptionController.text;
+      _item.category = FilterListClass.categoryNames.keys
+          .where((k) => FilterListClass.categoryNames[k] == _categoria)
+          .first;
 
-      Navigator.of(context).pushNamed('/new-item2', arguments: _item);
+      List<ImageClass> _media = [];
+      int i = 0;
+      for (var imagen in nonNull) {
+        if (imagen is ImageClass) {
+          _media.add(imagen);
+        } else {
+          _media.add(ImageClass.file(fileImage: nonNull[i]));
+        }
+        i = i + 1;
+      }
+      _item.media = _media;
+
+      Navigator.push(context,
+          MaterialPageRoute(builder: (context) => EditItem2(item: _item)));
     }
   }
 
@@ -121,7 +130,7 @@ class _NewItemState extends State<NewItem> {
               child: Column(
             children: <Widget>[
               Row(children: <Widget>[
-                Text('Nuevo producto', style: _styleTitle)
+                Text('Editar producto', style: _styleTitle)
               ]),
               Padding(
                 padding: EdgeInsets.only(
@@ -266,7 +275,8 @@ class _NewItemState extends State<NewItem> {
                         ),
                         child: new FlatButton(
                             onPressed: () {
-                              imageSelectorGallery(index);
+                              _imagen = index;
+                              imageSelectorGallery();
                             },
                             shape: new RoundedRectangleBorder(
                                 borderRadius: new BorderRadius.circular(30.0)),
@@ -285,8 +295,7 @@ class _NewItemState extends State<NewItem> {
                     : FlatButton(
                         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         padding: EdgeInsets.all(0),
-                        onPressed: () =>
-                            null, // necesario para efecto de InkResponse
+                        onPressed: () => null, // para efecto de InkResponse
                         child: GestureDetector(
                           onLongPress: () =>
                               setState(() => _images[index] = null),
@@ -297,7 +306,9 @@ class _NewItemState extends State<NewItem> {
                               padding: const EdgeInsets.all(3.0),
                               decoration: new BoxDecoration(
                                   image: new DecorationImage(
-                                    image: FileImage(_images[index]),
+                                    image: _images[index] is File
+                                        ? new AssetImage(_images[index].path)
+                                        : _images[index].image.image,
                                     fit: BoxFit.cover,
                                   ),
                                   borderRadius: BorderRadius.circular(15.0),
@@ -325,6 +336,7 @@ class _NewItemState extends State<NewItem> {
                 Divider(),
                 wImgTitle,
                 wImg,
+                Divider(),
                 new Container(
                     margin: EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 30.0),
                     child: RaisedButton(
@@ -333,7 +345,7 @@ class _NewItemState extends State<NewItem> {
                           EdgeInsets.symmetric(vertical: 7.0, horizontal: 20.0),
                       child: Text('Siguiente', style: _styleButton),
                       onPressed: () {
-                        createItem();
+                        editItem();
                       },
                     )),
               ],

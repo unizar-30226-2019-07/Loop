@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:selit/screens/debug_main.dart';
+import 'package:flutter/services.dart';
 import 'package:selit/screens/loading_screen.dart';
 import 'package:selit/screens/principal.dart';
 import 'package:selit/screens/users/profile.dart';
@@ -9,10 +9,14 @@ import 'package:selit/screens/items/item_list.dart';
 import 'package:selit/screens/items/item_details.dart';
 import 'package:selit/screens/items/new_item.dart';
 import 'package:selit/screens/items/new_item_2.dart';
+import 'package:selit/screens/settings/settings.dart';
+import 'package:selit/screens/settings/account.dart';
 
 class Routes {
   final routes = <String, dynamic>{
-    '/debug-main': (settings) => _buildRoute(settings, new DebugMain()),
+    '/': (settings) => _buildRoute(settings, new LoadingScreen()),
+    '/settings': (settings) => _buildRoute(settings, new Settings()),
+    '/account': (settings) => _buildRoute(settings, new Account()),
     '/profile': (settings) =>
         _buildRoute(settings, new Profile(userId: settings.arguments)),
     '/edit-profile': (settings) =>
@@ -40,17 +44,20 @@ class Routes {
   }
 
   Routes() {
-    runApp(new MaterialApp(
-      title: 'Selit!',
-      onGenerateRoute: _getRoute,
-      initialRoute: '/',
-      theme: ThemeData(
-        primaryColor: Color(0xFFC0392B),
-        primaryColorLight: Color(0xFFC11328),
-        primaryColorDark: Color(0xFF9A0F1F),
-        fontFamily: 'Nunito',
-      ),
-      home: LoadingScreen(),
-    ));
+    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
+        .then((_) {
+      runApp(new MaterialApp(
+        title: 'Selit!',
+        onGenerateRoute: _getRoute,
+        initialRoute: '/',
+        theme: ThemeData(
+          primaryColor: Color(0xFFC0392B),
+          primaryColorLight: Color(0xFFC11328),
+          primaryColorDark: Color(0xFF9A0F1F),
+          fontFamily: 'Nunito',
+        ),
+        home: LoadingScreen(),
+      ));
+    });
   }
 }

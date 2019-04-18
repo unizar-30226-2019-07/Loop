@@ -1,28 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:selit/class/image_class.dart';
 
 /// Foto de perfil con carga dinámica (mostrar la foto por defecto o la del usuario)
 class ProfilePicture extends StatelessWidget {
+  static final defaultImage = Image.asset('assets/img/profile_default.jpg', fit: BoxFit.cover);
+  static final color = Colors.grey[200];
 
-  final String _url;
+  final ImageClass _image;
 
-  ProfilePicture(this._url);
+  ProfilePicture(this._image);
 
   @override
-  Widget build(BuildContext context) {
-    if (_url == null || _url.isEmpty) {
-      // No existe foto de perfil: foto por defecto
-      return Image.asset(
-        'assets/img/profile_default.jpg',
-      );
-    } else {
-      // Tiene foto de perfil: mostrar la foto por defecto
-      // hasta que cargue la foto real
-      return FadeInImage.assetNetwork(
-        placeholder: 'assets/img/profile_default.jpg',
-        image: _url,
-        fadeInCurve: Curves.linear,
-        fadeInDuration: const Duration(milliseconds: 100),
-      );
-    }
-  }
+  Widget build(BuildContext context) => ClipOval(
+    child: AspectRatio(
+      aspectRatio: 1.0, // cuadrado
+      child: Container(
+        color: color,
+        child: _image?.image == null ? defaultImage : _image.image,
+      ),
+    )
+  );
+      
 }
