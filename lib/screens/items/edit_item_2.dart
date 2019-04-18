@@ -42,6 +42,7 @@ class _EditItemState2 extends State<EditItem2> {
     this._item = item;
     _priceController.text = item.price.toString();
     _divisa = item.currency;
+    _buttonFunction = createItem;
   }
 
   /// Titulos
@@ -86,6 +87,27 @@ class _EditItemState2 extends State<EditItem2> {
   }
 
   void createItem() {
+    // Diálogo "cargando..." para evitar repetir
+    _buttonFunction = null;
+    showDialog(
+      barrierDismissible: false, // JUST MENTION THIS LINE
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+            content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            CircularProgressIndicator(
+                strokeWidth: 5.0,
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.black)),
+            Container(
+                margin: EdgeInsets.only(top: 15.0), child: Text('Cargando...')),
+          ],
+        ));
+      },
+    );
+    // Editar producto
     double formattedPrice =
         double.tryParse(_priceController.text.replaceAll(',', '.'));
     if (_priceController.text.length < 1 ||
@@ -102,15 +124,19 @@ class _EditItemState2 extends State<EditItem2> {
         showInSnackBar("Datos actualizados correctamente", _colorStatusBarGood);
         Navigator.of(context).pop();
         Navigator.of(context).pop();
+        Navigator.of(context).pop();
       }).catchError((error) {
         if (error == "Unauthorized" || error == "Forbidden") {
           showInSnackBar("Acción no autorizada", _colorStatusBarBad);
         } else {
           showInSnackBar("No hay conexión a internet", _colorStatusBarBad);
         }
+        Navigator.of(context).pop();
       });
     }
   }
+
+  Function _buttonFunction; // inhabilidar boton
 
   ///Títulos iniciales
   Widget _buildBottomMenu() {
@@ -364,7 +390,8 @@ class _EditItemState2 extends State<EditItem2> {
                             color: Theme.of(context).primaryColor,
                             padding: EdgeInsets.symmetric(
                                 vertical: 7.0, horizontal: 20.0),
-                            child: Text('Modificar producto', style: _styleButton),
+                            child:
+                                Text('Modificar producto', style: _styleButton),
                             onPressed: () async {
                               createItem();
                             },
@@ -385,10 +412,9 @@ class _EditItemState2 extends State<EditItem2> {
                             color: Theme.of(context).primaryColor,
                             padding: EdgeInsets.symmetric(
                                 vertical: 7.0, horizontal: 20.0),
-                            child: Text('Modificar producto', style: _styleButton),
-                            onPressed: () async {
-                              createItem();
-                            },
+                            child:
+                                Text('Modificar producto', style: _styleButton),
+                            onPressed: _buttonFunction,
                           )),
                     ],
                   )));
@@ -405,17 +431,17 @@ class _EditItemState2 extends State<EditItem2> {
           children: <Widget>[
             Container(
               decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                      begin: Alignment(0.01, -1.0),
-                      end: Alignment(-0.01, 1.0),
-                      stops: [
-                        0.93,
-                        0.93
-                      ],
-                      colors: [
-                        Theme.of(context).primaryColor,
-                        Colors.grey[100],
-                      ]),
+                gradient: LinearGradient(
+                    begin: Alignment(0.01, -1.0),
+                    end: Alignment(-0.01, 1.0),
+                    stops: [
+                      0.93,
+                      0.93
+                    ],
+                    colors: [
+                      Theme.of(context).primaryColor,
+                      Colors.grey[100],
+                    ]),
               ),
               child: _buildBottomMenu(),
             ),

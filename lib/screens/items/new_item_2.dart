@@ -35,7 +35,9 @@ class _NewItemState2 extends State<NewItem2> {
   ItemClass _item;
 
   /// Constructor:
-  _NewItemState2(this._item);
+  _NewItemState2(this._item) {
+    _buttonFunction = createItem;
+  }
 
   final Color _colorStatusBarGood = Colors.blue.withOpacity(0.5);
   final Color _colorStatusBarBad = Colors.red.withOpacity(0.5);
@@ -50,8 +52,7 @@ class _NewItemState2 extends State<NewItem2> {
   static final _styleSubTitle = TextStyle(
       fontSize: 17.0, color: Colors.white, fontWeight: FontWeight.normal);
 
-  static final _styleButton = TextStyle(
-      fontSize: 19.0, color: Colors.white);
+  static final _styleButton = TextStyle(fontSize: 19.0, color: Colors.white);
 
   ///Selector de fecha
   DateTime selectedDate = DateTime.now();
@@ -83,7 +84,29 @@ class _NewItemState2 extends State<NewItem2> {
   }
 
   void createItem() {
-    double formattedPrice = double.tryParse(_priceController.text.replaceAll(',', '.'));
+    // Diálogo "cargando..." para evitar repetir
+    _buttonFunction = null;
+    showDialog(
+      barrierDismissible: false, // JUST MENTION THIS LINE
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+            content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            CircularProgressIndicator(
+                strokeWidth: 5.0,
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.black)),
+            Container(
+                margin: EdgeInsets.only(top: 15.0), child: Text('Cargando...')),
+          ],
+        ));
+      },
+    );
+    // Subir producto
+    double formattedPrice =
+        double.tryParse(_priceController.text.replaceAll(',', '.'));
     if (_priceController.text.length < 1 ||
         formattedPrice == null ||
         _tipoPrecio == '' ||
@@ -97,6 +120,7 @@ class _NewItemState2 extends State<NewItem2> {
         showInSnackBar("Datos actualizados correctamente", _colorStatusBarGood);
         Navigator.of(context).pop();
         Navigator.of(context).pop();
+        Navigator.of(context).pop();
       }).catchError((error) {
         if (error == "Unauthorized" || error == "Forbidden") {
           showInSnackBar("Acción no autorizada", _colorStatusBarBad);
@@ -104,9 +128,13 @@ class _NewItemState2 extends State<NewItem2> {
           print("Error: $error");
           showInSnackBar("No hay conexión a internet", _colorStatusBarBad);
         }
+        _buttonFunction = createItem;
+        Navigator.of(context).pop();
       });
     }
   }
+
+  Function _buttonFunction; // inhabilidar boton
 
   ///Títulos iniciales
   Widget _buildBottomMenu() {
@@ -171,37 +199,36 @@ class _NewItemState2 extends State<NewItem2> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                          Padding(
-                            padding: EdgeInsets.only(
-                              left: 11,
-                              top: 25,
-                            ),
-                            child: Text(_item.title,
-                                overflow: TextOverflow.ellipsis,
-                                style: new TextStyle(
-                                    fontSize: 22.0, fontWeight: FontWeight.bold)),
+                      Padding(
+                        padding: EdgeInsets.only(
+                          left: 11,
+                          top: 25,
+                        ),
+                        child: Text(_item.title,
+                            overflow: TextOverflow.ellipsis,
+                            style: new TextStyle(
+                                fontSize: 22.0, fontWeight: FontWeight.bold)),
+                      ),
+                      Padding(
+                          padding: EdgeInsets.only(
+                            left: 11,
+                            top: 10,
                           ),
-                          Padding(
-                            padding: EdgeInsets.only(
-                              left: 11,
-                              top: 10,
-                            ),
-                            child: Container(
-                              constraints: new BoxConstraints(
-                                  maxWidth:
-                                      MediaQuery.of(context).size.width - 95),
-                              child: Text(
-                                _item.description,
-                                overflow: TextOverflow.ellipsis,
-                                textAlign: TextAlign.left,
-                                maxLines: 7,
-                                style: new TextStyle(
-                                  fontSize: 15.0,
-                                  color: Colors.grey[600],
-                                ),
+                          child: Container(
+                            constraints: new BoxConstraints(
+                                maxWidth:
+                                    MediaQuery.of(context).size.width - 95),
+                            child: Text(
+                              _item.description,
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.left,
+                              maxLines: 7,
+                              style: new TextStyle(
+                                fontSize: 15.0,
+                                color: Colors.grey[600],
                               ),
-                            ))
-                        
+                            ),
+                          ))
                     ],
                   ),
                 ),
@@ -357,15 +384,13 @@ class _NewItemState2 extends State<NewItem2> {
                       Divider(),
                       wPrecio,
                       new Container(
-                        margin: EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 30.0),
-                        child: RaisedButton(
-                          color: Theme.of(context).primaryColor,
-                          padding: EdgeInsets.symmetric(vertical: 7.0, horizontal: 20.0),
-                          child: Text('Subir producto',
-                          style: _styleButton),
-                            onPressed: () async {
-                              createItem();
-                            },
+                          margin: EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 30.0),
+                          child: RaisedButton(
+                            color: Theme.of(context).primaryColor,
+                            padding: EdgeInsets.symmetric(
+                                vertical: 7.0, horizontal: 20.0),
+                            child: Text('Subir producto', style: _styleButton),
+                            onPressed: _buttonFunction,
                           )),
                     ],
                   )
@@ -384,8 +409,7 @@ class _NewItemState2 extends State<NewItem2> {
                             color: Theme.of(context).primaryColor,
                             padding: EdgeInsets.symmetric(
                                 vertical: 7.0, horizontal: 20.0),
-                            child: Text('Subir producto',
-                                style: _styleButton),
+                            child: Text('Subir producto', style: _styleButton),
                             onPressed: () async {
                               createItem();
                             },
@@ -405,17 +429,17 @@ class _NewItemState2 extends State<NewItem2> {
           children: <Widget>[
             Container(
               decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                      begin: Alignment(0.01, -1.0),
-                      end: Alignment(-0.01, 1.0),
-                      stops: [
-                        0.93,
-                        0.93
-                      ],
-                      colors: [
-                        Theme.of(context).primaryColor,
-                        Colors.grey[100],
-                      ]),
+                gradient: LinearGradient(
+                    begin: Alignment(0.01, -1.0),
+                    end: Alignment(-0.01, 1.0),
+                    stops: [
+                      0.93,
+                      0.93
+                    ],
+                    colors: [
+                      Theme.of(context).primaryColor,
+                      Colors.grey[100],
+                    ]),
               ),
               child: _buildBottomMenu(),
             ),
