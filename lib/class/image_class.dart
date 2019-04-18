@@ -33,8 +33,8 @@ class ImageClass {
   ImageClass.file({@required File fileImage}) {
     imageId = null;
     image = Image.file(fileImage);
-
-    base64 = base64Encode(fileImage.readAsBytesSync());
+    List<int> imageBytes = fileImage.readAsBytesSync();
+    base64 = base64Encode(imageBytes);
     mime = lookupMimeType(fileImage.path);
     charset = 'utf-8';
   }
