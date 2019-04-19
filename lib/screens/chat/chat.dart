@@ -14,6 +14,9 @@ import 'package:selit/screens/chat/message_list.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:image_picker/image_picker.dart';
 
+import 'package:selit/widgets/chats/message_sent.dart';
+import 'package:selit/widgets/chats/message_received.dart';
+
 final analytics = new FirebaseAnalytics();
 final auth = FirebaseAuth.instance;
 
@@ -46,6 +49,8 @@ class ChatScreenState extends State<ChatScreen> {
   static final _styleTitle =
       TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold);
 
+
+
   @override
   Widget build(BuildContext context) {
     Widget image = _chat.usuario.profileImage == null
@@ -76,6 +81,14 @@ class ChatScreenState extends State<ChatScreen> {
         body: new Container(
           child: new Column(
             children: <Widget>[
+
+              //Para debug del estilo de los mensajes
+              //TODO: borrar cuando se obtengan los mensajes de firebase.
+              MessageReceivedTile('Mensaje recibido...', '18:00'),
+              MessageSentTile('Mensaje enviado...', '18:00'),
+
+              //TODO: Descomentar para obtener mensajes de firebase.
+              /*
               new Flexible(
                 child: new FirebaseAnimatedList(
                   query: reference,
@@ -91,7 +104,8 @@ class ChatScreenState extends State<ChatScreen> {
                     );
                   },
                 ),
-              ),
+              ),*/
+
               new Divider(height: 1.0),
               new Container(
                 decoration:
@@ -204,10 +218,11 @@ class ChatScreenState extends State<ChatScreen> {
   void _sendMessage({String messageText, String imageUrl}) {
     reference.push().set({
       'text': messageText,
-      //'email': googleSignIn.currentUser.email,
+      'email': '',
       'imageUrl': imageUrl,
-      //'senderName': googleSignIn.currentUser.displayName,
-      //'senderPhotoUrl': googleSignIn.currentUser.photoUrl,
+      'senderName': '',
+      'senderPhotoUrl': '',
+      'time': ''
     });
 
     analytics.logEvent(name: 'send_message');
