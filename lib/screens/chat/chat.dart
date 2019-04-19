@@ -56,25 +56,38 @@ class ChatScreenState extends State<ChatScreen> {
     Widget image = _chat.usuario.profileImage == null
         ? Container()
         : Container(
-            padding: const EdgeInsets.all(3.0),
+            padding: const EdgeInsets.only(top: 3.0, bottom: 3.0, right: 10.0),
             child: SizedBox.fromSize(
                 size: Size(50.0, double.infinity),
                 child: ProfilePicture(_chat.usuario.profileImage)));
     return new Scaffold(
         appBar: new AppBar(
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              image,
-              Container(
-                  padding: const EdgeInsets.all(3.0),
-                  child: Text(
-                      _chat.usuario.nombre + ' ' + _chat.usuario.apellidos,
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                      style: _styleTitle))
-            ],
-          ),
+          title: InkWell(
+            onTap: (){
+              Navigator.of(context)
+                          .pushNamed('/profile', arguments: _chat.usuario.userId);
+            },
+            splashColor: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withOpacity(0.05),
+            highlightColor: Colors.transparent,
+            child: new Container(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  image,
+                  Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.all(3.0),
+                        child: Text(
+                          _chat.usuario.nombre + ' ' + _chat.usuario.apellidos,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                          style: _styleTitle)))
+                ],
+              ),
+            )),
           elevation:
               Theme.of(context).platform == TargetPlatform.iOS ? 0.0 : 4.0,
         ),
