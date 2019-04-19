@@ -44,33 +44,34 @@ class ChatScreenState extends State<ChatScreen> {
   }
 
   static final _styleTitle =
-    TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold);
+      TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold);
 
   @override
   Widget build(BuildContext context) {
     Widget image = _chat.usuario.profileImage == null
-                    ? Container()
-                    : Container(
-                        padding: const EdgeInsets.all(3.0),
-                        child: SizedBox.fromSize(
-                          size: Size(50.0, double.infinity),
-                          child: ProfilePicture(_chat.usuario.profileImage)));
+        ? Container()
+        : Container(
+            padding: const EdgeInsets.all(3.0),
+            child: SizedBox.fromSize(
+                size: Size(50.0, double.infinity),
+                child: ProfilePicture(_chat.usuario.profileImage)));
     return new Scaffold(
         appBar: new AppBar(
           title: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                image,
-                Container(
-                    padding: const EdgeInsets.all(3.0), 
-                    child: Text(_chat.usuario.nombre + ' ' + _chat.usuario.apellidos,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              image,
+              Container(
+                  padding: const EdgeInsets.all(3.0),
+                  child: Text(
+                      _chat.usuario.nombre + ' ' + _chat.usuario.apellidos,
                       overflow: TextOverflow.ellipsis,
                       maxLines: 1,
                       style: _styleTitle))
-            ],),
+            ],
+          ),
           elevation:
               Theme.of(context).platform == TargetPlatform.iOS ? 0.0 : 4.0,
-        
         ),
         body: new Container(
           child: new Column(

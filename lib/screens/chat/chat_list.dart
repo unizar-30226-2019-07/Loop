@@ -3,7 +3,8 @@ import 'package:selit/widgets/chats/chat_tile.dart';
 import 'package:selit/class/chat_class.dart';
 import 'package:selit/util/api/usuario_request.dart';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
-
+import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:selit/widgets/chats/swipe_widget.dart';
 
 class ChatList extends StatefulWidget {
   @override
@@ -12,12 +13,8 @@ class ChatList extends StatefulWidget {
   }
 }
 
-
 class ChatListState extends State<ChatList> {
-
-
   List<ChatClass> _chats = <ChatClass>[];
-  
 
   @override
   void initState() {
@@ -28,13 +25,13 @@ class ChatListState extends State<ChatList> {
     _loadDebugChats();
   }
 
-
   /*
    * Función debug para mostrar dos conversacion con el usuario 1
    * y dos para el 88.
    */
   Future<void> _loadDebugChats() async {
-    await UsuarioRequest.getUserById(1).then((user) { //Obtener usuario 1
+    await UsuarioRequest.getUserById(1).then((user) {
+      //Obtener usuario 1
       setState(() {
         _chats.add(new ChatClass(usuario: user));
         _chats.add(new ChatClass(usuario: user));
@@ -42,7 +39,8 @@ class ChatListState extends State<ChatList> {
     }).catchError((error) {
       print('Error al cargar el perfil de usuario: $error');
     });
-    await UsuarioRequest.getUserById(88).then((user) { //Obtener usuario 1
+    await UsuarioRequest.getUserById(88).then((user) {
+      //Obtener usuario 1
       setState(() {
         _chats.add(new ChatClass(usuario: user));
         _chats.add(new ChatClass(usuario: user));
@@ -50,7 +48,8 @@ class ChatListState extends State<ChatList> {
     }).catchError((error) {
       print('Error al cargar el perfil de usuario: $error');
     });
-    await UsuarioRequest.getUserById(1).then((user) { //Obtener usuario 1
+    await UsuarioRequest.getUserById(1).then((user) {
+      //Obtener usuario 1
       setState(() {
         _chats.add(new ChatClass(usuario: user));
         _chats.add(new ChatClass(usuario: user));
@@ -58,7 +57,8 @@ class ChatListState extends State<ChatList> {
     }).catchError((error) {
       print('Error al cargar el perfil de usuario: $error');
     });
-    await UsuarioRequest.getUserById(88).then((user) { //Obtener usuario 1
+    await UsuarioRequest.getUserById(88).then((user) {
+      //Obtener usuario 1
       setState(() {
         _chats.add(new ChatClass(usuario: user));
         _chats.add(new ChatClass(usuario: user));
@@ -68,12 +68,21 @@ class ChatListState extends State<ChatList> {
     });
   }
 
-  Widget _buildChatList(){
+  Widget _buildChatList() {
     return ListView.builder(
       padding: EdgeInsets.symmetric(horizontal: 5.0),
       itemCount: _chats.length,
       itemBuilder: (context, index) {
-        return ChatTile(_chats[index]);
+        return new OnSlide(items: <ActionItems>[
+          new ActionItems(
+              icon: new IconButton(
+                icon: new Icon(Icons.delete),
+                onPressed: () {},
+                color: Colors.red,
+              ),
+              onPress: () {},
+              backgroudColor: Colors.transparent),
+        ], child: ChatTile(_chats[index]));
       },
     );
   }
@@ -83,13 +92,13 @@ class ChatListState extends State<ChatList> {
     FlutterStatusbarcolor.setStatusBarColor(Colors.transparent);
     return Scaffold(
       appBar: new AppBar(
-          title: new Text("Chats",
+        title: new Text("Chats",
             style: TextStyle(
-              fontSize: 22.0, color: Colors.white, fontWeight: FontWeight.bold)),
-          elevation:
-              Theme.of(context).platform == TargetPlatform.iOS ? 0.0 : 4.0,
-        
-        ),
+                fontSize: 22.0,
+                color: Colors.white,
+                fontWeight: FontWeight.bold)),
+        elevation: Theme.of(context).platform == TargetPlatform.iOS ? 0.0 : 4.0,
+      ),
       resizeToAvoidBottomInset: false,
       body: Container(
         decoration: BoxDecoration(
@@ -109,9 +118,7 @@ class ChatListState extends State<ChatList> {
           child: Column(
             children: <Widget>[
               Expanded(
-                child: Container(
-                  child: _buildChatList()
-                ),
+                child: Container(child: _buildChatList()),
               ),
             ],
           ),
