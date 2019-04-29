@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:selit/widgets/chats/chat_tile.dart';
 import 'package:selit/class/chat_class.dart';
@@ -5,6 +6,7 @@ import 'package:selit/util/api/usuario_request.dart';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:selit/widgets/chats/swipe_widget.dart';
+
 
 class ChatList extends StatefulWidget {
   @override
@@ -68,6 +70,8 @@ class ChatListState extends State<ChatList> {
     });
   }
 
+
+/*
   Widget _buildChatList() {
     return ListView.builder(
       padding: EdgeInsets.symmetric(horizontal: 5.0),
@@ -85,6 +89,34 @@ class ChatListState extends State<ChatList> {
         ], child: ChatTile(_chats[index]));
       },
     );
+  }
+  */
+
+
+  Widget _buildChatList() {
+    return ListView.builder(
+      padding: EdgeInsets.symmetric(horizontal: 5.0),
+      itemCount: _chats.length,
+      itemBuilder: (context, index) {
+        return new OnSlide(items: <ActionItems>[
+          new ActionItems(
+              icon: new IconButton(
+                icon: new Icon(Icons.delete),
+                onPressed: () {},
+                color: Colors.red,
+              ),
+              onPress: () {},
+              backgroudColor: Colors.transparent),
+        ], child: ChatTile(_chats[index]));
+      },
+    );
+  }
+
+  Widget buildItem(BuildContext context, DocumentSnapshot document){
+    return Container(
+      child: Text(document['idUser'])
+    );
+
   }
 
   @override
@@ -118,7 +150,25 @@ class ChatListState extends State<ChatList> {
           child: Column(
             children: <Widget>[
               Expanded(
-                child: Container(child: _buildChatList()),
+                child: Container(
+                  child: StreamBuilder(
+                    stream: Firestore.instance.collection('users').snapshots(),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) {
+                        return Center(
+                          child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
+                          ),
+                        );
+                      } else {
+                        return ListView.builder(
+                          padding: EdgeInsets.all(10.0),
+                          itemBuilder: (context, index) => buildItem(context, snapshot.data.documents[index]),
+                          itemCount: snapshot.data.documents.length,
+                        );
+                      }
+                    },
+                  ),),
               ),
             ],
           ),
