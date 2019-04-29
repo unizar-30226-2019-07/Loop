@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:selit/widgets/chats/chat_tile.dart';
@@ -121,6 +123,8 @@ class ChatListState extends State<ChatList> {
 
   @override
   Widget build(BuildContext context) {
+    DocumentReference referenciaNuevoUsuario =
+      Firestore.instance.collection("users").document();
     FlutterStatusbarcolor.setStatusBarColor(Colors.transparent);
     return Scaffold(
       appBar: new AppBar(
@@ -149,6 +153,21 @@ class ChatListState extends State<ChatList> {
         child: SafeArea(
           child: Column(
             children: <Widget>[
+              RaisedButton(
+                  onPressed : (){
+                    print("Presionado");
+                    Firestore.instance.runTransaction((transaction) async {
+                        await transaction.set(Firestore.instance.collection("users").document(), {'idUser' : 'otro'});
+                        
+                    });
+                  },
+                  textColor: Colors.black,
+                  color: Colors.white,
+                  padding: const EdgeInsets.all(8.0),
+                  child: new Text(
+                    "Prueba",
+                  ),
+              ),
               Expanded(
                 child: Container(
                   child: StreamBuilder(
