@@ -420,7 +420,7 @@ class _NewItemState2 extends State<NewItem2> {
 
   @override
   Widget build(BuildContext context) {
-    FlutterStatusbarcolor.setStatusBarColor(Theme.of(context).primaryColor);
+    FlutterStatusbarcolor.setStatusBarColor(Colors.transparent);
     return Scaffold(
       key: _scaffoldKey,
       resizeToAvoidBottomInset: true,

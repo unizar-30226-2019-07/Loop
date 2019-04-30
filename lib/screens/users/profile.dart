@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:selit/class/usuario_class.dart';
 import 'package:selit/class/item_class.dart';
@@ -11,6 +12,7 @@ import 'package:selit/widgets/items/item_tile.dart';
 import 'package:selit/widgets/star_rating.dart';
 import 'package:selit/widgets/profile_picture.dart';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 
 /// Perfil de usuario: muestra sus datos, foto de perfil y
 /// dos listas: una con los productos en venta y otra con los vendidos
@@ -98,6 +100,7 @@ class _ProfileState extends State<Profile> {
     _cancelled = true;
   }
 
+  
   Future<void> _loadProfile(int _userId) async {
     // Mostrar usuario placeholder mientras carga el real
     _cancelled = false;
@@ -548,17 +551,50 @@ class _ProfileState extends State<Profile> {
         ],
       ),
       // Botón para añadir nuevos items
-      floatingActionButton: (_user?.userId == null ||
-              _loggedUserId == null ||
-              _user.userId != _loggedUserId)
-          ? Container()
-          : FloatingActionButton(
-              onPressed: () {
+      floatingActionButton: SpeedDial(
+          // both default to 16
+          marginRight: 18,
+          marginBottom: 20,
+          animatedIcon: AnimatedIcons.menu_close,
+          animatedIconTheme: IconThemeData(size: 22.0),
+          // this is ignored if animatedIcon is non null
+          // child: Icon(Icons.add),
+          visible: true,
+          curve: Curves.bounceIn,
+          overlayColor: Colors.black,
+          overlayOpacity: 0.5,
+          tooltip: 'Speed Dial',
+          heroTag: 'speed-dial-hero-tag',
+          backgroundColor: Theme.of(context).primaryColor,
+          foregroundColor: Colors.white,
+          elevation: 8.0,
+          shape: CircleBorder(),
+          children: [
+            SpeedDialChild(
+              child: Icon(Icons.add),
+              backgroundColor: Theme.of(context).primaryColor,
+              label: 'Añadir producto',
+              //labelStyle: TextTheme(fontSize: 18.0),
+              onTap: () {
                 Navigator.of(context).pushNamed('/new-item', arguments: _user);
               },
-              backgroundColor: Theme.of(context).primaryColor,
-              child: Icon(Icons.add, size: 30.0),
             ),
+            SpeedDialChild(
+              child: Icon(Icons.favorite),
+              backgroundColor: Theme.of(context).primaryColor,
+              label: 'Deseos',
+              //labelStyle: TextTheme(fontSize: 18.0),
+              onTap: () {
+                Navigator.of(context).pushNamed('/whises', arguments: _user);
+              },
+            ),
+          ],
+        ),
+          
+          
+          
+          
+          
     );
   }
 }

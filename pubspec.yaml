@@ -33,6 +33,7 @@ dependencies:
   location: ^2.3.3
   percent_indicator: "^1.0.14"
   google_maps_flutter: ^0.5.7
+  flutter_speed_dial: ^1.1.1
   flutter:
     sdk: flutter
     
