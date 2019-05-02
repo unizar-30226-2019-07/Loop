@@ -88,11 +88,13 @@ class UsuarioRequest {
     print(josn.toString());
     print("Edición de usuario: ${json.jsonEncode(usuario.toJsonEdit())}");
 
-    http.Response response = await http
-        .put('${APIConfig.BASE_URL}/users/${usuario.userId}', headers: {
-      HttpHeaders.contentTypeHeader: ContentType.json.toString(),
-      HttpHeaders.authorizationHeader: await Storage.loadToken(),
-    }, body: json.jsonEncode(usuario.toJsonEdit()));
+    http.Response response =
+        await http.put('${APIConfig.BASE_URL}/users/${usuario.userId}',
+            headers: {
+              HttpHeaders.contentTypeHeader: ContentType.json.toString(),
+              HttpHeaders.authorizationHeader: await Storage.loadToken(),
+            },
+            body: json.jsonEncode(usuario.toJsonEdit()));
 
     if (response.statusCode != 200) {
       throw (APIConfig.getErrorString(response));
@@ -136,20 +138,19 @@ class UsuarioRequest {
     }
   }
 
-   /// Actulizar los datos del usuario con ID [userId]
-static Future<void> edit(UsuarioClass chain) async{
-  final response = await http.put('${APIConfig.BASE_URL}/users/${chain.userId}',
-      headers: {
-      HttpHeaders.contentTypeHeader: ContentType.json.toString(),
-      HttpHeaders.authorizationHeader: await Storage.loadToken(),
-      },
+  /// Actulizar los datos del usuario con ID [userId]
+  static Future<void> edit(UsuarioClass chain) async {
+    final response =
+        await http.put('${APIConfig.BASE_URL}/users/${chain.userId}',
+            headers: {
+              HttpHeaders.contentTypeHeader: ContentType.json.toString(),
+              HttpHeaders.authorizationHeader: await Storage.loadToken(),
+            },
+            body: json.jsonEncode(chain.toJsonEdit()));
+    return response;
+  }
 
-      body: json.jsonEncode(chain.toJsonEdit())
-  );
-  return response;
-}
-
-  static Future<void> delete( int userId) async {
+  static Future<void> delete(int userId) async {
     http.Response response = await http.delete(
       '${APIConfig.BASE_URL}/users/$userId',
       headers: {
@@ -159,15 +160,15 @@ static Future<void> edit(UsuarioClass chain) async{
     );
 
     if (response.statusCode != 200) {
-      throw(APIConfig.getErrorString(response));
+      throw (APIConfig.getErrorString(response));
     }
   }
 
   /// Obtener lista de productos (no subastas) deseados
-  static Future<List<ItemClass>> getWishlistProducts(int userId) async {
+  static Future<List<ItemClass>> getWishlist(int userId, bool auctions) async {
     String token = await Storage.loadToken();
     final response = await http.get(
-      '${APIConfig.BASE_URL}/users/$userId/wishes_products',
+      '${APIConfig.BASE_URL}/users/$userId/wishes_${auctions ? 'auctions' : 'products'}',
       headers: {
         HttpHeaders.contentTypeHeader: ContentType.json.toString(),
         HttpHeaders.authorizationHeader: token,
@@ -181,30 +182,7 @@ static Future<void> edit(UsuarioClass chain) async{
       });
       return wishlist;
     } else {
-      throw(APIConfig.getErrorString(response));
+      throw (APIConfig.getErrorString(response));
     }
   }
-
-  /// Obtener lista de productos (no subastas) deseados
-  static Future<List<ItemClass>> getWishlistAuctions(int userId) async {
-    String token = await Storage.loadToken();
-    final response = await http.get(
-      '${APIConfig.BASE_URL}/users/$userId/wishes_auctions',
-      headers: {
-        HttpHeaders.contentTypeHeader: ContentType.json.toString(),
-        HttpHeaders.authorizationHeader: token,
-      },
-    );
-
-    if (response.statusCode == 200) {
-      List<ItemClass> wishlist = new List<ItemClass>();
-      (json.jsonDecode(response.body) as List<dynamic>).forEach((itemJson) {
-        wishlist.add(ItemClass.fromJson(itemJson, token));
-      });
-      return wishlist;
-    } else {
-      throw(APIConfig.getErrorString(response));
-    }
-  }
-
 }

@@ -62,7 +62,7 @@ class _WishesState extends State<Wishes> {
       print('ERROR: Intentando cargar objetos de un usuario sin ID');
     } else {
       // Cargar los objetos deseados (productos y subastas) del usuario
-      UsuarioRequest.getWishlistProducts(_user.userId).then((wishlistProducts) {
+      UsuarioRequest.getWishlist(_user.userId, false).then((wishlistProducts) {
         _cancelled = false;
         if (!_cancelled) {
           setState(() {
@@ -77,7 +77,7 @@ class _WishesState extends State<Wishes> {
         print('Error al cargar los productos deseados: $error');
         _wishListProductsEmpty = true;
       });
-      UsuarioRequest.getWishlistAuctions(_user.userId).then((wishlistAuctions) {
+      UsuarioRequest.getWishlist(_user.userId, true).then((wishlistAuctions) {
         if (!_cancelled) {
           setState(() {
             if (wishlistAuctions.isEmpty) {
