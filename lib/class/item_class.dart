@@ -23,7 +23,7 @@ class ItemClass {
   int numLikes;
   UsuarioClass owner; // vendedor del item
   List<ImageClass> media; // lista de 0+ imágenes
-  String endDate; //Fecha de finalización   yyyy-MM-dd'T'HH:mm:ss'Z'
+  DateTime endDate; //Fecha de finalización   yyyy-MM-dd
 
   /// Constructor por defecto, comprobar que los atributos son correctos
   ItemClass(
@@ -103,11 +103,16 @@ class ItemClass {
     this.currency = currency;
   }
 
-  void updateAuction({String type, double price, String currency, String endDate}) {
+  void updateAuction(
+      {String type,
+      double price,
+      String currency,
+      DateTime endDate}) {
     this.type = type;
     this.price = price;
     this.currency = currency;
     this.endDate = endDate;
+
   }
 
   Map<String, dynamic> toJsonCreate() => {
@@ -138,7 +143,7 @@ class ItemClass {
         "startPrice": price,
         "currency": currency,
         "media": List.generate(media.length, (i) => media[i].toJson()),
-        "endDate": endDate,
+        "endDate": _dateTimeString(endDate),
       };
 
   Map<String, dynamic> toJsonEdit() => {
@@ -155,5 +160,27 @@ class ItemClass {
         "currency": currency,
         "status": status,
         "media": List.generate(media.length, (i) => media[i].toJson()),
+      };
+
+  String _dateTimeString(DateTime fecha) {
+    return '${fecha.year}-${fecha.month.toString().padLeft(2, '0')}-${fecha.day.toString().padLeft(2
+    , '0')}';
+  } 
+
+  Map<String, dynamic> toJsonEditAuction() => {
+        "type": type,
+        "title": title,
+        "owner_id": owner.userId,
+        "description": description,
+        "location": {
+          "lat": locationLat,
+          "lng": locationLng,
+        },
+        "category": category,
+        "startPrice": price,
+        "currency": currency,
+        "media": List.generate(media.length, (i) => media[i].toJson()),
+        "status": status,
+        "endDate": _dateTimeString(endDate),
       };
 }

@@ -34,6 +34,9 @@ class _EditItemState2 extends State<EditItem2> {
 
   ItemClass _item;
 
+  /// Fecha límite
+  DateTime _selectedDate;
+
   final Color _colorStatusBarGood = Colors.blue.withOpacity(0.5);
   final Color _colorStatusBarBad = Colors.red.withOpacity(0.5);
 
@@ -60,18 +63,9 @@ class _EditItemState2 extends State<EditItem2> {
   ///Selector de fecha
   DateTime selectedDate = DateTime.now();
 
-  Future<Null> _selectDate(BuildContext context) async {
-    final DateTime picked = await showDatePicker(
-        context: context,
-        initialDate: selectedDate,
-        firstDate: DateTime(2018, 8),
-        lastDate: DateTime(2101));
-    if (picked != null && picked != selectedDate)
-      setState(() {
-        selectedDate = picked;
-      });
+  String _dateString(DateTime fecha) {
+    return '${fecha.day} / ${fecha.month} / ${fecha.year}';
   }
-
   void showInSnackBar(String value, Color alfa) {
     FocusScope.of(context).requestFocus(new FocusNode());
     _scaffoldKey.currentState?.removeCurrentSnackBar();
@@ -110,29 +104,63 @@ class _EditItemState2 extends State<EditItem2> {
     // Editar producto
     double formattedPrice =
         double.tryParse(_priceController.text.replaceAll(',', '.'));
-    if (_priceController.text.length < 1 ||
-        formattedPrice == null ||
-        _tipoPrecio == '' ||
-        _divisa == '') {
-      showInSnackBar("Rellena todos los campos correctamente", Colors.yellow);
-    } else {
-      //TODO cambiar sale por __tipoPrecio cuando estén implementadas las subastas
-      _item.update(type: "sale", price: formattedPrice, currency: _divisa);
 
-      ItemRequest.edit(_item).then((_) {
-        print('Item actualizado');
-        showInSnackBar("Datos actualizados correctamente", _colorStatusBarGood);
-        Navigator.of(context).pop();
-        Navigator.of(context).pop();
-        Navigator.of(context).pop();
-      }).catchError((error) {
-        if (error == "Unauthorized" || error == "Forbidden") {
-          showInSnackBar("Acción no autorizada", _colorStatusBarBad);
-        } else {
-          showInSnackBar("No hay conexión a internet", _colorStatusBarBad);
-        }
-        Navigator.of(context).pop();
-      });
+    if (_tipoPrecio == 'sale') {
+      if (_priceController.text.length < 1 ||
+          formattedPrice == null ||
+          _tipoPrecio == '' ||
+          _divisa == '') {
+        showInSnackBar("Rellena todos los campos correctamente", Colors.yellow);
+      } else {
+        _item.update(
+            type: _tipoPrecio, price: formattedPrice, currency: _divisa);
+
+        ItemRequest.edit(_item).then((_) {
+          print('Item actualizado');
+          showInSnackBar(
+              "Datos actualizados correctamente", _colorStatusBarGood);
+          Navigator.of(context).pop();
+          Navigator.of(context).pop();
+          Navigator.of(context).pop();
+        }).catchError((error) {
+          if (error == "Unauthorized" || error == "Forbidden") {
+            showInSnackBar("Acción no autorizada", _colorStatusBarBad);
+          } else {
+            showInSnackBar("No hay conexión a internet", _colorStatusBarBad);
+          }
+          _buttonFunction = createItem;
+          Navigator.of(context).pop();
+        });
+      }
+    } else {
+      if (_priceController.text.length < 1 ||
+          formattedPrice == null ||
+          _tipoPrecio == '' ||
+          _divisa == '' ||
+          _limitController.text.length < 1) {
+        showInSnackBar("Rellena todos los campos correctamente", Colors.yellow);
+      } else {
+        _item.updateAuction(
+            type: _tipoPrecio, price: formattedPrice, currency: _divisa, endDate: _selectedDate);
+
+        ItemRequest.editAuction(_item).then((_) {
+          print('Subasta actualizada');
+          showInSnackBar(
+              "Datos actualizados correctamente", _colorStatusBarGood);
+          Navigator.of(context).pop();
+          Navigator.of(context).pop();
+          Navigator.of(context).pop();
+        }).catchError((error) {
+          if (error == "Unauthorized" || error == "Forbidden") {
+            showInSnackBar("Acción no autorizada", _colorStatusBarBad);
+          } else {
+            print("Error: $error");
+            showInSnackBar("No hay conexión a internet", _colorStatusBarBad);
+          }
+          _buttonFunction = createItem;
+          Navigator.of(context).pop();
+        });
+      }
     }
   }
 
@@ -331,41 +359,46 @@ class _EditItemState2 extends State<EditItem2> {
       ],
     );
 
-    ///Límite en subasta
-    Widget wLimite = Row(
+    Widget wImgTitle = Padding(
+        padding: EdgeInsets.only(
+          left: 10,
+          top: 17,
+        ),
+        child: Text(
+          'Fecha y hora límite',
+          style: new TextStyle(
+            fontSize: 15,
+            color: Colors.grey[600],
+          ),
+        ));
+
+
+    Widget wAge = Row(
       children: <Widget>[
         Expanded(
           flex: 8,
           child: Container(
-              margin: EdgeInsets.only(left: 10, right: 10, bottom: 20),
-              //color: Colors.red, // util para ajustar margenes
-              child: Column(
-                children: <Widget>[
-                  new TextFormField(
-                    decoration: const InputDecoration(
-                      labelText: 'Límite',
-                    ),
-                    controller: _limitController,
-                    keyboardType: TextInputType.emailAddress,
-                  ),
-                ],
+              margin: EdgeInsets.only(left: 15, right: 10, top:10),
+              child: RaisedButton(
+                color: Colors.grey[600],
+                onPressed: () async {
+                  DateTime picked = await showDatePicker(
+                      context: context, 
+                      initialDate: _selectedDate ?? DateTime.now().add(new Duration(days: 0, hours: 1)),
+                      firstDate: DateTime.now(),
+                      lastDate: DateTime(2030, 1));
+                  setState(() {
+                    _selectedDate = picked;
+                  });
+                },
+                child: Text(
+                  _selectedDate == null
+                      ? 'Fecha ...'
+                      : _dateString(_selectedDate),
+                  style: _styleButton,
+                  textAlign: TextAlign.left,
+                ),
               )),
-        ),
-        Expanded(
-          flex: 2,
-          child: Container(
-              margin: EdgeInsets.only(left: 5, top: 20),
-              //color: Colors.red, // util para ajustar margenes
-              child: Column(children: <Widget>[
-                new FlatButton(
-                    onPressed: () {
-                      _selectDate(context);
-                      //_limitController.text = "${selectedDate.toLocal()}";
-                    },
-                    shape: new RoundedRectangleBorder(
-                        borderRadius: new BorderRadius.circular(30.0)),
-                    child: new Icon(Icons.calendar_today))
-              ])),
         )
       ],
     );
@@ -392,9 +425,7 @@ class _EditItemState2 extends State<EditItem2> {
                                 vertical: 7.0, horizontal: 20.0),
                             child:
                                 Text('Modificar producto', style: _styleButton),
-                            onPressed: () async {
-                              createItem();
-                            },
+                            onPressed: _buttonFunction,
                           )),
                     ],
                   )
@@ -405,7 +436,8 @@ class _EditItemState2 extends State<EditItem2> {
                       Divider(),
                       wPrecio,
                       Divider(),
-                      wLimite,
+                      wImgTitle,
+                      wAge,
                       new Container(
                           margin: EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 30.0),
                           child: RaisedButton(
