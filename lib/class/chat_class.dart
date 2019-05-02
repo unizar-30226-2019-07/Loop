@@ -9,11 +9,10 @@ class ChatClass {
   UsuarioClass usuario;
   int miId;
   ItemClass producto;
-  bool visibleAnunciante;
-  bool visibleCliente;
+  List<dynamic> visible;
   
 
   ChatClass({this.usuario, this.miId, this.producto, 
-    this.visibleAnunciante, this.visibleCliente});
+    this.visible});
   
 }
