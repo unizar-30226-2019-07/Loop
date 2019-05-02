@@ -99,6 +99,22 @@ class ItemRequest {
     }
   }
 
+  /// Subir subasta
+  static Future<void> createAuction(ItemClass item) async {
+    final response = await http.post(
+      '${APIConfig.BASE_URL}/auctions',
+      headers: {
+        HttpHeaders.contentTypeHeader: ContentType.json.toString(),
+        HttpHeaders.authorizationHeader: await Storage.loadToken(),
+      },
+      body: json.jsonEncode(item.toJsonCreateAuction()),
+    );
+
+    if (response.statusCode != 201) {
+      throw(APIConfig.getErrorString(response));
+    }
+  }
+
   /// Actualizar producto
   static Future<void> edit(ItemClass item) async {
     int _productId = item.itemId;

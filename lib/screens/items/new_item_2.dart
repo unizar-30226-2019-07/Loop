@@ -104,33 +104,66 @@ class _NewItemState2 extends State<NewItem2> {
         ));
       },
     );
+
     // Subir producto
     double formattedPrice =
         double.tryParse(_priceController.text.replaceAll(',', '.'));
-    if (_priceController.text.length < 1 ||
-        formattedPrice == null ||
-        _tipoPrecio == '' ||
-        _divisa == '') {
-      showInSnackBar("Rellena todos los campos correctamente", Colors.yellow);
-    } else {
-      ///TODO cambiar sale por __tipoPrecio cuando estén implementadas las subastas
-      _item.update(type: "sale", price: formattedPrice, currency: _divisa);
 
-      ItemRequest.create(_item).then((_) {
-        showInSnackBar("Datos actualizados correctamente", _colorStatusBarGood);
-        Navigator.of(context).pop();
-        Navigator.of(context).pop();
-        Navigator.of(context).pop();
-      }).catchError((error) {
-        if (error == "Unauthorized" || error == "Forbidden") {
-          showInSnackBar("Acción no autorizada", _colorStatusBarBad);
-        } else {
-          print("Error: $error");
-          showInSnackBar("No hay conexión a internet", _colorStatusBarBad);
-        }
-        _buttonFunction = createItem;
-        Navigator.of(context).pop();
-      });
+    if (_tipoPrecio == 'sale') {
+      if (_priceController.text.length < 1 ||
+          formattedPrice == null ||
+          _tipoPrecio == '' ||
+          _divisa == '') {
+        showInSnackBar("Rellena todos los campos correctamente", Colors.yellow);
+      } else {
+        _item.update(
+            type: _tipoPrecio, price: formattedPrice, currency: _divisa);
+
+        ItemRequest.create(_item).then((_) {
+          showInSnackBar(
+              "Datos actualizados correctamente", _colorStatusBarGood);
+          Navigator.of(context).pop();
+          Navigator.of(context).pop();
+          Navigator.of(context).pop();
+        }).catchError((error) {
+          if (error == "Unauthorized" || error == "Forbidden") {
+            showInSnackBar("Acción no autorizada", _colorStatusBarBad);
+          } else {
+            print("Error: $error");
+            showInSnackBar("No hay conexión a internet", _colorStatusBarBad);
+          }
+          _buttonFunction = createItem;
+          Navigator.of(context).pop();
+        });
+      }
+    } else {
+      if (_priceController.text.length < 1 ||
+          formattedPrice == null ||
+          _tipoPrecio == '' ||
+          _divisa == '' ||
+          _limitController.text.length < 1) {
+        showInSnackBar("Rellena todos los campos correctamente", Colors.yellow);
+      } else {
+        _item.updateAuction(
+            type: _tipoPrecio, price: formattedPrice, currency: _divisa, endDate: _limitController.text);
+
+        ItemRequest.createAuction(_item).then((_) {
+          showInSnackBar(
+              "Datos actualizados correctamente", _colorStatusBarGood);
+          Navigator.of(context).pop();
+          Navigator.of(context).pop();
+          Navigator.of(context).pop();
+        }).catchError((error) {
+          if (error == "Unauthorized" || error == "Forbidden") {
+            showInSnackBar("Acción no autorizada", _colorStatusBarBad);
+          } else {
+            print("Error: $error");
+            showInSnackBar("No hay conexión a internet", _colorStatusBarBad);
+          }
+          _buttonFunction = createItem;
+          Navigator.of(context).pop();
+        });
+      }
     }
   }
 
@@ -410,9 +443,7 @@ class _NewItemState2 extends State<NewItem2> {
                             padding: EdgeInsets.symmetric(
                                 vertical: 7.0, horizontal: 20.0),
                             child: Text('Subir producto', style: _styleButton),
-                            onPressed: () async {
-                              createItem();
-                            },
+                            onPressed: _buttonFunction,
                           )),
                     ],
                   )));

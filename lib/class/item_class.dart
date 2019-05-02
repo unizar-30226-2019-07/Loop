@@ -23,6 +23,7 @@ class ItemClass {
   int numLikes;
   UsuarioClass owner; // vendedor del item
   List<ImageClass> media; // lista de 0+ imágenes
+  String endDate; //Fecha de finalización   yyyy-MM-dd'T'HH:mm:ss'Z'
 
   /// Constructor por defecto, comprobar que los atributos son correctos
   ItemClass(
@@ -41,7 +42,8 @@ class ItemClass {
       this.numViews,
       this.numLikes,
       this.owner,
-      this.media})
+      this.media,
+      this.endDate})
       : assert(type == null || type == "sale" || type == "auction",
             'Tipo inválido para un item (venta/subasta)'),
         assert(status == null || status == "en venta" || status == "vendido",
@@ -101,6 +103,13 @@ class ItemClass {
     this.currency = currency;
   }
 
+  void updateAuction({String type, double price, String currency, String endDate}) {
+    this.type = type;
+    this.price = price;
+    this.currency = currency;
+    this.endDate = endDate;
+  }
+
   Map<String, dynamic> toJsonCreate() => {
         "type": type,
         "title": title,
@@ -114,6 +123,22 @@ class ItemClass {
         "price": price,
         "currency": currency,
         "media": List.generate(media.length, (i) => media[i].toJson()),
+      };
+
+  Map<String, dynamic> toJsonCreateAuction() => {
+        "type": type,
+        "title": title,
+        "owner_id": owner.userId,
+        "description": description,
+        "location": {
+          "lat": locationLat,
+          "lng": locationLng,
+        },
+        "category": category,
+        "startPrice": price,
+        "currency": currency,
+        "media": List.generate(media.length, (i) => media[i].toJson()),
+        "endDate": endDate,
       };
 
   Map<String, dynamic> toJsonEdit() => {
