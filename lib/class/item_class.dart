@@ -110,6 +110,10 @@ class ItemClass {
     this.endDate = endDate;
   }
 
+  bool isAuction() {
+    return this.type.compareTo("equals") == 0;
+  }
+
   Map<String, dynamic> toJsonCreate() => {
         "type": type,
         "title": title,

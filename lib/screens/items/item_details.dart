@@ -6,6 +6,7 @@ import 'package:carousel_pro/carousel_pro.dart';
 import 'package:selit/class/items/filter_list_class.dart';
 import 'package:selit/screens/items/edit_item.dart';
 import 'package:selit/util/storage.dart';
+import 'package:selit/util/api/usuario_request.dart';
 import 'package:selit/util/api/item_request.dart';
 import 'package:selit/widgets/profile_picture.dart';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
@@ -29,16 +30,6 @@ class _ItemDetails extends State<ItemDetails> {
 
   List<ImageProvider> _images = [];
 
-  // Constructor
-  _ItemDetails(this._item) {
-    if (_item.media.isNotEmpty) {
-      for (var imagen in _item.media) {
-        _images.add(imagen.image.image);
-      }
-    }
-    _loadCoordinates();
-  }
-
   static final _styleTitle = TextStyle(
       fontSize: 26.0, color: Colors.black, fontWeight: FontWeight.w700);
 
@@ -52,20 +43,49 @@ class _ItemDetails extends State<ItemDetails> {
   Completer<GoogleMapController> _controller = Completer();
   String _ubicacionCompleta;
 
-  bool _esFavorito = false;
 
   final Color _colorStatusBarBad = Colors.red.withOpacity(0.5);
 
+  // Constructor
+  _ItemDetails(this._item) {
+    // TODO comprobar si el objeto está en tu lista de deseados y actualizar _esFavorito y _favorite
+    if (_item.media.isNotEmpty) {
+      for (var imagen in _item.media) {
+        _images.add(imagen.image.image);
+      }
+    }
+    _loadCoordinates();
+    _favoriteFunction = _favoritePressed;
+  }
+
+  Function _favoriteFunction; // callback al presionar el corazón
+  bool _esFavorito = false;
   IconData _favorite = Icons.favorite_border;
 
+  /// Añadir o quitar el producto según proceda
   void _favoritePressed() {
+    _favoriteFunction = null;
+    if (_esFavorito) { // ya está, quitar
+      UsuarioRequest.removeFromWishlist(productId: _item.itemId, auctions: _item.isAuction())
+          .then((_) {
+        _esFavorito = false;
+      }).catchError((_) {
+        showInSnackBar("Ha ocurrido un problema", _colorStatusBarBad);
+      });
+    } else { // no está, añadir
+      UsuarioRequest.addToWishlist(productId: _item.itemId, auctions: _item.isAuction())
+          .then((_) {
+        _esFavorito = true;
+      }).catchError((_) {
+        showInSnackBar("Ha ocurrido un problema", _colorStatusBarBad);
+      });
+    }
+    // Actualizar el corazón
     setState(() {
       if (_esFavorito) {
         _favorite = Icons.favorite_border;
-        _esFavorito = false;
       } else {
         _favorite = Icons.favorite;
-        _esFavorito = true;
       }
     });
   }
@@ -91,19 +111,18 @@ class _ItemDetails extends State<ItemDetails> {
         _item?.owner?.locationLng != null) {
       final coordinates =
           new Coordinates(_item.owner.locationLat, _item.owner.locationLng);
-      try{
+      try {
         var addresses =
-          await Geocoder.local.findAddressesFromCoordinates(coordinates);
+            await Geocoder.local.findAddressesFromCoordinates(coordinates);
         if (addresses.length > 0) {
           setState(() {
             _ubicacionCompleta =
                 '${addresses.first.locality}, ${addresses.first.countryName}';
           });
         }
-      }catch(e){
-        print('Error al obtener addresses: '+ e.toString());
+      } catch (e) {
+        print('Error al obtener addresses: ' + e.toString());
       }
-      
     }
   }
 
@@ -384,9 +403,7 @@ class _ItemDetails extends State<ItemDetails> {
                                 iconSize: 35.0,
                                 tooltip: 'Favoritos',
                                 splashColor: Colors.red,
-                                onPressed: () {
-                                  _favoritePressed();
-                                },
+                                onPressed: _favoriteFunction,
                               ),
                             ),
                           ],
@@ -402,7 +419,9 @@ class _ItemDetails extends State<ItemDetails> {
                         padding:
                             const EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 20.0),
                         alignment: Alignment.centerLeft,
-                        child: Text('Categoría: ' + FilterListClass.categoryNames[_item.category],
+                        child: Text(
+                            'Categoría: ' +
+                                FilterListClass.categoryNames[_item.category],
                             style: TextStyle(
                                 fontSize: 17.0, color: Colors.grey[600]))),
                 Divider(),

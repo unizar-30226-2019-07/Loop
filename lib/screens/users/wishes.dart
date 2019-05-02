@@ -7,6 +7,8 @@ import 'package:selit/util/bubble_indication_painter.dart';
 import 'package:selit/widgets/items/item_tile.dart';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 
+/// Lista de productos o subastas deseados por el usuario,
+/// en dos listas de igual forma que se muestra en el perfil
 class Wishes extends StatefulWidget {
   final UsuarioClass user;
 
@@ -58,11 +60,12 @@ class _WishesState extends State<Wishes> {
   }
 
   void _loadProfileItems() async {
-    if (_user?.userId == null) {
-      print('ERROR: Intentando cargar objetos de un usuario sin ID');
+    if (_user == null) {
+      print('ERROR: Intentando cargar objetos sin tener un usuario');
     } else {
       // Cargar los objetos deseados (productos y subastas) del usuario
-      UsuarioRequest.getWishlist(_user.userId, false).then((wishlistProducts) {
+      UsuarioRequest.getWishlist(auctions: false)
+          .then((wishlistProducts) {
         _cancelled = false;
         if (!_cancelled) {
           setState(() {
@@ -77,7 +80,8 @@ class _WishesState extends State<Wishes> {
         print('Error al cargar los productos deseados: $error');
         _wishListProductsEmpty = true;
       });
-      UsuarioRequest.getWishlist(_user.userId, true).then((wishlistAuctions) {
+      UsuarioRequest.getWishlist(auctions: true)
+          .then((wishlistAuctions) {
         if (!_cancelled) {
           setState(() {
             if (wishlistAuctions.isEmpty) {

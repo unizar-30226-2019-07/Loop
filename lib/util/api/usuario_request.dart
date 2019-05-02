@@ -164,11 +164,12 @@ class UsuarioRequest {
     }
   }
 
-  /// Obtener lista de productos (no subastas) deseados
-  static Future<List<ItemClass>> getWishlist(int userId, bool auctions) async {
+  /// Obtener lista de deseados (productos o subastas)
+  static Future<List<ItemClass>> getWishlist(
+      {bool auctions}) async {
     String token = await Storage.loadToken();
     final response = await http.get(
-      '${APIConfig.BASE_URL}/users/$userId/wishes_${auctions ? 'auctions' : 'products'}',
+      '${APIConfig.BASE_URL}/users/me/wishes_${auctions ? 'auctions' : 'products'}',
       headers: {
         HttpHeaders.contentTypeHeader: ContentType.json.toString(),
         HttpHeaders.authorizationHeader: token,
@@ -185,4 +186,39 @@ class UsuarioRequest {
       throw (APIConfig.getErrorString(response));
     }
   }
+
+  /// Añadir producto o subasta a la lista de deseados
+  static Future<void> addToWishlist(
+      {int productId, bool auctions}) async {
+    String token = await Storage.loadToken();
+    final response = await http.post(
+      '${APIConfig.BASE_URL}/users/me/wishes_${auctions ? 'auctions' : 'products'}/$productId',
+      headers: {
+        HttpHeaders.contentTypeHeader: ContentType.json.toString(),
+        HttpHeaders.authorizationHeader: token,
+      },
+    );
+
+    if (response.statusCode != 201) { // creado
+      throw (APIConfig.getErrorString(response));
+    }
+  }
+
+  /// Añadir producto o subasta a la lista de deseados
+  static Future<void> removeFromWishlist(
+      {int productId, bool auctions}) async {
+    String token = await Storage.loadToken();
+    final response = await http.delete(
+      '${APIConfig.BASE_URL}/users/me/wishes_${auctions ? 'auctions' : 'products'}/$productId',
+      headers: {
+        HttpHeaders.contentTypeHeader: ContentType.json.toString(),
+        HttpHeaders.authorizationHeader: token,
+      },
+    );
+
+    if (response.statusCode != 200) { // borrado
+      throw (APIConfig.getErrorString(response));
+    }
+  }
+
 }
