@@ -16,7 +16,6 @@ class ItemRequest {
       int size,
       int page,
       @required FilterListClass filters}) async {
-
     // Mapa empleado para generar los parámetros de la request
     // search, priceFrom/To, distance, category, types, sort
     Map<String, String> _params = filters.getFiltersMap();
@@ -46,7 +45,7 @@ class ItemRequest {
       });
       return products;
     } else {
-      throw(APIConfig.getErrorString(response));
+      throw (APIConfig.getErrorString(response));
     }
   }
 
@@ -54,8 +53,10 @@ class ItemRequest {
   /// Por ahora se piden todos los items del usuario a la vez,
   /// sin cargar por páginas
   static Future<List<ItemClass>> getItemsFromUser(
-      {@required int userId, @required double userLat, @required double userLng, @required String status}) async {
-
+      {@required int userId,
+      @required double userLat,
+      @required double userLng,
+      @required String status}) async {
     // TODO workaround para ignorar la distancia de los objetos
     String _paramsString = '?lat=$userLat&lng=$userLng&distance=99999999.9';
     // Si status no es ni "en venta" ni "vendido", default a "en venta"
@@ -79,7 +80,7 @@ class ItemRequest {
       });
       return products;
     } else {
-      throw(APIConfig.getErrorString(response));
+      throw (APIConfig.getErrorString(response));
     }
   }
 
@@ -95,7 +96,7 @@ class ItemRequest {
     );
 
     if (response.statusCode != 201) {
-      throw(APIConfig.getErrorString(response));
+      throw (APIConfig.getErrorString(response));
     }
   }
 
@@ -111,7 +112,8 @@ class ItemRequest {
     );
 
     if (response.statusCode != 201) {
-      throw(APIConfig.getErrorString(response));
+      print(response.statusCode);
+      throw (APIConfig.getErrorString(response));
     }
   }
 
@@ -129,7 +131,25 @@ class ItemRequest {
     );
 
     if (response.statusCode != 200) {
-      throw(APIConfig.getErrorString(response));
+      throw (APIConfig.getErrorString(response));
+    }
+  }
+
+  ///Actualizar subasta
+  static Future<void> editAuction(ItemClass item) async {
+    int _auctionId = item.itemId;
+    print(json.jsonEncode(item.toJsonEditAuction()));
+    final response = await http.put(
+      '${APIConfig.BASE_URL}/auctions/$_auctionId',
+      headers: {
+        HttpHeaders.contentTypeHeader: ContentType.json.toString(),
+        HttpHeaders.authorizationHeader: await Storage.loadToken(),
+      },
+      body: json.jsonEncode(item.toJsonEditAuction()),
+    );
+
+    if (response.statusCode != 200) {
+      throw (APIConfig.getErrorString(response));
     }
   }
 
@@ -145,7 +165,7 @@ class ItemRequest {
     );
 
     if (response.statusCode != 200) {
-      throw(APIConfig.getErrorString(response));
+      throw (APIConfig.getErrorString(response));
     }
   }
 }

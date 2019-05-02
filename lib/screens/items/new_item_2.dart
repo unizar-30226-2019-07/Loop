@@ -39,6 +39,9 @@ class _NewItemState2 extends State<NewItem2> {
     _buttonFunction = createItem;
   }
 
+  /// Fecha límite
+  DateTime _selectedDate;
+
   final Color _colorStatusBarGood = Colors.blue.withOpacity(0.5);
   final Color _colorStatusBarBad = Colors.red.withOpacity(0.5);
 
@@ -56,18 +59,12 @@ class _NewItemState2 extends State<NewItem2> {
 
   ///Selector de fecha
   DateTime selectedDate = DateTime.now();
+  TimeOfDay selectedTime = TimeOfDay.now();
 
-  Future<Null> _selectDate(BuildContext context) async {
-    final DateTime picked = await showDatePicker(
-        context: context,
-        initialDate: selectedDate,
-        firstDate: DateTime(2018, 8),
-        lastDate: DateTime(2101));
-    if (picked != null && picked != selectedDate)
-      setState(() {
-        selectedDate = picked;
-      });
+  String _dateString(DateTime fecha) {
+    return '${fecha.day} / ${fecha.month} / ${fecha.year}';
   }
+
 
   void showInSnackBar(String value, Color alfa) {
     FocusScope.of(context).requestFocus(new FocusNode());
@@ -140,12 +137,16 @@ class _NewItemState2 extends State<NewItem2> {
       if (_priceController.text.length < 1 ||
           formattedPrice == null ||
           _tipoPrecio == '' ||
-          _divisa == '' ||
-          _limitController.text.length < 1) {
+          _divisa == '') {
         showInSnackBar("Rellena todos los campos correctamente", Colors.yellow);
       } else {
+        print('Subasta creada');
+
         _item.updateAuction(
-            type: _tipoPrecio, price: formattedPrice, currency: _divisa, endDate: _limitController.text);
+            type: _tipoPrecio,
+            price: formattedPrice,
+            currency: _divisa,
+            endDate: _selectedDate);
 
         ItemRequest.createAuction(_item).then((_) {
           showInSnackBar(
@@ -363,45 +364,50 @@ class _NewItemState2 extends State<NewItem2> {
       ],
     );
 
-    ///Límite en subasta
-    Widget wLimite = Row(
+    Widget wImgTitle = Padding(
+        padding: EdgeInsets.only(
+          left: 10,
+          top: 17,
+        ),
+        child: Text(
+          'Fecha y hora límite',
+          style: new TextStyle(
+            fontSize: 15,
+            color: Colors.grey[600],
+          ),
+        ));
+
+    Widget wAge = Row(
       children: <Widget>[
         Expanded(
           flex: 8,
           child: Container(
-              margin: EdgeInsets.only(left: 10, right: 10, bottom: 20),
-              //color: Colors.red, // util para ajustar margenes
-              child: Column(
-                children: <Widget>[
-                  new TextFormField(
-                    decoration: const InputDecoration(
-                      labelText: 'Límite',
-                    ),
-                    controller: _limitController,
-                    keyboardType: TextInputType.numberWithOptions(
-                        signed: false, decimal: true),
-                  ),
-                ],
+              margin: EdgeInsets.only(left: 15, right: 10, top: 10),
+              child: RaisedButton(
+                color: Colors.grey[600],
+                onPressed: () async {
+                  DateTime picked = await showDatePicker(
+                      context: context,
+                      initialDate: _selectedDate ??
+                          DateTime.now().add(new Duration(days: 0, hours: 1)),
+                      firstDate: DateTime.now(),
+                      lastDate: DateTime(2030, 1));
+                  setState(() {
+                    _selectedDate = picked;
+                  });
+                },
+                child: Text(
+                  _selectedDate == null
+                      ? 'Fecha ...'
+                      : _dateString(_selectedDate),
+                  style: _styleButton,
+                  textAlign: TextAlign.left,
+                ),
               )),
-        ),
-        Expanded(
-          flex: 2,
-          child: Container(
-              margin: EdgeInsets.only(left: 5, top: 20),
-              //color: Colors.red, // util para ajustar margenes
-              child: Column(children: <Widget>[
-                new FlatButton(
-                    onPressed: () {
-                      _selectDate(context);
-                      //_limitController.text = "${selectedDate.toLocal()}";
-                    },
-                    shape: new RoundedRectangleBorder(
-                        borderRadius: new BorderRadius.circular(30.0)),
-                    child: new Icon(Icons.calendar_today))
-              ])),
         )
       ],
     );
+
 
     return SafeArea(
         top: false,
@@ -434,7 +440,8 @@ class _NewItemState2 extends State<NewItem2> {
                       Divider(),
                       wPrecio,
                       Divider(),
-                      wLimite,
+                      wImgTitle,
+                      wAge,
                       Divider(),
                       new Container(
                           margin: EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 30.0),
