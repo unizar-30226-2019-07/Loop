@@ -71,6 +71,7 @@ class _ItemDetails extends State<ItemDetails> {
   }
 
   static Widget _buildEditConditional;
+  Widget _buildChatConditional = Container();
 
   void showInSnackBar(String value, Color alfa) {
     FocusScope.of(context).requestFocus(new FocusNode());
@@ -200,14 +201,46 @@ class _ItemDetails extends State<ItemDetails> {
         ));
   }
 
+  Widget _buildChatButton() {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(15.0, 5.0, 15.0, 25.0),
+      child: SizedBox(
+        width: double.infinity,
+        child: new RaisedButton(
+        padding: const EdgeInsets.all(10.0),
+        elevation: 1,
+        textColor: Colors.white,
+        color: Theme.of(context).primaryColor,
+        onPressed: () {
+          
+        },
+        child: new Text('Iniciar chat',
+            style: TextStyle(
+                fontSize: 21.0,
+                color: Colors.white,
+                fontWeight: FontWeight.bold)),
+      ),
+    ),);
+  }
+
   final _blendColor = Color.alphaBlend(Color(0x552B2B2B), Color(0xFFC0392B));
 
   void _leerIdUsuario() async {
     int idItem = _item.owner.userId;
     int miId = await Storage.loadUserId();
+    print('Mi id ' + miId.toString());
+    print('Id item ' + idItem.toString());
     if (miId == idItem) {
+      print('Construir editar');
       setState(() {
         _buildEditConditional = _buildEditButton();
+      }
+    );
+    }
+    else{
+      print('Construir chat');
+      setState(() {
+        _buildChatConditional = _buildChatButton();
       });
     }
   }
@@ -488,6 +521,7 @@ class _ItemDetails extends State<ItemDetails> {
                     ),
                   ),
                 ),
+                _buildChatConditional,
                 _cameraPosition == null
                     ? Container()
                     : _buildOwnerMap(_cameraPosition)
