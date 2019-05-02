@@ -220,7 +220,7 @@ class _ItemDetails extends State<ItemDetails> {
           Firestore.instance.runTransaction((transaction) async {
             await transaction.set(Firestore.instance.collection("chat").document(docId), 
               {'idAnunciante' : _item.owner.userId, 'idCliente' : miId, 'idProducto' : _item.itemId,
-                'visibleAnunciante' : false, 'visibleCliente' : true});
+                'visible' : [miId]});
               
           });
         },

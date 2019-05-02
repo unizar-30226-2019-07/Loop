@@ -2,6 +2,7 @@ import 'dart:collection';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:selit/util/storage.dart';
 import 'package:selit/widgets/chats/chat_tile.dart';
 import 'package:selit/class/chat_class.dart';
 import 'package:selit/util/api/usuario_request.dart';
@@ -19,14 +20,20 @@ class ChatList extends StatefulWidget {
 
 class ChatListState extends State<ChatList> {
   List<ChatClass> _chats = <ChatClass>[];
+  int miId;
 
   @override
   void initState() {
     super.initState();
+    _leerIdUsuario();
     _chats = <ChatClass>[];
 
     // Añadir 2 chats para debug
     //_loadDebugChats();
+  }
+
+  void _leerIdUsuario() async {
+    miId = await Storage.loadUserId();
   }
 
   /*
@@ -119,7 +126,7 @@ class ChatListState extends State<ChatList> {
 
   Widget buildItem(BuildContext context, DocumentSnapshot document){
     return Container(
-      child: Text(document['idUser'])
+      child: Text(document['idAnunciante'].toString())
     );
 
   }
@@ -174,7 +181,7 @@ class ChatListState extends State<ChatList> {
               Expanded(
                 child: Container(
                   child: StreamBuilder(
-                    stream: Firestore.instance.collection('users').snapshots(),
+                    stream: Firestore.instance.collection('chat').where('visible', arrayContains: miId).snapshots(),
                     builder: (context, snapshot) {
                       if (!snapshot.hasData) {
                         return Center(
