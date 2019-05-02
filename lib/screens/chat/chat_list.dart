@@ -26,13 +26,15 @@ class ChatListState extends State<ChatList> {
     _chats = <ChatClass>[];
 
     // Añadir 2 chats para debug
-    _loadDebugChats();
+    //_loadDebugChats();
   }
 
   /*
    * Función debug para mostrar dos conversacion con el usuario 1
    * y dos para el 88.
    */
+/*
+
   Future<void> _loadDebugChats() async {
     await UsuarioRequest.getUserById(1).then((user) {
       //Obtener usuario 1
@@ -71,6 +73,7 @@ class ChatListState extends State<ChatList> {
       print('Error al cargar el perfil de usuario: $error');
     });
   }
+  */
 
 
 /*

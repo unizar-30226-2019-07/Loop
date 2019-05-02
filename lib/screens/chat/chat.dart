@@ -8,6 +8,8 @@ import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:selit/class/usuario_class.dart';
+import 'package:selit/util/storage.dart';
 import 'package:selit/widgets/profile_picture.dart';
 import 'package:selit/class/chat_class.dart';
 import 'package:selit/screens/chat/message_list.dart';
@@ -41,19 +43,39 @@ class ChatScreenState extends State<ChatScreen> {
   final reference = FirebaseDatabase.instance.reference().child('messages');
 
   ChatClass _chat;
+  UsuarioClass _usuario;
 
   ChatScreenState(ChatClass chat) {
     this._chat = chat;
+    //_leerIdUsuario();
   }
 
   static final _styleTitle =
       TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold);
 
-
+/*
+  void _leerIdUsuario() async {
+    int idAnunciante = _chat.usuarioAnunciante.userId;
+    int miId = await Storage.loadUserId();
+    print('Mi id ' + miId.toString());
+    print('Id Anunciante ' + idAnunciante.toString());
+    if (miId == idAnunciante) {
+      setState(() {
+        _usuario = _chat.usuarioCliente;
+      }
+    );
+    }
+    else{
+      setState(() {
+        _usuario = _chat.usuarioAnunciante;
+      });
+    }
+  }
+  */
 
   @override
   Widget build(BuildContext context) {
-    Widget image = _chat.usuario.profileImage == null
+    Widget image = _usuario.profileImage == null
         ? Container()
         : Container(
             padding: const EdgeInsets.only(top: 3.0, bottom: 3.0, right: 10.0),

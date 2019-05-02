@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:selit/class/item_class.dart';
@@ -26,6 +27,8 @@ class _ItemDetails extends State<ItemDetails> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   ItemClass _item;
+
+  int miId;
 
   List<ImageProvider> _images = [];
 
@@ -212,7 +215,14 @@ class _ItemDetails extends State<ItemDetails> {
         textColor: Colors.white,
         color: Theme.of(context).primaryColor,
         onPressed: () {
-          
+          String docId = 'p' + _item.itemId.toString() + '_a' + 
+            _item.owner.userId.toString() + '_c' + miId.toString();
+          Firestore.instance.runTransaction((transaction) async {
+            await transaction.set(Firestore.instance.collection("chat").document(docId), 
+              {'idAnunciante' : _item.owner.userId, 'idCliente' : miId, 'idProducto' : _item.itemId,
+                'visibleAnunciante' : false, 'visibleCliente' : true});
+              
+          });
         },
         child: new Text('Iniciar chat',
             style: TextStyle(
@@ -227,7 +237,7 @@ class _ItemDetails extends State<ItemDetails> {
 
   void _leerIdUsuario() async {
     int idItem = _item.owner.userId;
-    int miId = await Storage.loadUserId();
+    miId = await Storage.loadUserId();
     print('Mi id ' + miId.toString());
     print('Id item ' + idItem.toString());
     if (miId == idItem) {
