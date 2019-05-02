@@ -15,7 +15,8 @@ class APIConfig {
     405: "Method Not Allowed",
     409: "Conflict",
     412: "Precondition Failed",
-    415: "Unsupported Media"
+    415: "Unsupported Media",
+    500: "Internal Server Error"
   };
 
   static String getErrorString(http.Response response) {

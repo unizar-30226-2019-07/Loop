@@ -125,6 +125,8 @@ class _NewItemState2 extends State<NewItem2> {
         }).catchError((error) {
           if (error == "Unauthorized" || error == "Forbidden") {
             showInSnackBar("Acción no autorizada", _colorStatusBarBad);
+          } else if (error == "Internal Server Error") {
+            showInSnackBar("Imagen no válida, prueba con otra", _colorStatusBarBad);
           } else {
             print("Error: $error");
             showInSnackBar("No hay conexión a internet", _colorStatusBarBad);
@@ -157,6 +159,8 @@ class _NewItemState2 extends State<NewItem2> {
         }).catchError((error) {
           if (error == "Unauthorized" || error == "Forbidden") {
             showInSnackBar("Acción no autorizada", _colorStatusBarBad);
+          } else if (error == "Internal Server Error") {
+            showInSnackBar("Imagen no válida, prueba con otra", _colorStatusBarBad);
           } else {
             print("Error: $error");
             showInSnackBar("No hay conexión a internet", _colorStatusBarBad);
