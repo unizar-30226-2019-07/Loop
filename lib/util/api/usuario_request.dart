@@ -1,4 +1,5 @@
 import 'package:selit/class/usuario_class.dart';
+import 'package:selit/class/item_class.dart';
 import 'package:selit/class/token_class.dart';
 import 'package:selit/util/api/api_config.dart';
 import 'package:selit/util/storage.dart';
@@ -158,6 +159,50 @@ static Future<void> edit(UsuarioClass chain) async{
     );
 
     if (response.statusCode != 200) {
+      throw(APIConfig.getErrorString(response));
+    }
+  }
+
+  /// Obtener lista de productos (no subastas) deseados
+  static Future<List<ItemClass>> getWishlistProducts(int userId) async {
+    String token = await Storage.loadToken();
+    final response = await http.get(
+      '${APIConfig.BASE_URL}/users/$userId/wishes_products',
+      headers: {
+        HttpHeaders.contentTypeHeader: ContentType.json.toString(),
+        HttpHeaders.authorizationHeader: token,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      List<ItemClass> wishlist = new List<ItemClass>();
+      (json.jsonDecode(response.body) as List<dynamic>).forEach((itemJson) {
+        wishlist.add(ItemClass.fromJson(itemJson, token));
+      });
+      return wishlist;
+    } else {
+      throw(APIConfig.getErrorString(response));
+    }
+  }
+
+  /// Obtener lista de productos (no subastas) deseados
+  static Future<List<ItemClass>> getWishlistAuctions(int userId) async {
+    String token = await Storage.loadToken();
+    final response = await http.get(
+      '${APIConfig.BASE_URL}/users/$userId/wishes_auctions',
+      headers: {
+        HttpHeaders.contentTypeHeader: ContentType.json.toString(),
+        HttpHeaders.authorizationHeader: token,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      List<ItemClass> wishlist = new List<ItemClass>();
+      (json.jsonDecode(response.body) as List<dynamic>).forEach((itemJson) {
+        wishlist.add(ItemClass.fromJson(itemJson, token));
+      });
+      return wishlist;
+    } else {
       throw(APIConfig.getErrorString(response));
     }
   }

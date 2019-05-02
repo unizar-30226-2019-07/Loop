@@ -2,13 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:selit/class/usuario_class.dart';
 import 'package:selit/class/item_class.dart';
-import 'package:selit/util/api/item_request.dart';
+import 'package:selit/util/api/usuario_request.dart';
 import 'package:selit/util/bubble_indication_painter.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:selit/util/storage.dart';
 import 'package:selit/widgets/items/item_tile.dart';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
-
 
 class Wishes extends StatefulWidget {
   final UsuarioClass user;
@@ -21,6 +18,8 @@ class Wishes extends StatefulWidget {
 
 class _WishesState extends State<Wishes> {
   // Estilos para los diferentes textos
+  static final _styleTitle = const TextStyle(
+      fontWeight: FontWeight.bold, fontSize: 22.0, color: Colors.white);
   static final _styleNothing =
       const TextStyle(fontSize: 20.0, color: Colors.grey);
 
@@ -28,27 +27,30 @@ class _WishesState extends State<Wishes> {
   PageController _pageController = PageController(initialPage: 0);
 
   /// Controlador listas "en venta" y "vendido"
-  ScrollController _controllerEnVenta =
+  ScrollController _controllerProducts =
+      ScrollController(initialScrollOffset: 0, keepScrollOffset: false);
+  ScrollController _controllerAuctions =
       ScrollController(initialScrollOffset: 0, keepScrollOffset: false);
 
+  /// Color de "en venta" (necesario alternarlo entre blanco-negro)
+  Color _tabColorLeft = Colors.black;
+
+  /// Color de "vendido" (necesario alternarlo entre blanco-negro)
+  Color _tabColorRight = Colors.white;
+
   // Objetos en venta y vendidos
-  List<ItemClass> _itemsEnVenta = <ItemClass>[];
-  bool _itemsEnVentaEmpty = false; // diferenciar entre cargando y no hay
+  List<ItemClass> _wishlistProducts = <ItemClass>[];
+  bool _wishListProductsEmpty = false; // diferenciar entre cargando y no hay
+  List<ItemClass> _wishlistAuctions = <ItemClass>[];
+  bool _wishListAuctionsEmpty = false; // diferenciar entre cargando y no hay
   bool _cancelled; // evitar bug al pedir objetos y cambiar de pantalla
 
-  /// Usuario a mostrar en el perfil (null = placeholder)
   UsuarioClass _user;
-  int _loggedUserId;
 
-  _WishesState(UsuarioClass _user) {
-    this._user = _user;
-    ///TODO: Actualmente carga la lista de productos en venta para debug. Cambiar por lista de deseos.
+  _WishesState(this._user) {
     _loadProfileItems();
-    Storage.loadUserId().then((id) {
-      print(id);
-      setState(() => _loggedUserId = id);
-    });
   }
+
   @override
   void dispose() {
     super.dispose();
@@ -59,117 +61,212 @@ class _WishesState extends State<Wishes> {
     if (_user?.userId == null) {
       print('ERROR: Intentando cargar objetos de un usuario sin ID');
     } else {
-      double userLat = await Storage.loadLat();
-      double userLng = await Storage.loadLng();
-      // Cargar los objetos en venta y vendidos para el usuario
-      ItemRequest.getItemsFromUser(
-              userId: _user.userId,
-              userLat: userLat,
-              userLng: userLng,
-              status: "en venta")
-          .then((itemsVenta) {
+      // Cargar los objetos deseados (productos y subastas) del usuario
+      UsuarioRequest.getWishlistProducts(_user.userId).then((wishlistProducts) {
+        _cancelled = false;
         if (!_cancelled) {
           setState(() {
-            if (itemsVenta.isEmpty) {
-              _itemsEnVentaEmpty = true;
+            if (wishlistProducts.isEmpty) {
+              _wishListProductsEmpty = true;
             } else {
-              _itemsEnVenta = itemsVenta;
+              _wishlistProducts = wishlistProducts;
             }
           });
         }
       }).catchError((error) {
-        print('Error al cargar los productos en venta de usuario: $error');
+        print('Error al cargar los productos deseados: $error');
+        _wishListProductsEmpty = true;
+      });
+      UsuarioRequest.getWishlistAuctions(_user.userId).then((wishlistAuctions) {
+        if (!_cancelled) {
+          setState(() {
+            if (wishlistAuctions.isEmpty) {
+              _wishListAuctionsEmpty = true;
+            } else {
+              _wishlistAuctions = wishlistAuctions;
+            }
+          });
+        }
+      }).catchError((error) {
+        print('Error al cargar las subastas deseadas: $error');
+        _wishListAuctionsEmpty = true;
       });
     }
   }
-  Widget _buildProductList() {
-    Widget wProductListSelling;
 
-    if (_itemsEnVenta.isEmpty) {
-      if (_itemsEnVentaEmpty) {
-        return SizedBox.expand(
-            // expandir horizontalmente
-            child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Icon(Icons.not_interested, color: Colors.grey, size: 65.0),
-            Container(
-              padding: EdgeInsets.only(top: 10),
-              child: Text('Nada por aquí...', style: _styleNothing),
-            )
-          ],
-        ));
+  // Pulsación del boton "ventas"
+  void _onPressedProducts() {
+    _pageController.animateToPage(0,
+        duration: Duration(milliseconds: 300), curve: Curves.decelerate);
+    if (_controllerProducts.hasClients) {
+      _controllerProducts.animateTo(0,
+          duration: Duration(milliseconds: 150), curve: Curves.linear);
+    }
+  }
+
+  // Pulsación del boton "subastas"
+  void _onPressedAuctions() {
+    _pageController.animateToPage(1,
+        duration: Duration(milliseconds: 300), curve: Curves.decelerate);
+    if (_controllerAuctions.hasClients) {
+      _controllerAuctions.animateTo(0,
+          duration: Duration(milliseconds: 150), curve: Curves.linear);
+    }
+  }
+
+  /// Indicación de lista vacía (se ha recibido info de que es vacía)
+  Widget _buildEmptyList() {
+    return SizedBox.expand(
+        // expandir horizontalmente
+        child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Icon(Icons.not_interested, color: Colors.grey, size: 65.0),
+        Container(
+          padding: EdgeInsets.only(top: 10),
+          child: Text('Nada por aquí...', style: _styleNothing),
+        )
+      ],
+    ));
+  }
+
+  /// Todavía no se ha recibido información sobre la lista
+  Widget _buildLoadingList() {
+    return SizedBox.expand(
+        // expandir horizontalmente
+        child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        CircularProgressIndicator(
+            strokeWidth: 5.0,
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.grey[600])),
+      ],
+    ));
+  }
+
+  /// Lista de productos (no subastas) deseados
+  Widget _buildProductList() {
+    if (_wishlistProducts.isEmpty) {
+      if (_wishListProductsEmpty) {
+        return _buildEmptyList();
       } else {
-        return SizedBox.expand(
-            // expandir horizontalmente
-            child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            CircularProgressIndicator(
-                strokeWidth: 5.0,
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.grey[600])),
-          ],
-        ));
+        return _buildLoadingList();
       }
     } else {
-       wProductListSelling = Container(
+      return Container(
         margin: EdgeInsets.only(top: 5),
         child: ListView.builder(
-          controller: _controllerEnVenta,
+          controller: _controllerProducts,
           padding: EdgeInsets.symmetric(horizontal: 15),
-          itemCount: _itemsEnVenta.length,
+          itemCount: _wishlistProducts.length,
           itemBuilder: (context, index) =>
-              ItemTile(_itemsEnVenta[index], index % 2 == 0),
+              ItemTile(_wishlistProducts[index], index % 2 == 0),
         ),
       );
     }
+  }
 
-     Widget wProductList = Scaffold(
-      backgroundColor: Colors.transparent,
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(50.0),
-        child: Container(
-          margin: EdgeInsets.symmetric(
-              horizontal: (MediaQuery.of(context).size.width - 300) / 2),
-          decoration: BoxDecoration(
-            color: Color(0x552B2B2B),
-            borderRadius: BorderRadius.all(Radius.circular(25.0)),
-          ),
-          child: CustomPaint(
-            painter: TabIndicationPainter(pageController: _pageController),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              
-              
-            ),
-          ),
+  /// Lista de subastas (no productos) deseados
+  Widget _buildAuctionList() {
+    if (_wishlistAuctions.isEmpty) {
+      if (_wishListAuctionsEmpty) {
+        return _buildEmptyList();
+      } else {
+        return _buildLoadingList();
+      }
+    } else {
+      return Container(
+        margin: EdgeInsets.only(top: 5),
+        child: ListView.builder(
+          controller: _controllerAuctions,
+          padding: EdgeInsets.symmetric(horizontal: 15),
+          itemCount: _wishlistAuctions.length,
+          itemBuilder: (context, index) =>
+              ItemTile(_wishlistAuctions[index], index % 2 == 0),
+        ),
+      );
+    }
+  }
+
+  /// Constructor para los botones "en venta" y "vendido"
+  Widget _buildTabButton(displayText, onPress, textColor) {
+    return Expanded(
+      child: FlatButton(
+        splashColor: Colors.transparent,
+        highlightColor: Colors.transparent,
+        onPressed: onPress,
+        child: Text(
+          displayText,
+          style: TextStyle(color: textColor, fontSize: 16.0),
         ),
       ),
-      body: wProductListSelling,
     );
-
-    return Column(
-      children: <Widget>[
-        Expanded(
-          child: wProductList,
-        ),
-      ],
-    );
-
   }
+
+  /// Toda la pantalla, dos tabs con las dos listas
+  Widget _buildWishlist() {
+    return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Container(
+            margin: EdgeInsets.fromLTRB(20.0, 25.0, 0.0, 15.0),
+            child: Text('Lista de deseados', style: _styleTitle),
+          ),
+          Expanded(
+            child: Scaffold(
+              backgroundColor: Colors.transparent,
+              appBar: PreferredSize(
+                preferredSize: Size.fromHeight(50.0),
+                child: Container(
+                  margin: EdgeInsets.symmetric(
+                      horizontal:
+                          (MediaQuery.of(context).size.width - 300) / 2),
+                  decoration: BoxDecoration(
+                    color: Color(0x552B2B2B),
+                    borderRadius: BorderRadius.all(Radius.circular(25.0)),
+                  ),
+                  child: CustomPaint(
+                    painter:
+                        TabIndicationPainter(pageController: _pageController),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: <Widget>[
+                        _buildTabButton(
+                            "Ventas", _onPressedProducts, _tabColorLeft),
+                        _buildTabButton(
+                            "Subastas", _onPressedAuctions, _tabColorRight),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              body: PageView(
+                  controller: _pageController,
+                  onPageChanged: (pageIndex) {
+                    if (pageIndex == 0) {
+                      // en venta
+                      setState(() {
+                        _tabColorLeft = Colors.black;
+                        _tabColorRight = Colors.white;
+                      });
+                    } else {
+                      // vendidos
+                      setState(() {
+                        _tabColorLeft = Colors.white;
+                        _tabColorRight = Colors.black;
+                      });
+                    }
+                  },
+                  children: <Widget>[_buildProductList(), _buildAuctionList()]),
+            ),
+          )
+        ]);
+  }
+
   @override
   Widget build(BuildContext context) {
     FlutterStatusbarcolor.setStatusBarColor(Colors.transparent);
     return Scaffold(
-      appBar: new AppBar(
-        leading: Container(),
-        title: new Text("Lista de deseos",
-            style: TextStyle(
-                fontSize: 22.0,
-                color: Colors.white,
-                fontWeight: FontWeight.bold)),
-        elevation: Theme.of(context).platform == TargetPlatform.iOS ? 0.0 : 4.0,
-      ),
       resizeToAvoidBottomInset: false,
       body: Container(
         decoration: BoxDecoration(
@@ -177,8 +274,8 @@ class _WishesState extends State<Wishes> {
               begin: Alignment(0.15, -1.0),
               end: Alignment(-0.15, 1.0),
               stops: [
-                0.4,
-                0.4
+                0.35,
+                0.35
               ],
               colors: [
                 Theme.of(context).primaryColor,
@@ -186,15 +283,7 @@ class _WishesState extends State<Wishes> {
               ]),
         ),
         child: SafeArea(
-          child: Column(
-            children: <Widget>[
-              Expanded(
-                child: Container(
-                  child: _buildProductList(),
-                ),
-              ),
-            ],
-          ),
+          child: _buildWishlist(),
         ),
       ),
     );

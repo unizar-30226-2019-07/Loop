@@ -159,6 +159,7 @@ class _ProfileState extends State<Profile> {
         }
       }).catchError((error) {
         print('Error al cargar los productos en venta de usuario: $error');
+        _itemsEnVentaEmpty = true;
       });
       ItemRequest.getItemsFromUser(
               userId: _user.userId,
@@ -177,6 +178,7 @@ class _ProfileState extends State<Profile> {
         }
       }).catchError((error) {
         print('Error al cargar los productos vendidos de usuario: $error');
+        _itemsVendidosEmpty = true;
       });
     }
   }
