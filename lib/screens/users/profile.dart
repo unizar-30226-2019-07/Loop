@@ -100,7 +100,6 @@ class _ProfileState extends State<Profile> {
     _cancelled = true;
   }
 
-  
   Future<void> _loadProfile(int _userId) async {
     // Mostrar usuario placeholder mientras carga el real
     _cancelled = false;
@@ -378,7 +377,8 @@ class _ProfileState extends State<Profile> {
                   Container(
                       margin: EdgeInsets.only(left: 5.0),
                       child: _sexSymbol.containsKey(_user?.sexo)
-                          ? Icon(_sexSymbol[_user.sexo], color: Colors.white, size: 18.0)
+                          ? Icon(_sexSymbol[_user.sexo],
+                              color: Colors.white, size: 18.0)
                           : Container())
                 ]),
               ),
@@ -553,45 +553,51 @@ class _ProfileState extends State<Profile> {
         ],
       ),
       // Botón para añadir nuevos items
-      floatingActionButton: SpeedDial(
-          // both default to 16
-          marginRight: 18,
-          marginBottom: 20,
-          animatedIcon: AnimatedIcons.menu_close,
-          animatedIconTheme: IconThemeData(size: 22.0),
-          // this is ignored if animatedIcon is non null
-          // child: Icon(Icons.add),
-          visible: true,
-          curve: Curves.bounceIn,
-          overlayColor: Colors.black,
-          overlayOpacity: 0.5,
-          tooltip: 'Speed Dial',
-          heroTag: 'speed-dial-hero-tag',
-          backgroundColor: Theme.of(context).primaryColor,
-          foregroundColor: Colors.white,
-          elevation: 8.0,
-          shape: CircleBorder(),
-          children: [
-            SpeedDialChild(
-              child: Icon(Icons.add),
+      floatingActionButton: (_user?.userId == null ||
+              _loggedUserId == null ||
+              _user.userId != _loggedUserId)
+          ? Container()
+          : SpeedDial(
+              // both default to 16
+              marginRight: 18,
+              marginBottom: 20,
+              animatedIcon: AnimatedIcons.menu_close,
+              animatedIconTheme: IconThemeData(size: 22.0),
+              // this is ignored if animatedIcon is non null
+              // child: Icon(Icons.add),
+              visible: true,
+              curve: Curves.bounceIn,
+              overlayColor: Colors.black,
+              overlayOpacity: 0.5,
+              tooltip: 'Speed Dial',
+              heroTag: 'speed-dial-hero-tag',
               backgroundColor: Theme.of(context).primaryColor,
-              label: 'Añadir producto',
-              //labelStyle: TextTheme(fontSize: 18.0),
-              onTap: () {
-                Navigator.of(context).pushNamed('/new-item', arguments: _user);
-              },
+              foregroundColor: Colors.white,
+              elevation: 8.0,
+              shape: CircleBorder(),
+              children: [
+                SpeedDialChild(
+                  child: Icon(Icons.add),
+                  backgroundColor: Theme.of(context).primaryColor,
+                  label: 'Añadir producto',
+                  //labelStyle: TextTheme(fontSize: 18.0),
+                  onTap: () {
+                    Navigator.of(context)
+                        .pushNamed('/new-item', arguments: _user);
+                  },
+                ),
+                SpeedDialChild(
+                  child: Icon(Icons.favorite),
+                  backgroundColor: Theme.of(context).primaryColor,
+                  label: 'Deseos',
+                  //labelStyle: TextTheme(fontSize: 18.0),
+                  onTap: () {
+                    Navigator.of(context)
+                        .pushNamed('/whises', arguments: _user);
+                  },
+                ),
+              ],
             ),
-            SpeedDialChild(
-              child: Icon(Icons.favorite),
-              backgroundColor: Theme.of(context).primaryColor,
-              label: 'Deseos',
-              //labelStyle: TextTheme(fontSize: 18.0),
-              onTap: () {
-                Navigator.of(context).pushNamed('/whises', arguments: _user);
-              },
-            ),
-          ],
-        ),
     );
   }
 }
