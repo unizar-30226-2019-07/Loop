@@ -92,7 +92,7 @@ class ItemRequest {
         HttpHeaders.contentTypeHeader: ContentType.json.toString(),
         HttpHeaders.authorizationHeader: await Storage.loadToken(),
       },
-      body: json.jsonEncode(item.toJsonCreate()),
+      body: json.utf8.encode(json.jsonEncode(item.toJsonCreate())),
     );
 
     if (response.statusCode != 201) {
@@ -108,7 +108,7 @@ class ItemRequest {
         HttpHeaders.contentTypeHeader: ContentType.json.toString(),
         HttpHeaders.authorizationHeader: await Storage.loadToken(),
       },
-      body: json.jsonEncode(item.toJsonCreateAuction()),
+      body: json.utf8.encode(json.jsonEncode(item.toJsonCreateAuction())),
     );
 
     if (response.statusCode != 201) {
@@ -127,7 +127,7 @@ class ItemRequest {
         HttpHeaders.contentTypeHeader: ContentType.json.toString(),
         HttpHeaders.authorizationHeader: await Storage.loadToken(),
       },
-      body: json.jsonEncode(item.toJsonEdit()),
+      body: json.utf8.encode(json.jsonEncode(item.toJsonEdit())),
     );
 
     if (response.statusCode != 200) {
@@ -145,7 +145,7 @@ class ItemRequest {
         HttpHeaders.contentTypeHeader: ContentType.json.toString(),
         HttpHeaders.authorizationHeader: await Storage.loadToken(),
       },
-      body: json.jsonEncode(item.toJsonEditAuction()),
+      body: json.utf8.encode(json.jsonEncode(item.toJsonEditAuction())),
     );
 
     if (response.statusCode != 200) {
