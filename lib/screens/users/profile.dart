@@ -206,6 +206,36 @@ class _ProfileState extends State<Profile> {
     }
   }
 
+  // TODO borrar, esto es (deberia ser) temporal
+  // principalmente porque el botón no aparece cuando debería aparecer
+  Widget _buildReportButton() {
+    return Container(
+      margin: EdgeInsets.only(right: 15),
+      child: GestureDetector(
+          onTap: () => Navigator.of(context).pushNamed('/report-user', arguments: _user),
+          child: ClipRRect(
+              borderRadius: BorderRadius.circular(4.0),
+              child: Container(
+                  padding: EdgeInsets.all(2.0),
+                  color: _blendColor,
+                  alignment: Alignment.centerRight,
+                  width: 159.0,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: <Widget>[
+                      Container(
+                        margin: EdgeInsets.only(left: 5, right: 5),
+                        child: Icon(Icons.report_problem,
+                            color: Colors.white, size: 18.0),
+                      ),
+                      Container(
+                          margin: EdgeInsets.only(right: 5),
+                          child: Text('Reportar usuario',
+                              style: _styleEditProfile))
+                    ],
+                  )))));
+  }
+
   /// Constructor para los botones "en venta" y "vendido"
   Widget _buildTabButton(displayText, onPress, textColor) {
     return Expanded(
@@ -274,7 +304,7 @@ class _ProfileState extends State<Profile> {
     Widget wEditProfile = (_user?.userId == null ||
             _loggedUserId == null ||
             _user.userId != _loggedUserId)
-        ? Container()
+        ? _buildReportButton()
         : Container(
             margin: EdgeInsets.only(right: 15),
             child: GestureDetector(
