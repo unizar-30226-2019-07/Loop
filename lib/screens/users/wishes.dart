@@ -5,7 +5,7 @@ import 'package:selit/class/item_class.dart';
 import 'package:selit/util/api/usuario_request.dart';
 import 'package:selit/util/bubble_indication_painter.dart';
 import 'package:selit/widgets/items/item_tile.dart';
-import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
+import 'package:selit/util/bar_color.dart';
 
 /// Lista de productos o subastas deseados por el usuario,
 /// en dos listas de igual forma que se muestra en el perfil
@@ -269,7 +269,7 @@ class _WishesState extends State<Wishes> {
 
   @override
   Widget build(BuildContext context) {
-    FlutterStatusbarcolor.setStatusBarColor(Colors.transparent);
+    BarColor.changeBarColor(color: Colors.transparent, whiteForeground: true);
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: Container(

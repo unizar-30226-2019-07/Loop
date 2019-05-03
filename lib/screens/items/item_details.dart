@@ -9,7 +9,7 @@ import 'package:selit/util/storage.dart';
 import 'package:selit/util/api/usuario_request.dart';
 import 'package:selit/util/api/item_request.dart';
 import 'package:selit/widgets/profile_picture.dart';
-import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
+import 'package:selit/util/bar_color.dart';
 import 'package:selit/widgets/star_rating.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
@@ -43,7 +43,6 @@ class _ItemDetails extends State<ItemDetails> {
   Completer<GoogleMapController> _controller = Completer();
   String _ubicacionCompleta;
 
-
   final Color _colorStatusBarBad = Colors.red.withOpacity(0.5);
 
   // Constructor
@@ -65,15 +64,19 @@ class _ItemDetails extends State<ItemDetails> {
   /// Añadir o quitar el producto según proceda
   void _favoritePressed() {
     _favoriteFunction = null;
-    if (_esFavorito) { // ya está, quitar
-      UsuarioRequest.removeFromWishlist(productId: _item.itemId, auctions: _item.isAuction())
+    if (_esFavorito) {
+      // ya está, quitar
+      UsuarioRequest.removeFromWishlist(
+              productId: _item.itemId, auctions: _item.isAuction())
           .then((_) {
         _esFavorito = false;
       }).catchError((_) {
         showInSnackBar("Ha ocurrido un problema", _colorStatusBarBad);
       });
-    } else { // no está, añadir
-      UsuarioRequest.addToWishlist(productId: _item.itemId, auctions: _item.isAuction())
+    } else {
+      // no está, añadir
+      UsuarioRequest.addToWishlist(
+              productId: _item.itemId, auctions: _item.isAuction())
           .then((_) {
         _esFavorito = true;
       }).catchError((_) {
@@ -294,8 +297,9 @@ class _ItemDetails extends State<ItemDetails> {
 
   @override
   Widget build(BuildContext context) {
-    FlutterStatusbarcolor.setStatusBarColor(
-        Theme.of(context).primaryColor.withAlpha(200));
+    BarColor.changeBarColor(
+        color: Theme.of(context).primaryColor,
+        whiteForeground: true);
     final ThemeData theme = Theme.of(context);
     final TextStyle descriptionStyle = theme.textTheme.subhead;
     // Item en venta o no (también tener en cuenta si es nulo)

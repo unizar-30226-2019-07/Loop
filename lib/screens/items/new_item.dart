@@ -5,7 +5,7 @@ import 'package:selit/class/item_class.dart';
 import 'package:selit/class/items/filter_list_class.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:percent_indicator/percent_indicator.dart';
-import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
+import 'package:selit/util/bar_color.dart';
 import 'package:selit/class/usuario_class.dart';
 
 /// Primera pantalla del formulario de subida de un nuevo producto
@@ -342,7 +342,7 @@ class _NewItemState extends State<NewItem> {
 
   @override
   Widget build(BuildContext context) {
-    FlutterStatusbarcolor.setStatusBarColor(Colors.transparent);
+    BarColor.changeBarColor(color: Colors.transparent, whiteForeground: true);
     return Scaffold(
       key: _scaffoldKey,
       resizeToAvoidBottomInset: true,

@@ -11,7 +11,7 @@ import 'package:selit/util/storage.dart';
 import 'package:selit/widgets/items/item_tile.dart';
 import 'package:selit/widgets/star_rating.dart';
 import 'package:selit/widgets/profile_picture.dart';
-import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
+import 'package:selit/util/bar_color.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 
 /// Perfil de usuario: muestra sus datos, foto de perfil y
@@ -556,7 +556,7 @@ class _ProfileState extends State<Profile> {
 
   @override
   Widget build(BuildContext context) {
-    FlutterStatusbarcolor.setStatusBarColor(Colors.transparent);
+    BarColor.changeBarColor(color: Colors.transparent, whiteForeground: true);
     return Scaffold(
       body: Stack(
         children: <Widget>[

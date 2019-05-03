@@ -6,7 +6,7 @@ import 'package:selit/util/bubble_indication_painter.dart';
 import 'package:selit/util/api/usuario_request.dart';
 import 'package:selit/class/usuario_class.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
+import 'package:selit/util/bar_color.dart';
 import 'package:location/location.dart';
 
 import 'package:selit/screens/debug_main.dart';
@@ -90,14 +90,15 @@ class _LoginPageState extends State<LoginPage>
         _delayPrincipal();
       }
     }).catchError((error) {
-        if (error == "Unauthorized") {
-          showInSnackBar("La cuenta no es válida", _colorStatusBarBad);
-        } else if (error == "Forbidden") {
-          showInSnackBar("Usuario o contraseña incorrectos", _colorStatusBarBad);
-        } else {
-          showInSnackBar("Ha ocurrido un error en el servidor", _colorStatusBarBad);
-        }
-      });
+      if (error == "Unauthorized") {
+        showInSnackBar("La cuenta no es válida", _colorStatusBarBad);
+      } else if (error == "Forbidden") {
+        showInSnackBar("Usuario o contraseña incorrectos", _colorStatusBarBad);
+      } else {
+        showInSnackBar(
+            "Ha ocurrido un error en el servidor", _colorStatusBarBad);
+      }
+    });
   }
 
   Function _signUpCallback;
@@ -133,22 +134,22 @@ class _LoginPageState extends State<LoginPage>
     );
 
     // Realizar la petición de inicio de sesión e informar al usuario del resultado
-    UsuarioRequest.signUp(
-      registeredUser,
-      signupPasswordController.text
-      ).then((_) => showInSnackBar("Se ha enviado un correo de confirmación", _colorStatusBarGood)
-      ).catchError((error) {
-        if (error == "Conflict") {
-          showInSnackBar("La dirección de correo ya existe", _colorStatusBarBad);
-        } else {
-          showInSnackBar("No hay conexión a internet", _colorStatusBarBad);
-        }
-      });
+    UsuarioRequest.signUp(registeredUser, signupPasswordController.text)
+        .then((_) => showInSnackBar(
+            "Se ha enviado un correo de confirmación", _colorStatusBarGood))
+        .catchError((error) {
+      if (error == "Conflict") {
+        showInSnackBar("La dirección de correo ya existe", _colorStatusBarBad);
+      } else {
+        showInSnackBar("No hay conexión a internet", _colorStatusBarBad);
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    FlutterStatusbarcolor.setStatusBarColor(Theme.of(context).primaryColorLight);
+    BarColor.changeBarColor(
+        color: Theme.of(context).primaryColorLight, whiteForeground: true);
     return new Scaffold(
       key: _scaffoldKey,
       body: NotificationListener<OverscrollIndicatorNotification>(
@@ -218,19 +219,21 @@ class _LoginPageState extends State<LoginPage>
                             left = Colors.black;
                           });
                         } else if (i == 1) {
-                          
                           Location locationService = new Location();
                           // Intentar obtener la localización del usuario
                           try {
-                            LocationData data = await locationService.getLocation();
+                            LocationData data =
+                                await locationService.getLocation();
                             locationLat = data.latitude;
                             locationLng = data.longitude;
                             setState(() {
                               _signUpCallback = _trySignUp;
-                              _signUpButtonColor = Theme.of(context).primaryColorDark;
+                              _signUpButtonColor =
+                                  Theme.of(context).primaryColorDark;
                             });
                           } on PlatformException catch (_) {
-                            showInSnackBar("Es necesaria la localización", Colors.red);
+                            showInSnackBar(
+                                "Es necesaria la localización", Colors.red);
                           }
 
                           setState(() {

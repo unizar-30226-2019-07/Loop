@@ -3,7 +3,7 @@ import 'package:flutter_range_slider/flutter_range_slider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:selit/screens/items/item_list.dart';
 import 'package:selit/class/items/filter_list_class.dart';
-import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
+import 'package:selit/util/bar_color.dart';
 import 'dart:async';
 
 /// Listado de filtros de la lista de items, diseñado para acompañar
@@ -141,8 +141,6 @@ class _ItemListDrawerState extends State<ItemListDrawer> {
   /// Menú izquierdo de filtros
   @override
   Widget build(BuildContext context) {
-    FlutterStatusbarcolor.setStatusBarColor(Colors.transparent);
-
     // Estilo para los sliders
     final _sliderThemeData = SliderTheme.of(context).copyWith(
       activeTrackColor: Colors.grey[50], // linea activa

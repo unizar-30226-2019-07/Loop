@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
+import 'package:selit/util/bar_color.dart';
 import 'package:selit/util/storage.dart';
 
 // Vista temporal con varios botones que llevan a diferentes vistas
@@ -7,7 +7,7 @@ import 'package:selit/util/storage.dart';
 class Settings extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    FlutterStatusbarcolor.setStatusBarColor(Colors.transparent);
+    BarColor.changeBarColor(color: Colors.transparent, whiteForeground: true);
     return Scaffold(
         appBar: AppBar(
           leading: Container(),

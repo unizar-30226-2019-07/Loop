@@ -1,23 +1,14 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:geocoder/geocoder.dart';
-import 'package:selit/class/item_class.dart';
-import 'package:carousel_pro/carousel_pro.dart';
 import 'package:selit/class/usuario_class.dart';
-import 'package:selit/screens/items/edit_item.dart';
-import 'package:selit/util/storage.dart';
-import 'package:selit/util/api/usuario_request.dart';
-import 'package:selit/util/api/item_request.dart';
 import 'package:selit/widgets/profile_picture.dart';
-import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 import 'package:selit/widgets/star_rating.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:selit/util/bar_color.dart';
 
 /// Pantalla para realizar informe sobre otro usuario
 /// Formulario que informa sobre quién es el usuario que se va a reportar,
 /// pide una razón por el reporte y permite subir el informe
 class ReportUser extends StatefulWidget {
-  UsuarioClass otherUser;
+  final UsuarioClass otherUser;
 
   ReportUser({this.otherUser});
   @override
@@ -204,8 +195,7 @@ class _ReportUserState extends State<ReportUser> {
 
   @override
   Widget build(BuildContext context) {
-    FlutterStatusbarcolor.setStatusBarColor(Colors.transparent);
-
+    BarColor.changeBarColor(color: Colors.transparent, whiteForeground: true);
     return Stack(children: <Widget>[
       Scaffold(
         resizeToAvoidBottomInset: false,

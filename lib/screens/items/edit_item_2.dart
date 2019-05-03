@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/percent_indicator.dart';
-import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
+import 'package:selit/util/bar_color.dart';
 import 'package:selit/class/item_class.dart';
 import 'package:selit/util/api/item_request.dart';
 
@@ -458,7 +458,7 @@ class _EditItemState2 extends State<EditItem2> {
 
   @override
   Widget build(BuildContext context) {
-    FlutterStatusbarcolor.setStatusBarColor(Theme.of(context).primaryColor);
+    BarColor.changeBarColor(color: Colors.transparent, whiteForeground: true);
     return Scaffold(
       key: _scaffoldKey,
       resizeToAvoidBottomInset: true,
