@@ -19,23 +19,16 @@ class _LoadingScreenState extends State<LoadingScreen> {
 
   /// Devuelve true si existe un token guardado y es válido (es decir,
   /// hay un usuario que ha iniciado sesión en la aplicación)
-  Future<bool> _checkForLoggedUser(BuildContext context) async {
-    bool legitUser = false;
+  Future<void> _checkForLoggedUser(BuildContext context) async {
     String token = await Storage.loadToken();
     if (token == null) {
       print('LOADING: No hay token');
+      throw ("NOTOKEN");
     } else {
-      UsuarioClass receivedUser = await UsuarioRequest.getUserById(0);
-      if (receivedUser == null) {
-        print('LOADING: Había token pero no era válido');
-        Storage.deleteToken();
-      } else {
+        await UsuarioRequest.getUserById(0);
         print('LOADING: Usuario registrado');
         print (token);
-        legitUser = true;
-      }
     }
-    return legitUser;
   }
 
   void _showErrorDialog(BuildContext context) {
@@ -59,19 +52,19 @@ class _LoadingScreenState extends State<LoadingScreen> {
   void initState() {
     super.initState();
 
-    _checkForLoggedUser(context).then((legit) {
+    _checkForLoggedUser(context).then((_) {
       Navigator.of(context).pop();
-      if (legit) {
+
         print('Redirect a principal');
         Navigator.of(context).pushReplacementNamed('/principal');
-      } else {
-        print('Redirect a login');
-        Navigator.of(context).pushReplacementNamed('/login-page');
-      }
+
     }).timeout(TIMEOUT, onTimeout: () {
       _showErrorDialog(context);
-    }).catchError((_) {
-      _showErrorDialog(context);
+    }).catchError((error) {
+
+      print('$error Redirect a login');
+      Storage.deleteToken();
+      Navigator.of(context).pushReplacementNamed('/login-page');
     });
 
   }
