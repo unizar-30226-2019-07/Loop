@@ -34,12 +34,16 @@ class ImageClass {
     imageId = null;
     image = Image.file(fileImage);
 
-    base64 = base64Encode(fileImage.readAsBytesSync());
-    mime = lookupMimeType(fileImage.path);
+    List<int> aurora = fileImage.readAsBytesSync();
+    base64 = base64Encode(aurora);
+    mime = lookupMimeType(fileImage.absolute.path, headerBytes: aurora);
     charset = 'utf-8';
   }
 
+
+
   Map<String, dynamic> toJson() => {
+
     'idImagen' : imageId,
     'base64' : base64,
     'mime' : mime,
