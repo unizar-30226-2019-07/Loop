@@ -11,6 +11,7 @@ import 'package:selit/class/chat_class.dart';
 import 'package:selit/util/api/usuario_request.dart';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:selit/widgets/chats/chat_tile_loading.dart';
 import 'package:selit/widgets/chats/swipe_widget.dart';
 
 
@@ -179,6 +180,18 @@ Future<List<ChatClass>> _getChatData(BuildContext context, List<DocumentSnapshot
     return listaChats;
   }
 
+  Future<ChatClass> _getData(BuildContext context, DocumentSnapshot document) async {
+    ItemClass item = await ItemRequest.getItembyId(itemId: document['idProducto']);
+    int idOtro = document['idAnunciante'];
+    if(miId == idOtro){
+      idOtro = document['idCliente'];
+    }
+    // Obtener UsuarioClass del otro usuario
+    UsuarioClass usuario = await UsuarioRequest.getUserById(idOtro);
+    ChatClass chat =  new ChatClass(usuario: usuario, miId: miId, producto: item, visible: document['visible']);
+    return chat;
+  }
+
   Widget createListView(BuildContext context, AsyncSnapshot snapshot) {
     List<ChatClass> listaChats = snapshot.data;
     return new ListView.builder(
@@ -261,7 +274,28 @@ Future<List<ChatClass>> _getChatData(BuildContext context, List<DocumentSnapshot
                           ),
                         );
                       } else {
+                        return ListView.builder(
+                          padding: EdgeInsets.all(10.0),
+                          itemBuilder: (context, index) => 
+                            FutureBuilder(
+                              future: _getData(context, snapshot.data.documents[index]),
+                              builder: (BuildContext context, AsyncSnapshot snapshotFutureBuilder) {
+                                switch (snapshotFutureBuilder.connectionState) {
+                                  case ConnectionState.none:
+                                  case ConnectionState.waiting:
+                                    return ChatTileLoading();
+                                  default:
+                                    if (snapshotFutureBuilder.hasError)
+                                      return new Text('Error: ${snapshotFutureBuilder.error}');
+                                    else
+                                      return buildItemWidget2(context, snapshotFutureBuilder.data);
+                                }
+                              },
+                            ),
 
+                          itemCount: snapshot.data.documents.length,
+                        );
+                        /*
                         return FutureBuilder(
                           future: _getChatData(context, snapshot.data.documents, snapshot.data.documents.length),
                           builder: (BuildContext context, AsyncSnapshot snapshot) {
@@ -277,6 +311,7 @@ Future<List<ChatClass>> _getChatData(BuildContext context, List<DocumentSnapshot
                             }
                           },
                         );
+                        */
                         /*
                         return ListView.builder(
                           padding: EdgeInsets.all(10.0),
