@@ -100,21 +100,6 @@ class ChatListState extends State<ChatList> {
         child: SafeArea(
           child: Column(
             children: <Widget>[
-              RaisedButton(
-                  onPressed : (){
-                    print("Presionado");
-                    Firestore.instance.runTransaction((transaction) async {
-                        await transaction.set(Firestore.instance.collection("users").document(), {'idUser' : 'otro'});
-                        
-                    });
-                  },
-                  textColor: Colors.black,
-                  color: Colors.white,
-                  padding: const EdgeInsets.all(8.0),
-                  child: new Text(
-                    "Prueba",
-                  ),
-              ),
               Expanded(
                 child: Container(
                   child: StreamBuilder(
