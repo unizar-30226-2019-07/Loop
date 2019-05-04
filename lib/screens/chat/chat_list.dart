@@ -162,6 +162,48 @@ class ChatListState extends State<ChatList> {
 
   }
 
+Future<List<ChatClass>> _getChatData(BuildContext context, List<DocumentSnapshot> documents, int numDocs) async {
+    List<ChatClass> listaChats = new List<ChatClass>();
+    for(int i = 0; i < numDocs; i++){
+      ItemClass item = await ItemRequest.getItembyId(itemId: documents[i]['idProducto']);
+      int idOtro = documents[i]['idAnunciante'];
+      if(miId == idOtro){
+        idOtro = documents[i]['idCliente'];
+      }
+      // Obtener UsuarioClass del otro usuario
+      UsuarioClass usuario = await UsuarioRequest.getUserById(idOtro);
+      ChatClass chat =  new ChatClass(usuario: usuario, miId: miId, producto: item, visible: documents[i]['visible']);
+      listaChats.add(chat);
+    }
+
+    return listaChats;
+  }
+
+  Widget createListView(BuildContext context, AsyncSnapshot snapshot) {
+    List<ChatClass> listaChats = snapshot.data;
+    return new ListView.builder(
+        itemCount: listaChats.length,
+        itemBuilder: (context, index) => 
+          buildItemWidget2(context, listaChats[index]));
+}
+
+  Widget buildItemWidget2(BuildContext context, ChatClass chat) {
+    return Container(
+      child: OnSlide(items: <ActionItems>[
+          new ActionItems(
+              icon: new IconButton(
+                icon: new Icon(Icons.delete),
+                onPressed: () {},
+                color: Colors.red,
+              ),
+              onPress: () {},
+              backgroudColor: Colors.transparent),
+        ], child: ChatTile(chat)
+    ));
+
+  }
+
+
   @override
   Widget build(BuildContext context) {
     FlutterStatusbarcolor.setStatusBarColor(Colors.transparent);
@@ -219,6 +261,23 @@ class ChatListState extends State<ChatList> {
                           ),
                         );
                       } else {
+
+                        return FutureBuilder(
+                          future: _getChatData(context, snapshot.data.documents, snapshot.data.documents.length),
+                          builder: (BuildContext context, AsyncSnapshot snapshot) {
+                            switch (snapshot.connectionState) {
+                              case ConnectionState.none:
+                              case ConnectionState.waiting:
+                                return new Text('loading...');
+                              default:
+                                if (snapshot.hasError)
+                                  return new Text('Error: ${snapshot.error}');
+                                else
+                                  return createListView(context, snapshot);
+                            }
+                          },
+                        );
+                        /*
                         return ListView.builder(
                           padding: EdgeInsets.all(10.0),
                           itemBuilder: (context, index) => 
@@ -226,6 +285,7 @@ class ChatListState extends State<ChatList> {
 
                           itemCount: snapshot.data.documents.length,
                         );
+                        */
                       }
                     },
                   ),),
