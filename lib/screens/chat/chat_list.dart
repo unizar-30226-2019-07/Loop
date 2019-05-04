@@ -33,154 +33,13 @@ class ChatListState extends State<ChatList> {
     _leerIdUsuario();
     _chats = <ChatClass>[];
 
-    // Añadir 2 chats para debug
-    //_loadDebugChats();
   }
 
   void _leerIdUsuario() async {
     miId = await Storage.loadUserId();
   }
 
-  /*
-   * Función debug para mostrar dos conversacion con el usuario 1
-   * y dos para el 88.
-   */
-/*
-
-  Future<void> _loadDebugChats() async {
-    await UsuarioRequest.getUserById(1).then((user) {
-      //Obtener usuario 1
-      setState(() {
-        _chats.add(new ChatClass(usuario: user));
-        _chats.add(new ChatClass(usuario: user));
-      });
-    }).catchError((error) {
-      print('Error al cargar el perfil de usuario: $error');
-    });
-    await UsuarioRequest.getUserById(88).then((user) {
-      //Obtener usuario 1
-      setState(() {
-        _chats.add(new ChatClass(usuario: user));
-        _chats.add(new ChatClass(usuario: user));
-      });
-    }).catchError((error) {
-      print('Error al cargar el perfil de usuario: $error');
-    });
-    await UsuarioRequest.getUserById(1).then((user) {
-      //Obtener usuario 1
-      setState(() {
-        _chats.add(new ChatClass(usuario: user));
-        _chats.add(new ChatClass(usuario: user));
-      });
-    }).catchError((error) {
-      print('Error al cargar el perfil de usuario: $error');
-    });
-    await UsuarioRequest.getUserById(88).then((user) {
-      //Obtener usuario 1
-      setState(() {
-        _chats.add(new ChatClass(usuario: user));
-        _chats.add(new ChatClass(usuario: user));
-      });
-    }).catchError((error) {
-      print('Error al cargar el perfil de usuario: $error');
-    });
-  }
-  */
-
-
-/*
-  Widget _buildChatList() {
-    return ListView.builder(
-      padding: EdgeInsets.symmetric(horizontal: 5.0),
-      itemCount: _chats.length,
-      itemBuilder: (context, index) {
-        return new OnSlide(items: <ActionItems>[
-          new ActionItems(
-              icon: new IconButton(
-                icon: new Icon(Icons.delete),
-                onPressed: () {},
-                color: Colors.red,
-              ),
-              onPress: () {},
-              backgroudColor: Colors.transparent),
-        ], child: ChatTile(_chats[index]));
-      },
-    );
-  }
-  */
-
-
-  Widget _buildChatList() {
-    return ListView.builder(
-      padding: EdgeInsets.symmetric(horizontal: 5.0),
-      itemCount: _chats.length,
-      itemBuilder: (context, index) {
-        return new OnSlide(items: <ActionItems>[
-          new ActionItems(
-              icon: new IconButton(
-                icon: new Icon(Icons.delete),
-                onPressed: () {},
-                color: Colors.red,
-              ),
-              onPress: () {},
-              backgroudColor: Colors.transparent),
-        ], child: ChatTile(_chats[index]));
-      },
-    );
-  }
-
-  void buildItem(BuildContext context, DocumentSnapshot document, int index) async {
-    // Obtener ItemClass del producto
-    ItemClass item = await ItemRequest.getItembyId(itemId: document['idProducto']);
-    int idOtro = document['idAnunciante'];
-    if(miId == idOtro){
-      idOtro = document['idCliente'];
-    }
-    // Obtener UsuarioClass del otro usuario
-    UsuarioClass usuario = await UsuarioRequest.getUserById(idOtro);
-    ChatClass chat =  new ChatClass(usuario: usuario, miId: miId, producto: item, visible: document['visible']);
-    setState(() {
-      print('Index lista: ' + index.toString());
-      //_chats[index] = chat;
-      _chats.add(chat);
-    });
-  }
-
-  Widget buildItemWidget(BuildContext context, DocumentSnapshot document, int index) {
-    buildItem(context, document, index);
-    return Container(
-      child: OnSlide(items: <ActionItems>[
-          new ActionItems(
-              icon: new IconButton(
-                icon: new Icon(Icons.delete),
-                onPressed: () {},
-                color: Colors.red,
-              ),
-              onPress: () {},
-              backgroudColor: Colors.transparent),
-        ], child: ChatTile(_chats[index])
-    ));
-
-  }
-
-Future<List<ChatClass>> _getChatData(BuildContext context, List<DocumentSnapshot> documents, int numDocs) async {
-    List<ChatClass> listaChats = new List<ChatClass>();
-    for(int i = 0; i < numDocs; i++){
-      ItemClass item = await ItemRequest.getItembyId(itemId: documents[i]['idProducto']);
-      int idOtro = documents[i]['idAnunciante'];
-      if(miId == idOtro){
-        idOtro = documents[i]['idCliente'];
-      }
-      // Obtener UsuarioClass del otro usuario
-      UsuarioClass usuario = await UsuarioRequest.getUserById(idOtro);
-      ChatClass chat =  new ChatClass(usuario: usuario, miId: miId, producto: item, visible: documents[i]['visible']);
-      listaChats.add(chat);
-    }
-
-    return listaChats;
-  }
-
-  Future<ChatClass> _getData(BuildContext context, DocumentSnapshot document) async {
+  Future<ChatClass> _getChatData(BuildContext context, DocumentSnapshot document) async {
     ItemClass item = await ItemRequest.getItembyId(itemId: document['idProducto']);
     int idOtro = document['idAnunciante'];
     if(miId == idOtro){
@@ -192,15 +51,7 @@ Future<List<ChatClass>> _getChatData(BuildContext context, List<DocumentSnapshot
     return chat;
   }
 
-  Widget createListView(BuildContext context, AsyncSnapshot snapshot) {
-    List<ChatClass> listaChats = snapshot.data;
-    return new ListView.builder(
-        itemCount: listaChats.length,
-        itemBuilder: (context, index) => 
-          buildItemWidget2(context, listaChats[index]));
-}
-
-  Widget buildItemWidget2(BuildContext context, ChatClass chat) {
+  Widget buildChatTile(BuildContext context, ChatClass chat) {
     return Container(
       child: OnSlide(items: <ActionItems>[
           new ActionItems(
@@ -278,7 +129,7 @@ Future<List<ChatClass>> _getChatData(BuildContext context, List<DocumentSnapshot
                           padding: EdgeInsets.all(10.0),
                           itemBuilder: (context, index) => 
                             FutureBuilder(
-                              future: _getData(context, snapshot.data.documents[index]),
+                              future: _getChatData(context, snapshot.data.documents[index]),
                               builder: (BuildContext context, AsyncSnapshot snapshotFutureBuilder) {
                                 switch (snapshotFutureBuilder.connectionState) {
                                   case ConnectionState.none:
@@ -288,39 +139,12 @@ Future<List<ChatClass>> _getChatData(BuildContext context, List<DocumentSnapshot
                                     if (snapshotFutureBuilder.hasError)
                                       return new Text('Error: ${snapshotFutureBuilder.error}');
                                     else
-                                      return buildItemWidget2(context, snapshotFutureBuilder.data);
+                                      return buildChatTile(context, snapshotFutureBuilder.data);
                                 }
                               },
                             ),
-
                           itemCount: snapshot.data.documents.length,
                         );
-                        /*
-                        return FutureBuilder(
-                          future: _getChatData(context, snapshot.data.documents, snapshot.data.documents.length),
-                          builder: (BuildContext context, AsyncSnapshot snapshot) {
-                            switch (snapshot.connectionState) {
-                              case ConnectionState.none:
-                              case ConnectionState.waiting:
-                                return new Text('loading...');
-                              default:
-                                if (snapshot.hasError)
-                                  return new Text('Error: ${snapshot.error}');
-                                else
-                                  return createListView(context, snapshot);
-                            }
-                          },
-                        );
-                        */
-                        /*
-                        return ListView.builder(
-                          padding: EdgeInsets.all(10.0),
-                          itemBuilder: (context, index) => 
-                            buildItemWidget(context, snapshot.data.documents[index], index),
-
-                          itemCount: snapshot.data.documents.length,
-                        );
-                        */
                       }
                     },
                   ),),
