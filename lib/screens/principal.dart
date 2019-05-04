@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:selit/util/storage.dart';
 import 'package:selit/widgets/fancy_bottom_navigation.dart';
 import 'package:selit/screens/items/item_list.dart';
 import 'package:selit/screens/settings/settings.dart';
@@ -21,8 +22,18 @@ class _Principal extends State<Principal> {
   static int _currentPage = 0;
   static int _userId = 0; //Valor 0 usuario interno
 
+    @override
+  void initState() {
+    super.initState();
+    _leerIdUsuario();
+  }
+
+  void _leerIdUsuario() async {
+    _userId = await Storage.loadUserId();
+  }
+
   // Lista de pantallas (en orden según aparecen en la barra de navegación)
-  List<Widget> screenList = [ItemList(), ChatList(), Profile(userId: _userId), Settings()];
+  List<Widget> screenList = [ItemList(), ChatList(miId: _userId), Profile(userId: _userId), Settings()];
 
 	@override
 	Widget build(BuildContext context) {

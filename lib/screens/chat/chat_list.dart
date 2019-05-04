@@ -16,38 +16,39 @@ import 'package:selit/widgets/chats/swipe_widget.dart';
 
 
 class ChatList extends StatefulWidget {
+  int miId;
+  ChatList({@required this.miId});
+
   @override
   ChatListState createState() {
-    return new ChatListState();
+    return new ChatListState(miId);
   }
 }
 
 class ChatListState extends State<ChatList> {
   List<ChatClass> _chats = new List();
-  int miId;
+  int _miId;
   int _indice = 0;
+
+  ChatListState(int miId){
+    _miId = miId;
+  }
 
   @override
   void initState() {
     super.initState();
-    _leerIdUsuario();
     _chats = <ChatClass>[];
-
-  }
-
-  void _leerIdUsuario() async {
-    miId = await Storage.loadUserId();
   }
 
   Future<ChatClass> _getChatData(BuildContext context, DocumentSnapshot document) async {
     ItemClass item = await ItemRequest.getItembyId(itemId: document['idProducto']);
     int idOtro = document['idAnunciante'];
-    if(miId == idOtro){
+    if(_miId == idOtro){
       idOtro = document['idCliente'];
     }
     // Obtener UsuarioClass del otro usuario
     UsuarioClass usuario = await UsuarioRequest.getUserById(idOtro);
-    ChatClass chat =  new ChatClass(usuario: usuario, miId: miId, producto: item, visible: document['visible']);
+    ChatClass chat =  new ChatClass(usuario: usuario, miId: _miId, producto: item, visible: document['visible']);
     return chat;
   }
 
@@ -70,6 +71,7 @@ class ChatListState extends State<ChatList> {
 
   @override
   Widget build(BuildContext context) {
+    print('Mi id: ' + _miId.toString());
     FlutterStatusbarcolor.setStatusBarColor(Colors.transparent);
     return Scaffold(
       appBar: new AppBar(
@@ -116,7 +118,7 @@ class ChatListState extends State<ChatList> {
               Expanded(
                 child: Container(
                   child: StreamBuilder(
-                    stream: Firestore.instance.collection('chat').where('visible', arrayContains: miId).snapshots(),
+                    stream: Firestore.instance.collection('chat').where('visible', arrayContains: _miId).snapshots(),
                     builder: (context, snapshot) {
                       if (!snapshot.hasData) {
                         return Center(
@@ -131,6 +133,7 @@ class ChatListState extends State<ChatList> {
                             FutureBuilder(
                               future: _getChatData(context, snapshot.data.documents[index]),
                               builder: (BuildContext context, AsyncSnapshot snapshotFutureBuilder) {
+                                print('Id chat: ' + snapshot.data.documents[index].documentID);
                                 switch (snapshotFutureBuilder.connectionState) {
                                   case ConnectionState.none:
                                   case ConnectionState.waiting:
