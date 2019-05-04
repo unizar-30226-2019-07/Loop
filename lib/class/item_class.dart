@@ -24,6 +24,7 @@ class ItemClass {
   UsuarioClass owner; // vendedor del item
   List<ImageClass> media; // lista de 0+ imágenes
   DateTime endDate; //Fecha de finalización   yyyy-MM-dd
+  double lastBid;
 
   /// Constructor por defecto, comprobar que los atributos son correctos
   ItemClass(
@@ -43,7 +44,8 @@ class ItemClass {
       this.numLikes,
       this.owner,
       this.media,
-      this.endDate})
+      this.endDate, 
+      this.lastBid})
       : assert(type == null || type == "sale" || type == "auction",
             'Tipo inválido para un item (venta/subasta)'),
         assert(status == null || status == "en venta" || status == "vendido",
@@ -96,6 +98,34 @@ class ItemClass {
             numLikes: json['nfav'],
             owner: UsuarioClass.fromJson(json['owner'], tokenHeader),
             media: _getImages(json['media'], tokenHeader));
+  
+  /// Constructor a partir de JSON (auctions)
+  ItemClass.fromJsonAuctions(Map<String, dynamic> json, String tokenHeader)
+      : this(
+            itemId: json['idSubasta'],
+            type: json['type'],
+            title: json['title'],
+            description: json['description'],
+            published: json['published'] == null
+               ? null
+               : DateFormat("yyyy-MM-dd").parse(json['published']),
+            locationLat: json['location']['lat'],
+            locationLng: json['location']['lng'],
+            distance: json['distance'],
+            category: json['category'],
+            price: json['startPrice'],
+            currency: json['currency'],
+            status: json['status'],
+            numViews: json['nvis'],
+            numLikes: json['nfav'],
+            //TODO: backend devuelve null en campo owner. Descomentar cuando se solucione.
+            //owner: UsuarioClass.fromJson(json['owner'], tokenHeader),
+            endDate: json['endDate'] == null
+                ? null
+               : DateFormat("yyyy-MM-dd").parse(json['endDate']),
+            lastBid: json['lastBid'],
+            media: _getImages(json['media'], tokenHeader)
+           );
 
   void update({String type, double price, String currency}) {
     this.type = type;
