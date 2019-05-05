@@ -16,8 +16,8 @@ import 'package:selit/widgets/chats/swipe_widget.dart';
 
 
 class ChatList extends StatefulWidget {
-  int miId;
-  ChatList({@required this.miId});
+  static int miId;
+  ChatList(miId);
 
   @override
   ChatListState createState() {
@@ -26,18 +26,27 @@ class ChatList extends StatefulWidget {
 }
 
 class ChatListState extends State<ChatList> {
-  List<ChatClass> _chats = new List();
   int _miId;
-  int _indice = 0;
 
   ChatListState(int miId){
+    print('Mi id es: ' + miId.toString());
     _miId = miId;
   }
 
   @override
   void initState() {
     super.initState();
-    _chats = <ChatClass>[];
+    if (_miId == null){
+      _miId = -1; //Quitar null porque sino hará query de todos los chats
+      _leerIdUsuario();
+    }
+  }
+
+  void _leerIdUsuario() async {
+    int idStorage = await Storage.loadUserId();
+    setState(() {
+      _miId = idStorage;
+    });
   }
 
   Future<ChatClass> _getChatData(BuildContext context, DocumentSnapshot document) async {

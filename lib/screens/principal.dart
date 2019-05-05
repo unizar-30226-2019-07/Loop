@@ -20,20 +20,25 @@ class _Principal extends State<Principal> {
 
   // Página actual (al principio es 0 -> home)
   static int _currentPage = 0;
-  static int _userId = 0; //Valor 0 usuario interno
+  static int _idUsuario = 0; //Valor 0 usuario interno
 
     @override
   void initState() {
-    super.initState();
     _leerIdUsuario();
+    super.initState();
+    print('Valor after _idUsuario: ' + _idUsuario.toString());
   }
 
   void _leerIdUsuario() async {
-    _userId = await Storage.loadUserId();
+    int idStorage = await Storage.loadUserId();
+    setState(() {
+      _idUsuario = idStorage;
+    });
+    print('Valor _idUsuario: ' + _idUsuario.toString());
   }
 
   // Lista de pantallas (en orden según aparecen en la barra de navegación)
-  List<Widget> screenList = [ItemList(), ChatList(miId: _userId), Profile(userId: _userId), Settings()];
+  static List<Widget> screenList = [ItemList(), ChatList(_idUsuario), Profile(userId: _idUsuario), Settings()];
 
 	@override
 	Widget build(BuildContext context) {
@@ -52,6 +57,7 @@ class _Principal extends State<Principal> {
           ],
           // Cambiar la pantalla
           onTabChangedListener: (position) {
+            print('Valor al cambiar tab _idUsuario: ' + _idUsuario.toString());
             setState(() {
               _currentPage = position;
             });
