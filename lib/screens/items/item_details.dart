@@ -217,29 +217,7 @@ class _ItemDetails extends State<ItemDetails> {
         textColor: Colors.white,
         color: Theme.of(context).primaryColor,
         onPressed: () {
-          String docId = 'p' + _item.itemId.toString() + '_a' + 
-            _item.owner.userId.toString() + '_c' + miId.toString();
-            /*
-          function() async {
-            final QuerySnapshot result = await Firestore.instance
-              .collection('company')
-              .where('name', isEqualTo: name)
-              .limit(1)
-              .getDocuments();
-            final List<DocumentSnapshot> documents = result.documents;
-          }
-          */
-          Firestore.instance.runTransaction((transaction) async {
-            await transaction.set(Firestore.instance.collection("chat").document(docId), 
-              {'idAnunciante' : _item.owner.userId, 'idCliente' : miId, 'idProducto' : _item.itemId,
-                'visible' : [miId]});
-              
-          });
-          List<int> visible = new List<int>();
-          visible.add(miId);
-          ChatClass chat =  new ChatClass(usuario: _item.owner, miId: miId, producto: _item,
-            visible: visible, docId: docId);
-          Navigator.push(context, MaterialPageRoute(builder: (context) => ChatScreen(chat)));
+          iniciarChat();
         },
         child: new Text('Iniciar chat',
             style: TextStyle(
@@ -331,6 +309,57 @@ class _ItemDetails extends State<ItemDetails> {
         ),
       ),
     );
+  }
+  void iniciarChat() async {
+    String docId = 'p' + _item.itemId.toString() + '_a' + 
+      _item.owner.userId.toString() + '_c' + miId.toString();
+
+    Firestore.instance.collection('chat').document(docId).get().then((document){
+      if(document == null){
+        print('CREAR NUEVO CHAT');
+        // Se crea el chat
+        Firestore.instance.runTransaction((transaction) async {
+          await transaction.set(Firestore.instance.collection("chat").document(docId), 
+            {'idAnunciante' : _item.owner.userId, 'idCliente' : miId, 'idProducto' : _item.itemId,
+              'visible' : [miId]});
+        });
+        List<int> visible = new List<int>();
+        visible.add(miId);
+        ChatClass chat =  new ChatClass(usuario: _item.owner, miId: miId, producto: _item,
+          visible: visible, docId: docId);
+        Navigator.push(context, MaterialPageRoute(builder: (context) => ChatScreen(chat)));
+      }
+      else{
+        print('CHAT EXISTENTE');
+        // Ya existe el chat (hay que preservar los valores de visible)
+        ChatClass chat =  new ChatClass(usuario: _item.owner, miId: miId, producto: _item,
+          visible: List.from(document.data[0]['visible']), docId: docId);
+        Navigator.push(context, MaterialPageRoute(builder: (context) => ChatScreen(chat)));
+      }
+    });
+  /*
+    var document = await Firestore.instance.collection('chat').document(docId).get();
+    if(document.data == null){
+      print('CREAR NUEVO CHAT');
+      // Se crea el chat
+      Firestore.instance.runTransaction((transaction) async {
+        await transaction.set(Firestore.instance.collection("chat").document(docId), 
+          {'idAnunciante' : _item.owner.userId, 'idCliente' : miId, 'idProducto' : _item.itemId,
+            'visible' : [miId]});
+      });
+      List<int> visible = new List<int>();
+      visible.add(miId);
+      ChatClass chat =  new ChatClass(usuario: _item.owner, miId: miId, producto: _item,
+        visible: visible, docId: docId);
+      Navigator.push(context, MaterialPageRoute(builder: (context) => ChatScreen(chat)));
+    }
+    else{
+      // Ya existe el chat (hay que preservar los valores de visible)
+      ChatClass chat =  new ChatClass(usuario: _item.owner, miId: miId, producto: _item,
+        visible: List.from(document.data[0]['visible']), docId: docId);
+      Navigator.push(context, MaterialPageRoute(builder: (context) => ChatScreen(chat)));
+    }    
+    */
   }
 
   @override
