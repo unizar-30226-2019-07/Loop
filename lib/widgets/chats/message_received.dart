@@ -22,12 +22,11 @@ class MessageReceivedTile extends StatelessWidget {
       bottom: false,
       child: Padding(
         padding: const EdgeInsets.only(
-            top: 10.0, bottom: 10.0, left: 10.0, right: 100.0),
+            top: 5.0, bottom: 5.0, left: 10.0, right: 100.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             SizedBox(
-              height: height,
               child: Card(
                 clipBehavior: Clip.antiAlias,
                 elevation: 0.5,
@@ -43,7 +42,7 @@ class MessageReceivedTile extends StatelessWidget {
                     children: <Widget>[
                       Expanded(
                         child: Container(
-                          padding: const EdgeInsets.only(left: 20.0),
+                          padding: const EdgeInsets.only(left: 20.0, right: 20.0),
                           child: Column(
                             mainAxisSize: MainAxisSize.max,
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -57,7 +56,7 @@ class MessageReceivedTile extends StatelessWidget {
                                           fontWeight: FontWeight.bold))),
                               new Container(
                                   margin: const EdgeInsets.only(
-                                      top: 3.0),
+                                      top: 3.0, bottom: 3.0),
                                   child: new Text(hora,
                                       style: new TextStyle(
                                           fontSize: 12.0,

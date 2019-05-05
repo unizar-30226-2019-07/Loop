@@ -166,7 +166,7 @@ class ChatScreenState extends State<ChatScreen> {
                         );
                       } else {
                         return ListView.builder(
-                          padding: EdgeInsets.all(10.0),
+                          padding: EdgeInsets.only(left: 10.0, right: 10.0, top: 5.0, bottom: 5.0),
                           itemBuilder: (context, index) =>
                             buildMessage(snapshot.data.documents[index]),   
                           itemCount: snapshot.data.documents.length,
@@ -299,7 +299,17 @@ class ChatScreenState extends State<ChatScreen> {
   }
 
   Future _sendMessage({String messageText, String imageUrl}) async {
+    print('Enviando mensaje');
     // Falta poner visible al otro si no lo esta
+    if(!_chat.visible.contains(_chat.usuario.userId)){
+      _chat.visible.add(_chat.usuario.userId);
+      print('Cambiando visibilidad');
+      Firestore.instance.runTransaction((transaction) async {
+            await transaction.set(Firestore.instance.collection("chat").document(_chat.docId), 
+              {'idAnunciante' : _chat.usuario.userId, 'idCliente' : _miId,
+              'idProducto' : _chat.producto.itemId, 'visible' : _chat.visible});
+      });
+    }
     await Firestore.instance.collection("chat").document(_chat.docId).collection("mensaje").document().setData({
       'contenido' : messageText, 'estado' : 'enviado',
         'fecha' : DateTime.now(), 'idEmisor' : _miId

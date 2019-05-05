@@ -2,9 +2,11 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoder/geocoder.dart';
+import 'package:selit/class/chat_class.dart';
 import 'package:selit/class/item_class.dart';
 import 'package:carousel_pro/carousel_pro.dart';
 import 'package:selit/class/items/filter_list_class.dart';
+import 'package:selit/screens/chat/chat.dart';
 import 'package:selit/screens/items/edit_item.dart';
 import 'package:selit/util/storage.dart';
 import 'package:selit/util/api/item_request.dart';
@@ -217,12 +219,27 @@ class _ItemDetails extends State<ItemDetails> {
         onPressed: () {
           String docId = 'p' + _item.itemId.toString() + '_a' + 
             _item.owner.userId.toString() + '_c' + miId.toString();
+            /*
+          function() async {
+            final QuerySnapshot result = await Firestore.instance
+              .collection('company')
+              .where('name', isEqualTo: name)
+              .limit(1)
+              .getDocuments();
+            final List<DocumentSnapshot> documents = result.documents;
+          }
+          */
           Firestore.instance.runTransaction((transaction) async {
             await transaction.set(Firestore.instance.collection("chat").document(docId), 
               {'idAnunciante' : _item.owner.userId, 'idCliente' : miId, 'idProducto' : _item.itemId,
                 'visible' : [miId]});
               
           });
+          List<int> visible = new List<int>();
+          visible.add(miId);
+          ChatClass chat =  new ChatClass(usuario: _item.owner, miId: miId, producto: _item,
+            visible: visible, docId: docId);
+          Navigator.push(context, MaterialPageRoute(builder: (context) => ChatScreen(chat)));
         },
         child: new Text('Iniciar chat',
             style: TextStyle(

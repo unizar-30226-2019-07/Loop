@@ -29,12 +29,11 @@ class MessageSentTile extends StatelessWidget {
       bottom: false,
       child: Padding(
         padding: const EdgeInsets.only(
-            top: 10.0, bottom: 10.0, left: 100.0, right: 10.0),
+            top: 5.0, bottom: 5.0, left: 100.0, right: 10.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: <Widget>[
             SizedBox(
-              height: height,
               child: Card(
                 color: Theme.of(context).primaryColor,
                 clipBehavior: Clip.antiAlias,
@@ -51,7 +50,7 @@ class MessageSentTile extends StatelessWidget {
                     children: <Widget>[
                       Expanded(
                         child: Container(
-                          padding: const EdgeInsets.only(right: 20.0),
+                          padding: const EdgeInsets.only(left: 20.0, right: 20.0),
                           child: Column(
                             mainAxisSize: MainAxisSize.max,
                             crossAxisAlignment: CrossAxisAlignment.end,
@@ -65,7 +64,7 @@ class MessageSentTile extends StatelessWidget {
                                           fontWeight: FontWeight.bold))),
                               new Container(
                                   margin: const EdgeInsets.only(
-                                      top: 3.0),
+                                      top: 3.0, bottom: 3.0),
                                   child: new Text(hora,
                                       style: new TextStyle(
                                           fontSize: 12.0,
