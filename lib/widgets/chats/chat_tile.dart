@@ -11,25 +11,27 @@ class ChatTile extends StatelessWidget {
 
   static final _styleTitle =
       TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold);
-  static final _styleDescription =
+        static final _styleMensaje =
       TextStyle(fontSize: 14.0, color: Colors.grey[700]);
+  static final _styleUsuario =
+      TextStyle(fontSize: 14.0, color: Colors.black);
   // Nota: stylePrice usa el color rojo de la aplicación (ver más abajo)
   static final _stylePrice =
       TextStyle(fontSize: 16.0, fontWeight: FontWeight.w900);
 
-  static const double height = 75.0;
+  static const double height = 86.0;
 
   
 
   @override
   Widget build(BuildContext context) {
-    Widget image = _chat.usuario.profileImage == null
+    Widget image = _chat.producto.media[0] == null
                     ? Container()
                     : Container(
                         padding: const EdgeInsets.all(3.0),
                         child: SizedBox.fromSize(
-                          size: Size(60.0, double.infinity),
-                          child: ProfilePicture(_chat.usuario.profileImage)));
+                          size: Size(71.0, double.infinity),
+                          child: ProfilePicture(_chat.producto.media[0])));
     return SafeArea(
       top: false,
       bottom: false,
@@ -63,17 +65,21 @@ class ChatTile extends StatelessWidget {
                             mainAxisSize: MainAxisSize.max,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
-                              Text(_chat.usuario.nombre + ' ' + _chat.usuario.apellidos,
+                              Text(_chat.producto.title,
                                   overflow: TextOverflow.ellipsis,
                                   maxLines: 1,
                                   style: _styleTitle),
+                              Text(_chat.usuario.nombre + ' ' + _chat.usuario.apellidos,
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                  style: _styleUsuario),
                               Expanded(
                                 child: Stack(
                                   children: <Widget>[
                                     ClipRect(
                                       child: Text('Este es mi ultimo mensaje enviado',
                                           maxLines: 1,
-                                          style: _styleDescription),
+                                          style: _styleMensaje),
                                     ),
                                     Container(
                                       decoration: BoxDecoration(

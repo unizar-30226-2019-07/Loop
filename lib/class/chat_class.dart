@@ -10,9 +10,10 @@ class ChatClass {
   int miId;
   ItemClass producto;
   List<dynamic> visible;
+  String docId;
   
 
   ChatClass({this.usuario, this.miId, this.producto, 
-    this.visible});
+    this.visible, this.docId});
   
 }

@@ -15,7 +15,7 @@ class ChatTileLoading extends StatelessWidget {
   static final _stylePrice =
       TextStyle(fontSize: 16.0, fontWeight: FontWeight.w900);
 
-  static const double height = 75.0;
+  static const double height = 86.0;
 
   
 
@@ -24,7 +24,7 @@ class ChatTileLoading extends StatelessWidget {
     Widget image = Container(
                         padding: const EdgeInsets.all(3.0),
                         child: SizedBox.fromSize(
-                          size: Size(60.0, double.infinity),));
+                          size: Size(71.0, double.infinity),));
     return SafeArea(
       top: false,
       bottom: false,

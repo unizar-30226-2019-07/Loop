@@ -57,7 +57,8 @@ class ChatListState extends State<ChatList> {
     }
     // Obtener UsuarioClass del otro usuario
     UsuarioClass usuario = await UsuarioRequest.getUserById(idOtro);
-    ChatClass chat =  new ChatClass(usuario: usuario, miId: _miId, producto: item, visible: document['visible']);
+    ChatClass chat =  new ChatClass(usuario: usuario, miId: _miId, producto: item,
+      visible: document['visible'], docId: document.documentID);
     return chat;
   }
 

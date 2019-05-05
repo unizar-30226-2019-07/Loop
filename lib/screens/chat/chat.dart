@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -8,6 +9,7 @@ import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:selit/class/usuario_class.dart';
 import 'package:selit/util/storage.dart';
 import 'package:selit/widgets/profile_picture.dart';
@@ -44,10 +46,21 @@ class ChatScreenState extends State<ChatScreen> {
 
   ChatClass _chat;
   UsuarioClass _usuario;
+  int _miId;
 
   ChatScreenState(ChatClass chat) {
     this._chat = chat;
-    //_leerIdUsuario();
+    if (_miId == null){
+      _miId = -1; //Quitar null porque sino hará query de todos los chats
+    }
+    _leerIdUsuario();
+  }
+
+  void _leerIdUsuario() async {
+    int idStorage = await Storage.loadUserId();
+    setState(() {
+      _miId = idStorage;
+    });
   }
 
   static final _styleTitle =
@@ -75,7 +88,7 @@ class ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Widget image = _usuario.profileImage == null
+    Widget image = _chat.usuario.profileImage == null
         ? Container()
         : Container(
             padding: const EdgeInsets.only(top: 3.0, bottom: 3.0, right: 10.0),
@@ -119,8 +132,8 @@ class ChatScreenState extends State<ChatScreen> {
 
               //Para debug del estilo de los mensajes
               //TODO: borrar cuando se obtengan los mensajes de firebase.
-              MessageReceivedTile('Mensaje recibido...', '18:00'),
-              MessageSentTile('Mensaje enviado...', '18:00'),
+              //MessageReceivedTile('Mensaje recibido...', '18:00'),
+              //MessageSentTile('Mensaje enviado...', '18:00'),
 
               //TODO: Descomentar para obtener mensajes de firebase.
               /*
@@ -140,7 +153,28 @@ class ChatScreenState extends State<ChatScreen> {
                   },
                 ),
               ),*/
-
+              Expanded(
+                child: Container(
+                  child: StreamBuilder(
+                    stream: Firestore.instance.collection('chat').document(_chat.docId).collection('mensaje').orderBy('fecha', descending: false).snapshots(),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) {
+                        return Center(
+                          child: CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
+                          ),
+                        );
+                      } else {
+                        return ListView.builder(
+                          padding: EdgeInsets.all(10.0),
+                          itemBuilder: (context, index) =>
+                            buildMessage(snapshot.data.documents[index]),   
+                          itemCount: snapshot.data.documents.length,
+                        );
+                      }
+                    },
+                  ),),
+              ),
               new Divider(height: 1.0),
               new Container(
                 decoration:
@@ -181,6 +215,18 @@ class ChatScreenState extends State<ChatScreen> {
     );
   }
 
+  Widget buildMessage(DocumentSnapshot document){
+    print('Contenido del mensaje: ' + document['contenido']);
+    String formattedDate = DateFormat('yyyy-MM-dd – kk:mm').format(document['fecha'].toDate());
+    //String formattedDate = timeago.format(document['fecha'].toDate());
+    if(_miId == document['idEmisor']){
+      return MessageSentTile(document['contenido'], formattedDate);
+    }
+    else{
+      return MessageReceivedTile(document['contenido'], formattedDate);
+    }
+  }
+
   Widget _buildTextComposer() {
     return new IconTheme(
         data: new IconThemeData(
@@ -200,6 +246,8 @@ class ChatScreenState extends State<ChatScreen> {
                       color: Theme.of(context).accentColor,
                     ),
                     onPressed: () async {
+              
+
                       /*
                       await _ensureLoggedIn();
                       File imageFile = await ImagePicker.pickImage();
@@ -250,16 +298,11 @@ class ChatScreenState extends State<ChatScreen> {
     _sendMessage(messageText: text, imageUrl: null);
   }
 
-  void _sendMessage({String messageText, String imageUrl}) {
-    reference.push().set({
-      'text': messageText,
-      'email': '',
-      'imageUrl': imageUrl,
-      'senderName': '',
-      'senderPhotoUrl': '',
-      'time': ''
+  Future _sendMessage({String messageText, String imageUrl}) async {
+    // Falta poner visible al otro si no lo esta
+    await Firestore.instance.collection("chat").document(_chat.docId).collection("mensaje").document().setData({
+      'contenido' : messageText, 'estado' : 'enviado',
+        'fecha' : DateTime.now(), 'idEmisor' : _miId
     });
-
-    analytics.logEvent(name: 'send_message');
   }
 }
