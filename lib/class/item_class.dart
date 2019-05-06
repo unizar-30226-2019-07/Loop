@@ -24,6 +24,7 @@ class ItemClass {
   int numLikes;
   UsuarioClass owner; // vendedor del item
   List<ImageClass> media; // lista de 0+ imágenes
+  bool favorited; // si está en la lista de deseados
   DateTime endDate; //Fecha de finalización   yyyy-MM-dd
   LastBid lastBid;
 
@@ -45,6 +46,7 @@ class ItemClass {
       this.numLikes,
       this.owner,
       this.media,
+      this.favorited,
       this.endDate, 
       this.lastBid})
       : assert(type == null || type == "sale" || type == "auction",
@@ -79,10 +81,10 @@ class ItemClass {
   }
 
   /// Constructor a partir de JSON
-  ItemClass.fromJson(Map<String, dynamic> json, String tokenHeader)
+  ItemClass.fromJsonProducts(Map<String, dynamic> json, String tokenHeader)
       : this(
             itemId: json['id_producto'],
-            type: json['type'],
+            type: 'sale',
             title: json['title'],
             description: json['description'],
             published: json['publicate_date'] == null
@@ -97,6 +99,7 @@ class ItemClass {
             status: json['status'],
             numViews: json['nvis'],
             numLikes: json['nfav'],
+            favorited: json['in_wishlist'],
             owner: UsuarioClass.fromJson(json['owner'], tokenHeader),
             media: _getImages(json['media'], tokenHeader));
   
@@ -119,6 +122,7 @@ class ItemClass {
             status: json['status'],
             numViews: json['nvis'],
             numLikes: json['nfav'],
+            favorited: json['in_wishlist'],
             owner: UsuarioClass.fromJson(json['owner'], tokenHeader),
             endDate: json['endDate'] == null
                 ? null
@@ -148,7 +152,7 @@ class ItemClass {
   }
 
   bool isAuction() {
-    return this.type.compareTo("equals") == 0;
+    return this.type.compareTo("auction") == 0;
   }
 
   Map<String, dynamic> toJsonCreate() => {

@@ -47,48 +47,65 @@ class _ItemDetails extends State<ItemDetails> {
 
   // Constructor
   _ItemDetails(this._item) {
-    // TODO comprobar si el objeto está en tu lista de deseados y actualizar _esFavorito y _favorite
     if (_item.media.isNotEmpty) {
       for (var imagen in _item.media) {
         _images.add(imagen.image.image);
       }
     }
     _loadCoordinates();
+    // productos deseados
     _favoriteFunction = _favoritePressed;
+    _esFavorito = (_item?.favorited == true);
+    _favorite = _esFavorito ? Icons.favorite : Icons.favorite_border;
   }
 
   Function _favoriteFunction; // callback al presionar el corazón
-  bool _esFavorito = false;
-  IconData _favorite = Icons.favorite_border;
+  bool _esFavorito;
+  IconData _favorite;
 
   /// Añadir o quitar el producto según proceda
-  void _favoritePressed() {
-    _favoriteFunction = null;
+  void _favoritePressed() async {
+    setState(() {
+      _favoriteFunction = null;
+    });
     if (_esFavorito) {
       // ya está, quitar
-      UsuarioRequest.removeFromWishlist(
+      await UsuarioRequest.removeFromWishlist(
               productId: _item.itemId, auctions: _item.isAuction())
           .then((_) {
         _esFavorito = false;
-      }).catchError((_) {
-        showInSnackBar("Ha ocurrido un problema", _colorStatusBarBad);
+      }).catchError((msg) {
+        if (msg == "Precondition Failed") {
+          showInSnackBar(
+              "Este producto no está en tu lista", _colorStatusBarBad);
+          _esFavorito = false;
+        } else {
+          showInSnackBar("Ha ocurrido un problema", _colorStatusBarBad);
+        }
       });
     } else {
       // no está, añadir
-      UsuarioRequest.addToWishlist(
+      await UsuarioRequest.addToWishlist(
               productId: _item.itemId, auctions: _item.isAuction())
           .then((_) {
         _esFavorito = true;
-      }).catchError((_) {
-        showInSnackBar("Ha ocurrido un problema", _colorStatusBarBad);
+      }).catchError((msg) {
+        if (msg == "Precondition Failed") {
+          showInSnackBar(
+              "Este producto ya está en tu lista", _colorStatusBarBad);
+          _esFavorito = true;
+        } else {
+          showInSnackBar("Ha ocurrido un problema", _colorStatusBarBad);
+        }
       });
     }
     // Actualizar el corazón
     setState(() {
+      _favoriteFunction = _favoritePressed;
       if (_esFavorito) {
-        _favorite = Icons.favorite_border;
-      } else {
         _favorite = Icons.favorite;
+      } else {
+        _favorite = Icons.favorite_border;
       }
     });
   }
@@ -298,8 +315,7 @@ class _ItemDetails extends State<ItemDetails> {
   @override
   Widget build(BuildContext context) {
     BarColor.changeBarColor(
-        color: Theme.of(context).primaryColor,
-        whiteForeground: true);
+        color: Theme.of(context).primaryColor, whiteForeground: true);
     final ThemeData theme = Theme.of(context);
     final TextStyle descriptionStyle = theme.textTheme.subhead;
     // Item en venta o no (también tener en cuenta si es nulo)
@@ -314,7 +330,7 @@ class _ItemDetails extends State<ItemDetails> {
       // Mover +/- 0.004 la latitud y longitud
       double randomLat = (200 - ((_item.owner.userId * 37 + 48) % 400)) / 50000;
       double randomLng = (200 - ((_item.owner.userId * 83 + 21) % 400)) / 50000;
-      print('Con ID ${_item.owner.userId} se mueve ($randomLat, $randomLng)');
+      //print('Con ID ${_item.owner.userId} se mueve ($randomLat, $randomLng)');
       LatLng movedLL = LatLng(_item.owner.locationLat + randomLat,
           _item.owner.locationLng + randomLng);
       // Posición de cámara para mostrarla en el mapa
@@ -398,17 +414,26 @@ class _ItemDetails extends State<ItemDetails> {
                                 ),
                               ],
                             ),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.only(bottom: 8.0, left: 8.0),
-                              child: IconButton(
-                                icon: Icon(_favorite),
-                                color: Colors.red,
-                                iconSize: 35.0,
-                                tooltip: 'Favoritos',
-                                splashColor: Colors.red,
-                                onPressed: _favoriteFunction,
-                              ),
+                            SizedBox.fromSize(
+                              size: Size(60.0, 60.0),
+                              child: _favoriteFunction == null
+                                  ? Container(
+                                      margin: EdgeInsets.all(15.0),
+                                      child: CircularProgressIndicator(
+                                          strokeWidth: 4.0,
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                  _esFavorito
+                                                      ? Colors.grey
+                                                      : Colors.red)))
+                                  : IconButton(
+                                      icon: Icon(_favorite),
+                                      color: Colors.red,
+                                      iconSize: 35.0,
+                                      tooltip: 'Favoritos',
+                                      splashColor: Colors.red,
+                                      onPressed: _favoriteFunction,
+                                    ),
                             ),
                           ],
                         ))),
@@ -428,7 +453,6 @@ class _ItemDetails extends State<ItemDetails> {
                                 FilterListClass.categoryNames[_item.category],
                             style: TextStyle(
                                 fontSize: 17.0, color: Colors.grey[600]))),
-             
                 Divider(),
                 SizedBox(
                   width: double.infinity,

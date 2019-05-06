@@ -619,7 +619,7 @@ class _ProfileState extends State<Profile> {
                 SpeedDialChild(
                   child: Icon(Icons.favorite),
                   backgroundColor: Theme.of(context).primaryColor,
-                  label: 'Deseos',
+                  label: 'Lista de deseos',
                   //labelStyle: TextTheme(fontSize: 18.0),
                   onTap: () {
                     Navigator.of(context)

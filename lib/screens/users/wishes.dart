@@ -60,11 +60,12 @@ class _WishesState extends State<Wishes> {
   }
 
   void _loadProfileItems() async {
-    if (_user == null) {
+    if (_user?.locationLat == null || _user?.locationLng == null) {
       print('ERROR: Intentando cargar objetos sin tener un usuario');
     } else {
       // Cargar los objetos deseados (productos y subastas) del usuario
-      UsuarioRequest.getWishlist(auctions: false)
+      UsuarioRequest.getWishlist(
+              auctions: false, lat: _user.locationLat, lng: _user.locationLng)
           .then((wishlistProducts) {
         _cancelled = false;
         if (!_cancelled) {
@@ -80,7 +81,8 @@ class _WishesState extends State<Wishes> {
         print('Error al cargar los productos deseados: $error');
         _wishListProductsEmpty = true;
       });
-      UsuarioRequest.getWishlist(auctions: true)
+      UsuarioRequest.getWishlist(
+              auctions: true, lat: _user.locationLat, lng: _user.locationLng)
           .then((wishlistAuctions) {
         if (!_cancelled) {
           setState(() {
