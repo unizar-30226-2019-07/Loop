@@ -43,7 +43,6 @@ class ImageClass {
 
 
   Map<String, dynamic> toJson() => {
-
     'idImagen' : imageId,
     'base64' : base64,
     'mime' : mime,

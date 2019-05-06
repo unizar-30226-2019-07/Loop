@@ -2,6 +2,7 @@ import 'package:selit/class/usuario_class.dart';
 import 'package:selit/class/image_class.dart';
 import 'package:selit/class/items/filter_list_class.dart';
 import 'package:intl/intl.dart';
+import 'package:selit/class/lastBid_class.dart';
 
 /// Objeto/producto en venta de la aplicación, almacena información
 /// sobre su descripción, su tipo de venta y el usuario vendedor (ver [UsuarioClass])
@@ -24,7 +25,7 @@ class ItemClass {
   UsuarioClass owner; // vendedor del item
   List<ImageClass> media; // lista de 0+ imágenes
   DateTime endDate; //Fecha de finalización   yyyy-MM-dd
-  double lastBid;
+  LastBid lastBid;
 
   /// Constructor por defecto, comprobar que los atributos son correctos
   ItemClass(
@@ -103,7 +104,7 @@ class ItemClass {
   ItemClass.fromJsonAuctions(Map<String, dynamic> json, String tokenHeader)
       : this(
             itemId: json['idSubasta'],
-            type: json['type'],
+            type: "auction",
             title: json['title'],
             description: json['description'],
             published: json['published'] == null
@@ -118,12 +119,13 @@ class ItemClass {
             status: json['status'],
             numViews: json['nvis'],
             numLikes: json['nfav'],
-            //TODO: backend devuelve null en campo owner. Descomentar cuando se solucione.
-            //owner: UsuarioClass.fromJson(json['owner'], tokenHeader),
+            owner: UsuarioClass.fromJson(json['owner'], tokenHeader),
             endDate: json['endDate'] == null
                 ? null
                : DateFormat("yyyy-MM-dd").parse(json['endDate']),
-            lastBid: json['lastBid'],
+            lastBid: json['lastBid'] == null
+              ? null
+              : LastBid.fromJson(json['lastBid'], tokenHeader),
             media: _getImages(json['media'], tokenHeader)
            );
 

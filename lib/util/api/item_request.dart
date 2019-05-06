@@ -27,6 +27,7 @@ class ItemRequest {
 
     print("Parametros: $_otherParameters");
 
+
     http.Response response;
     if (_params["type"] == "sale") {
       // Esperar la respuesta de la petición
@@ -59,7 +60,7 @@ class ItemRequest {
       print('ITEM API STOP ◼');
     }
 
-    //print(response.body);
+    print(response.body);
     // Crear la lista de items a partir de la respuesta y devovlerla
     if (response.statusCode == 200) {
       List<ItemClass> products = new List<ItemClass>();

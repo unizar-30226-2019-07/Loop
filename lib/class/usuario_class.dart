@@ -65,10 +65,13 @@ class UsuarioClass {
             email: json["email"],
             locationLat: json['location']['lat'],
             locationLng: json['location']['lng'],
-            profileImage: ImageClass.network(
-              imageId: json['picture']['idImagen'],
-              tokenHeader: tokenHeader,
-            ));
+            profileImage: json['picture'] == null
+                ? null
+                : ImageClass.network(
+             imageId: json['picture']['idImagen'],
+             tokenHeader: tokenHeader,
+            )
+            );
 
   void update(
       {String nombre,
