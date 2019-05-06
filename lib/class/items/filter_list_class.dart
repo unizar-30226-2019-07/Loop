@@ -3,17 +3,17 @@
 class FilterListClass {
   /// Nombres de categorías empleados por la API
   /// Mapa (nombre de API) -> (nombre en la aplicación)
-  // TODO actualizar cuando se refleje en la base de datos
+  /// NOTA: Ambos nombres son iguales, pero es importante diferenciar
+  /// los nombres de la API con los nombres de la aplicación
   static final Map<String, String> categoryNames = {
-    'Automocion': 'Automoción',
-    'Automoción': 'Automoción con tilde', // en la BD hay de las dos
-    'Informatica': 'Informática',
-    'Ropa': 'Moda',
-    'Deporte': 'Deporte y ocio',
+    'Automoción': 'Automoción',
+    'Informática': 'Informática',
+    'Moda': 'Moda',
+    'Deporte y ocio': 'Deporte y ocio',
     'Videojuegos': 'Videojuegos',
-    'Libros': 'Libros y música',
-    'Hogar': 'Hogar y jardín',
-    'Foto': 'Foto y audio',
+    'Libros y música': 'Libros y música',
+    'Hogar y jardín': 'Hogar y jardín',
+    'Foto y audio': 'Foto y audio',
   };
   static final List<String> typeNames = [
     'Venta y subasta',

@@ -25,7 +25,7 @@ class _ItemListDrawerState extends State<ItemListDrawer> {
   static final _styleTextSliders =
       TextStyle(fontSize: 17.0, color: Colors.grey[200]);
 
-  /// Botones para seleccionar categoría y ordenaciónc
+  /// Botones para seleccionar categoría y ordenación
   static final _styleFilterButton =
       TextStyle(fontSize: 18.0, color: Colors.black);
 
