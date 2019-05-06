@@ -7,9 +7,10 @@ class MessageSentTile extends StatelessWidget {
 
   final String mensaje;
   final String hora;
+  final String estado;
 
 
-  MessageSentTile(this.mensaje, this.hora);
+  MessageSentTile(this.mensaje, this.hora, this.estado);
 
   static final _styleTitle = TextStyle(
     fontSize: 18.0,
@@ -65,11 +66,24 @@ class MessageSentTile extends StatelessWidget {
                               new Container(
                                   margin: const EdgeInsets.only(
                                       top: 3.0, bottom: 3.0),
-                                  child: new Text(hora,
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: <Widget>[
+                                      Container(
+                                        margin: const EdgeInsets.only(right: 20.0),
+                                        child: new Text(estado,
+                                      style: new TextStyle(
+                                          fontSize: 12.0,
+                                          color: Colors.white70,
+                                          fontWeight: FontWeight.w100))),
+                                      new Text(hora,
                                       style: new TextStyle(
                                           fontSize: 12.0,
                                           color: Colors.white,
-                                          fontWeight: FontWeight.bold))),
+                                          fontWeight: FontWeight.bold)),
+                                    ],
+                                  ))
+                                  
                             ],
                           ),
                         ),

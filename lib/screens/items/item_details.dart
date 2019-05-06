@@ -333,7 +333,7 @@ class _ItemDetails extends State<ItemDetails> {
         print('CHAT EXISTENTE');
         // Ya existe el chat (hay que preservar los valores de visible)
         ChatClass chat =  new ChatClass(usuario: _item.owner, miId: miId, producto: _item,
-          visible: List.from(document.data[0]['visible']), docId: docId);
+          visible: List.from(document.data['visible']), docId: docId);
         Navigator.push(context, MaterialPageRoute(builder: (context) => ChatScreen(chat)));
       }
     });

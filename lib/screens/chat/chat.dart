@@ -14,7 +14,6 @@ import 'package:selit/class/usuario_class.dart';
 import 'package:selit/util/storage.dart';
 import 'package:selit/widgets/profile_picture.dart';
 import 'package:selit/class/chat_class.dart';
-import 'package:selit/screens/chat/message_list.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -63,6 +62,8 @@ class ChatScreenState extends State<ChatScreen> {
     });
   }
 
+  static final _styleUsuario =
+    TextStyle(fontSize: 14.0, color: Colors.black);
   static final _styleTitle =
       TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold);
 
@@ -88,19 +89,26 @@ class ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Widget image = _chat.usuario.profileImage == null
+    Widget itemImage = _chat.producto.media[0] == null
         ? Container()
         : Container(
             padding: const EdgeInsets.only(top: 3.0, bottom: 3.0, right: 10.0),
             child: SizedBox.fromSize(
                 size: Size(50.0, double.infinity),
+                child: ProfilePicture(_chat.producto.media[0])));
+    Widget userImage = _chat.usuario.profileImage == null
+        ? Container()
+        : Container(
+            padding: const EdgeInsets.only(top: 3.0, bottom: 3.0, right: 10.0),
+            child: SizedBox.fromSize(
+                size: Size(30.0, 30.0),
                 child: ProfilePicture(_chat.usuario.profileImage)));
     return new Scaffold(
         appBar: new AppBar(
           title: InkWell(
             onTap: (){
               Navigator.of(context)
-                          .pushNamed('/profile', arguments: _chat.usuario.userId);
+                      .pushNamed('/item-details', arguments: _chat.producto);
             },
             splashColor: Theme.of(context)
                           .colorScheme
@@ -111,15 +119,33 @@ class ChatScreenState extends State<ChatScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  image,
+                  Stack(
+                    children: <Widget>[
+                      itemImage,
+                      Positioned(
+                        left: 20.0,
+                        top: 20.0,
+                        child: userImage)
+                    ],
+                  ),
+                  
                   Expanded(
                       child: Container(
                         padding: const EdgeInsets.all(3.0),
-                        child: Text(
-                          _chat.usuario.nombre + ' ' + _chat.usuario.apellidos,
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                          style: _styleTitle)))
+                        child:
+                        Column(
+                          children: <Widget>[
+                            Text(_chat.producto.title,
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                  style: _styleTitle),
+                            Text(_chat.usuario.nombre + ' ' + _chat.usuario.apellidos,
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                style: _styleUsuario),
+                          ],
+                        )
+                      ))
                 ],
               ),
             )),
@@ -156,7 +182,7 @@ class ChatScreenState extends State<ChatScreen> {
               Expanded(
                 child: Container(
                   child: StreamBuilder(
-                    stream: Firestore.instance.collection('chat').document(_chat.docId).collection('mensaje').orderBy('fecha', descending: false).snapshots(),
+                    stream: Firestore.instance.collection('chat').document(_chat.docId).collection('mensaje').orderBy('fecha', descending: true).snapshots(),
                     builder: (context, snapshot) {
                       if (!snapshot.hasData) {
                         return Center(
@@ -167,6 +193,8 @@ class ChatScreenState extends State<ChatScreen> {
                       } else {
                         return ListView.builder(
                           padding: EdgeInsets.only(left: 10.0, right: 10.0, top: 5.0, bottom: 5.0),
+                          reverse: true,
+                          shrinkWrap: true,
                           itemBuilder: (context, index) =>
                             buildMessage(snapshot.data.documents[index]),   
                           itemCount: snapshot.data.documents.length,
@@ -216,11 +244,19 @@ class ChatScreenState extends State<ChatScreen> {
   }
 
   Widget buildMessage(DocumentSnapshot document){
+    // Cambiar a recibido solo los mensajes del otro usuario
+    if(document['idEmisor'] != _miId){
+      Firestore.instance.runTransaction((transaction) async {
+        await transaction.set(Firestore.instance.collection("chat").document(document.documentID)
+          .collection("mensaje").document(document.documentID), 
+          {'contenido' : document['contenido'], 'estado' : 'recibido',
+          'fecha' : document['fecha'], 'idEmisor' : document['idEmisor']});
+        });
+    }
     print('Contenido del mensaje: ' + document['contenido']);
     String formattedDate = DateFormat('yyyy-MM-dd – kk:mm').format(document['fecha'].toDate());
-    //String formattedDate = timeago.format(document['fecha'].toDate());
     if(_miId == document['idEmisor']){
-      return MessageSentTile(document['contenido'], formattedDate);
+      return MessageSentTile(document['contenido'], formattedDate, document['estado']);
     }
     else{
       return MessageReceivedTile(document['contenido'], formattedDate);
