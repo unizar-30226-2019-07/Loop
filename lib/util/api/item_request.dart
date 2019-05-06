@@ -22,14 +22,14 @@ class ItemRequest {
     if (size != null) _params.putIfAbsent("\$size", () => size.toString());
     if (page != null) _params.putIfAbsent("\$page", () => page.toString());
 
-    String _otherParameters = '?lat=$lat&lng=$lng';
+    String _otherParameters = '?lat=$lat&lng=$lng&token=yes';
     _params.forEach((key, value) => _otherParameters += '&$key=$value');
 
     print("Parametros: $_otherParameters");
 
 
     http.Response response;
-    if (_params["type"] == "sale") {
+    if (_params["type"] == "sale") { // productos
       // Esperar la respuesta de la petición
       print('ITEM API PLAY ▶');
       response = await http
@@ -38,22 +38,11 @@ class ItemRequest {
         HttpHeaders.authorizationHeader: await Storage.loadToken(),
       });
       print('ITEM API STOP ◼');
-    } else if (_params["type"] == "auction") {
+    } else { // subastas
       // Esperar la respuesta de la petición
       print('ITEM API PLAY ▶');
       response = await http
           .get('${APIConfig.BASE_URL}/auctions$_otherParameters', headers: {
-        HttpHeaders.contentTypeHeader: ContentType.json.toString(),
-        HttpHeaders.authorizationHeader: await Storage.loadToken(),
-      });
-      print('ITEM API STOP ◼');
-    }
-    //TODO: Subastas y ventas 
-    else{
-      // Esperar la respuesta de la petición
-      print('ITEM API PLAY ▶');
-      response = await http
-          .get('${APIConfig.BASE_URL}/products$_otherParameters', headers: {
         HttpHeaders.contentTypeHeader: ContentType.json.toString(),
         HttpHeaders.authorizationHeader: await Storage.loadToken(),
       });
@@ -65,22 +54,15 @@ class ItemRequest {
     if (response.statusCode == 200) {
       List<ItemClass> products = new List<ItemClass>();
       String token = await Storage.loadToken();
-      if (_params["type"] == "sale") {
+      if (_params["type"] == "sale") { // productos
         (json.jsonDecode(response.body) as List<dynamic>)
             .forEach((productJson) {
-          products.add(ItemClass.fromJson(productJson, token));
+          products.add(ItemClass.fromJsonProducts(productJson, token));
         });
-      } else if (_params["type"] == "auction") {
+      } else { // subastas
         (json.jsonDecode(response.body) as List<dynamic>)
             .forEach((productJson) {
           products.add(ItemClass.fromJsonAuctions(productJson, token));
-        });
-      }
-      //TODO: Subastas y ventas 
-      else{
-        (json.jsonDecode(response.body) as List<dynamic>)
-            .forEach((productJson) {
-          products.add(ItemClass.fromJson(productJson, token));
         });
       }
       return products;
@@ -116,7 +98,7 @@ class ItemRequest {
       List<ItemClass> products = new List<ItemClass>();
       String token = await Storage.loadToken();
       (json.jsonDecode(response.body) as List<dynamic>).forEach((productJson) {
-        products.add(ItemClass.fromJson(productJson, token));
+        products.add(ItemClass.fromJsonProducts(productJson, token));
       });
       return products;
     } else {

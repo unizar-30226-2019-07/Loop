@@ -16,9 +16,8 @@ class FilterListClass {
     'Foto y audio': 'Foto y audio',
   };
   static final List<String> typeNames = [
-    'Venta y subasta',
-    'Solo ventas',
-    'Solo subastas'
+    'En venta',
+    'Subastas'
   ];
   static final List<String> orderNames = [
     'Más cercanos',
@@ -167,8 +166,8 @@ class FilterListClass {
     if (searchQuery != null && searchQuery.isNotEmpty)
       map.putIfAbsent("search", () => searchQuery);
     // Tipos: venta o subasta
-    if (typeId == 1) map.putIfAbsent("type", () => "sale");
-    if (typeId == 2) map.putIfAbsent("type", () => "auction");
+    if (typeId == 0) map.putIfAbsent("type", () => "sale");
+    if (typeId == 1) map.putIfAbsent("type", () => "auction");
     // Precio
     map.putIfAbsent("priceFrom", () => priceRange[minPriceIndex].toString());
     map.putIfAbsent("priceTo", () => priceRange[maxPriceIndex].toString());
