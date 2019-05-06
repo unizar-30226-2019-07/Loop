@@ -428,17 +428,7 @@ class _ItemDetails extends State<ItemDetails> {
                                 FilterListClass.categoryNames[_item.category],
                             style: TextStyle(
                                 fontSize: 17.0, color: Colors.grey[600]))),
-                _item.type == "null"
-                    ? Container()
-                    : Container(
-                        padding:
-                            const EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 20.0),
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                            'Categoría: ' +
-                                FilterListClass.categoryNames[_item.category],
-                            style: TextStyle(
-                                fontSize: 17.0, color: Colors.grey[600]))),                
+             
                 Divider(),
                 SizedBox(
                   width: double.infinity,
