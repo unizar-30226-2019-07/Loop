@@ -77,7 +77,7 @@ class ChatTile extends StatelessWidget {
                                 child: Stack(
                                   children: <Widget>[
                                     ClipRect(
-                                      child: Text('Este es mi ultimo mensaje enviado',
+                                      child: Text(_chat.lastMessage,
                                           maxLines: 1,
                                           style: _styleMensaje),
                                     ),

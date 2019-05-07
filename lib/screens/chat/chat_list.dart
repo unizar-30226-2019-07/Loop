@@ -78,17 +78,9 @@ class ChatListState extends State<ChatList> {
     UsuarioClass usuario = await UsuarioRequest.getUserById(idOtro);
 
     String lastMessage;
-    var streamSub2 = Firestore.instance.collection('chat').document(document.documentID)
-      .collection('mensaje').limit(1).snapshots().listen(
-      (data) {
-        lastMessage = data.documents[0]['contenido'];
-        print('Last message: ' + lastMessage);
-      } 
-    );
-    streamSub2.cancel();
-    //print('Ultimo mensaje: ' + document('mensaje')[0]['contenido']);
     ChatClass chat =  new ChatClass(usuario: usuario, miId: _miId, producto: item,
-      visible: new List.from(document['visible']), docId: document.documentID);
+      visible: new List.from(document['visible']), docId: document.documentID, 
+      lastMessage: document['ultimoMensaje']);
     return chat;
   }
 
@@ -143,7 +135,8 @@ class ChatListState extends State<ChatList> {
               Expanded(
                 child: Container(
                   child: StreamBuilder(
-                    stream: Firestore.instance.collection('chat').where('visible', arrayContains: _miId).snapshots(),
+                    stream: Firestore.instance.collection('chat').where('visible', arrayContains: _miId)
+                      .orderBy('fechaUltimoMensaje', descending: true).snapshots(),
                     builder: (context, snapshot) {
                       if (!snapshot.hasData) {
                         return Center(

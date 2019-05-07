@@ -360,12 +360,12 @@ class _ItemDetails extends State<ItemDetails> {
         Firestore.instance.runTransaction((transaction) async {
           await transaction.set(Firestore.instance.collection("chat").document(docId), 
             {'idAnunciante' : _item.owner.userId, 'idCliente' : miId, 'idProducto' : _item.itemId,
-              'visible' : [miId]});
+              'visible' : [miId], 'ultimoMensaje' : '', 'fechaUltimoMensaje' : DateTime.now()});
         });
         List<int> visible = new List<int>();
         visible.add(miId);
         ChatClass chat =  new ChatClass(usuario: _item.owner, miId: miId, producto: _item,
-          visible: visible, docId: docId);
+          visible: visible, docId: docId, lastMessage: '');
         Navigator.push(context, MaterialPageRoute(builder: (context) => ChatScreen(chat)));
       }
       else{

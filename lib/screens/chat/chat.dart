@@ -341,14 +341,22 @@ class ChatScreenState extends State<ChatScreen> {
       _chat.visible.add(_chat.usuario.userId);
       print('Cambiando visibilidad');
       Firestore.instance.runTransaction((transaction) async {
-            await transaction.set(Firestore.instance.collection("chat").document(_chat.docId), 
-              {'idAnunciante' : _chat.usuario.userId, 'idCliente' : _miId,
-              'idProducto' : _chat.producto.itemId, 'visible' : _chat.visible});
+        await transaction.set(Firestore.instance.collection("chat").document(_chat.docId), 
+          {'idAnunciante' : _chat.usuario.userId, 'idCliente' : _miId,
+          'idProducto' : _chat.producto.itemId, 'visible' : _chat.visible});   
       });
     }
+    var fecha = DateTime.now();
+    // Mensaje en colleccion mensajes
     await Firestore.instance.collection("chat").document(_chat.docId).collection("mensaje").document().setData({
       'contenido' : messageText, 'estado' : 'enviado',
-        'fecha' : DateTime.now(), 'idEmisor' : _miId
+        'fecha' : fecha, 'idEmisor' : _miId
     });
+    Firestore.instance.runTransaction((transaction) async {
+        await transaction.set(Firestore.instance.collection("chat").document(_chat.docId), 
+          {'idAnunciante' : _chat.usuario.userId, 'idCliente' : _miId,
+          'idProducto' : _chat.producto.itemId, 'visible' : _chat.visible,
+          'ultimoMensaje' : messageText, 'fechaUltimoMensaje' : fecha});   
+     });
   }
 }
