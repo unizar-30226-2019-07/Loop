@@ -4,6 +4,7 @@ import 'package:selit/screens/loading_screen.dart';
 import 'package:selit/screens/principal.dart';
 import 'package:selit/screens/users/profile.dart';
 import 'package:selit/screens/users/wishes.dart';
+import 'package:selit/screens/users/rate_user.dart';
 import 'package:selit/screens/users/report_user.dart';
 import 'package:selit/screens/users/edit_profile.dart';
 import 'package:selit/screens/login/login_page.dart';
@@ -25,6 +26,8 @@ class Routes {
         _buildRoute(settings, new EditProfile(user: settings.arguments)),
     '/whises': (settings) =>
         _buildRoute(settings, new Wishes(user: settings.arguments)),
+    '/rate-user': (settings) =>
+        _buildRoute(settings, new RateUser(otherUser: settings.arguments)),
     '/report-user': (settings) =>
         _buildRoute(settings, new ReportUser(otherUser: settings.arguments)),
     '/login-page': (settings) => _buildRoute(settings, new LoginPage()),
