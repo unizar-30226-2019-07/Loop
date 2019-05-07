@@ -178,9 +178,10 @@ class ItemRequest {
 
   /// Eliminar producto
   static Future<void> delete(ItemClass item) async {
+    
     int _productId = item.itemId;
     final response = await http.delete(
-      '${APIConfig.BASE_URL}/products/$_productId',
+      '${APIConfig.BASE_URL}/${item.type == "sale" ? "products" : "auctions"}/$_productId',
       headers: {
         HttpHeaders.contentTypeHeader: ContentType.json.toString(),
         HttpHeaders.authorizationHeader: await Storage.loadToken(),
@@ -188,6 +189,26 @@ class ItemRequest {
     );
 
     if (response.statusCode != 200) {
+      throw (APIConfig.getErrorString(response));
+    }
+  }
+
+
+  /// Pujar
+  static Future<void> bidUp(ItemClass item, String amount, int bidder_id) async {
+    int _productId = item.itemId;
+    print(json.jsonEncode(item.toJsonBidUp(amount, bidder_id)));
+    print(_productId);
+    final response = await http.post(
+      '${APIConfig.BASE_URL}/auctions/$_productId/bid',
+      headers: {
+        HttpHeaders.contentTypeHeader: ContentType.json.toString(),
+        HttpHeaders.authorizationHeader: await Storage.loadToken(),
+      },
+      body: json.utf8.encode(json.jsonEncode(item.toJsonBidUp(amount, bidder_id))),
+    );
+    print(response.statusCode);
+    if (response.statusCode != 201) {
       throw (APIConfig.getErrorString(response));
     }
   }

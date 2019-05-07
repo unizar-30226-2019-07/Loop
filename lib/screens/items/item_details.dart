@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:geocoder/geocoder.dart';
+import 'package:intl/intl.dart';
 import 'package:selit/class/item_class.dart';
 import 'package:carousel_pro/carousel_pro.dart';
 import 'package:selit/class/items/filter_list_class.dart';
@@ -25,19 +26,35 @@ class ItemDetails extends StatefulWidget {
 
 class _ItemDetails extends State<ItemDetails> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final TextEditingController _pujaController = new TextEditingController();
+
+  final Color _colorStatusBarGood = Colors.blue.withOpacity(0.5);
+
+  static final _styleDialogTitle = TextStyle(
+      fontSize: 19.0, color: Colors.white, fontWeight: FontWeight.bold);
+
+  static final _styleDialogContent = TextStyle(
+      fontSize: 15.0, color: Colors.white, fontWeight: FontWeight.normal);
+
+  int miId;
 
   ItemClass _item;
 
   List<ImageProvider> _images = [];
-
-  static final _styleTitle = TextStyle(
-      fontSize: 26.0, color: Colors.black, fontWeight: FontWeight.w700);
 
   static final styleTagWhite = TextStyle(
       fontSize: 18.0, color: Colors.white, fontWeight: FontWeight.bold);
 
   static final styleTagBlack = TextStyle(
       fontSize: 22.0, color: Colors.black, fontWeight: FontWeight.bold);
+
+  static final styleTagPrice = TextStyle(
+      fontSize: 32.0, color: Colors.black, fontWeight: FontWeight.bold);
+
+  static final styleTagTitle = TextStyle(
+      fontSize: 32.0, color: Colors.black, fontWeight: FontWeight.bold);
+
+  Function _buttonFunction; // inhabilidar boton
 
   // Mapas
   Completer<GoogleMapController> _controller = Completer();
@@ -47,6 +64,7 @@ class _ItemDetails extends State<ItemDetails> {
 
   // Constructor
   _ItemDetails(this._item) {
+    _buttonFunction = pujar;
     if (_item.media.isNotEmpty) {
       for (var imagen in _item.media) {
         _images.add(imagen.image.image);
@@ -62,6 +80,8 @@ class _ItemDetails extends State<ItemDetails> {
   Function _favoriteFunction; // callback al presionar el corazón
   bool _esFavorito;
   IconData _favorite;
+
+  // Diálogo a mostrar cuando se pulsa el boton
 
   /// Añadir o quitar el producto según proceda
   void _favoritePressed() async {
@@ -108,6 +128,55 @@ class _ItemDetails extends State<ItemDetails> {
         _favorite = Icons.favorite_border;
       }
     });
+  }
+
+  void pujar() {
+    // Diálogo "cargando..." para evitar repetir
+    _buttonFunction = null;
+
+    showDialog(
+      barrierDismissible: false, // JUST MENTION THIS LINE
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+            content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            CircularProgressIndicator(
+                strokeWidth: 5.0,
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.black)),
+            Container(
+                margin: EdgeInsets.only(top: 15.0), child: Text('Cargando...')),
+          ],
+        ));
+      },
+    );
+
+    if (_pujaController.text.length < 1) {
+      showInSnackBar("Rellena todos los campos correctamente", Colors.yellow);
+    } else {
+      print('Pujando...');
+
+      ItemRequest.bidUp(_item, _pujaController.text, miId).then((_) {
+        showInSnackBar("Puja realizada correctamente", _colorStatusBarGood);
+        Navigator.of(context).pop();
+        Navigator.of(context).pop();
+        //Navigator.of(context).pop();
+      }).catchError((error) {
+        if (error == "Unauthorized" || error == "Forbidden") {
+          showInSnackBar("Acción no autorizada", _colorStatusBarBad);
+        } else if (error == "Conflict") {
+          showInSnackBar(
+              "Oferta inferior o igual al precio actual", Colors.yellow);
+        } else {
+          print("Error: $error");
+          showInSnackBar("No hay conexión a internet", _colorStatusBarBad);
+        }
+        _buttonFunction = pujar;
+        Navigator.of(context).pop();
+      });
+    }
   }
 
   static Widget _buildEditConditional;
@@ -243,7 +312,7 @@ class _ItemDetails extends State<ItemDetails> {
 
   void _leerIdUsuario() async {
     int idItem = _item.owner.userId;
-    int miId = await Storage.loadUserId();
+    miId = await Storage.loadUserId();
     if (miId == idItem) {
       setState(() {
         _buildEditConditional = _buildEditButton();
@@ -314,6 +383,86 @@ class _ItemDetails extends State<ItemDetails> {
 
   @override
   Widget build(BuildContext context) {
+    AlertDialog dialog = AlertDialog(
+      backgroundColor: Theme.of(context).primaryColor,
+      shape: RoundedRectangleBorder(
+          side: BorderSide(
+              color: Color.alphaBlend(Color(0x552B2B2B), Color(0xFFC0392B)),
+              width: 2.0),
+          borderRadius: BorderRadius.circular(10.0)),
+      title: Text('Información de la puja', style: _styleDialogTitle),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          _item.type == "auction"
+              ? Container(
+                  decoration: new BoxDecoration(
+                      color: _blendColor,
+                      borderRadius:
+                          new BorderRadius.all(const Radius.circular(10.0))),
+                  child: Column(children: <Widget>[
+                    Container(
+                      padding: const EdgeInsets.only(top: 5, left: 10),
+                      child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Container(
+                              child: Text(
+                                  'Fecha límite: ${DateFormat('dd-MM-yyyy').format(_item?.endDate) ?? ''}',
+                                  style: _styleDialogContent))),
+                    ),
+                    Container(
+                        padding: const EdgeInsets.only(top: 5, left: 10),
+                        child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Container(
+                                child: Text(
+                                    'Precio de salida: ${_item?.price ?? ''} ${_item?.currency ?? ''}',
+                                    style: _styleDialogContent)))),
+                    Container(
+                        padding:
+                            const EdgeInsets.only(top: 5, left: 10, bottom: 5),
+                        child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Container(
+                                child: _item.lastBid == null
+                                    ? Text('No hay pujas todavía',
+                                        style: _styleDialogContent)
+                                    : Text(
+                                        'Última puja: ${_item?.lastBid?.amount ?? ''} ${_item?.currency ?? ''}',
+                                        style: _styleDialogContent)))),
+                  ]))
+              : Container(),
+          Container(
+              padding: EdgeInsets.only(top: 15, bottom: 35),
+              child: new Theme(
+                data: new ThemeData(
+                    primaryColor: Colors.white,
+                    accentColor: Colors.white,
+                    hintColor: Colors.white),
+                child: new TextField(
+                  style: TextStyle(
+                    color: Colors.white,
+                  ),
+                  decoration: new InputDecoration(
+                      labelText: 'Introduce tu puja',
+                      labelStyle: TextStyle(color: Colors.white),
+                      border: new UnderlineInputBorder(
+                          borderSide: new BorderSide(color: Colors.white))),
+                  controller: _pujaController,
+                  keyboardType: TextInputType.number,
+                ),
+              )),
+          RaisedButton(
+            padding: EdgeInsets.symmetric(vertical: 7.0, horizontal: 40.0),
+            color: Colors.white,
+            child: Text('Pujar',
+                style: TextStyle(fontSize: 19.0, color: Colors.black)),
+            onPressed: _buttonFunction,
+          )
+        ],
+      ),
+    );
+
     BarColor.changeBarColor(
         color: Theme.of(context).primaryColor, whiteForeground: true);
     final ThemeData theme = Theme.of(context);
@@ -341,6 +490,15 @@ class _ItemDetails extends State<ItemDetails> {
     }
     return new Scaffold(
       key: _scaffoldKey,
+      floatingActionButton: _item.type == "auction"
+          ? new FloatingActionButton(
+              elevation: 8.0,
+              child: new Icon(Icons.attach_money),
+              backgroundColor: Theme.of(context).primaryColor,
+              onPressed: () =>
+                  showDialog(context: context, builder: (context) => dialog),
+            )
+          : Container(),
       body: SafeArea(
           child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 7.0),
@@ -374,85 +532,152 @@ class _ItemDetails extends State<ItemDetails> {
                       ]),
                 Container(child: _buildEditConditional),
                 Container(
-                    padding: const EdgeInsets.fromLTRB(16.0, 15.0, 16.0, 0.0),
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      _item?.title ?? '',
-                      style: _styleTitle,
-                    )),
-                Container(
-                    padding: const EdgeInsets.fromLTRB(16.0, 5.0, 16.0, 0.0),
-                    child: DefaultTextStyle(
-                        style: descriptionStyle,
-                        child: Row(
-                          mainAxisSize: MainAxisSize.max,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            Row(
-                              // three line description
-                              mainAxisSize: MainAxisSize.max,
-                              //mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                Padding(
-                                    padding: const EdgeInsets.only(
-                                        bottom: 8.0, right: 10.0),
-                                    child: Chip(
-                                      backgroundColor: _itemEnVenta
-                                          ? Theme.of(context).primaryColor
-                                          : _blendColor,
-                                      label: Text(
-                                          _itemEnVenta ? 'En venta' : 'Vendido',
-                                          style: styleTagWhite),
-                                    )),
-                                Padding(
+                    //padding: const EdgeInsets.fromLTRB(16.0, 15.0, 16.0, 0.0),
+                    // alignment: Alignment.centerLeft,
+                    child: Column(children: [
+                  Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Padding(
+                            padding: const EdgeInsets.only(left: 15, top: 20),
+                            child: Text(
+                              _item?.title ?? '',
+                              style: styleTagTitle,
+                            ))
+                      ]),
+                  Row(
+                      crossAxisAlignment: _item.type == "auction"
+                          ? CrossAxisAlignment.end
+                          : CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Column(children: [
+                          _item.type == "auction"
+                              ? Container(
                                   padding: const EdgeInsets.only(
-                                      bottom: 8.0, left: 8.0),
-                                  child: Text(
-                                    '${_item?.price ?? ''} ${_item?.currency ?? ''}',
-                                    style: styleTagBlack,
+                                      bottom: 0.0, left: 9, top: 0),
+                                  child: _item.type == "auction" &&
+                                          _item.lastBid != null
+                                      ? Text(
+                                          'Última puja',
+                                          style: TextStyle(
+                                              fontSize: 15.0,
+                                              color: Colors.grey[600]),
+                                        )
+                                      : Text(
+                                          'Precio salida',
+                                          style: TextStyle(
+                                              fontSize: 15.0,
+                                              color: Colors.grey[600]),
+                                        ))
+                              : Container(),
+                          Container(
+                              padding: const EdgeInsets.only(
+                                  bottom: 0.0, left: 15, top: 0),
+                              child: _item.type == "auction" &&
+                                      _item.lastBid != null
+                                  ? Text(
+                                      '${_item?.lastBid?.amount ?? ''} ${_item?.currency ?? ''}',
+                                      style: styleTagBlack,
+                                    )
+                                  : Text(
+                                      '${_item?.price ?? ''} ${_item?.currency ?? ''}',
+                                      style: styleTagBlack,
+                                    ))
+                        ]),
+                        Column(children: [
+                          SizedBox.fromSize(
+                            size: Size(60.0, 60.0),
+                            child: _favoriteFunction == null
+                                ? Container(
+                                    margin: EdgeInsets.all(15.0),
+                                    child: CircularProgressIndicator(
+                                        strokeWidth: 4.0,
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                                _esFavorito
+                                                    ? Colors.grey
+                                                    : Colors.red)))
+                                : IconButton(
+                                    padding: _item.type == "auction"
+                                        ? const EdgeInsets.only(
+                                            bottom: 0.0, right: 10, top: 20)
+                                        : const EdgeInsets.only(
+                                            bottom: 0.0, right: 10, top: 0),
+                                    icon: Icon(_favorite),
+                                    color: Colors.red,
+                                    iconSize: 35.0,
+                                    tooltip: 'Favoritos',
+                                    splashColor: Colors.red,
+                                    onPressed: _favoriteFunction,
                                   ),
-                                ),
-                              ],
-                            ),
-                            SizedBox.fromSize(
-                              size: Size(60.0, 60.0),
-                              child: _favoriteFunction == null
-                                  ? Container(
-                                      margin: EdgeInsets.all(15.0),
-                                      child: CircularProgressIndicator(
-                                          strokeWidth: 4.0,
-                                          valueColor:
-                                              AlwaysStoppedAnimation<Color>(
-                                                  _esFavorito
-                                                      ? Colors.grey
-                                                      : Colors.red)))
-                                  : IconButton(
-                                      icon: Icon(_favorite),
-                                      color: Colors.red,
-                                      iconSize: 35.0,
-                                      tooltip: 'Favoritos',
-                                      splashColor: Colors.red,
-                                      onPressed: _favoriteFunction,
-                                    ),
-                            ),
-                          ],
-                        ))),
+                          ),
+                        ]),
+                      ]),
+                ])),
+                Divider(),
                 Container(
-                    padding: const EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 15.0),
+                    padding: const EdgeInsets.fromLTRB(15.0, 10.0, 10.0, 15.0),
                     alignment: Alignment.topLeft,
                     child: Text(_item?.description ?? '',
                         style: TextStyle(fontSize: 15.0, color: Colors.black))),
                 _item.category == null
                     ? Container()
                     : Container(
-                        padding:
-                            const EdgeInsets.fromLTRB(20.0, 10.0, 10.0, 20.0),
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                            'Categoría: ' +
-                                FilterListClass.categoryNames[_item.category],
-                            style: TextStyle(
-                                fontSize: 17.0, color: Colors.grey[600]))),
+                        child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                            Column(children: [
+                              Padding(
+                                  padding: const EdgeInsets.only(
+                                      bottom: 0.0, left: 15, top: 5),
+                                  child: Text(
+                                      'Categoría: ' +
+                                          FilterListClass
+                                              .categoryNames[_item.category],
+                                      style: TextStyle(
+                                          fontSize: 15.0,
+                                          color: Colors.grey[600])))
+                            ]),
+                            Column(children: [
+                              Container(
+                                  padding: const EdgeInsets.fromLTRB(
+                                      16.0, 5.0, 7.0, 0.0),
+                                  child: DefaultTextStyle(
+                                      style: descriptionStyle,
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.max,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: <Widget>[
+                                          Row(
+                                            // three line description
+                                            mainAxisSize: MainAxisSize.max,
+                                            //mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: <Widget>[
+                                              Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          bottom: 8.0,
+                                                          right: 10.0),
+                                                  child: Chip(
+                                                    backgroundColor:
+                                                        _itemEnVenta
+                                                            ? Theme.of(context)
+                                                                .primaryColor
+                                                            : _blendColor,
+                                                    label: Text(
+                                                        _itemEnVenta
+                                                            ? 'En venta'
+                                                            : 'Vendido',
+                                                        style: styleTagWhite),
+                                                  )),
+                                            ],
+                                          ),
+                                        ],
+                                      )))
+                            ]),
+                          ])),
                 Divider(),
                 SizedBox(
                   width: double.infinity,

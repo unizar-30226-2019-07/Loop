@@ -223,4 +223,9 @@ class ItemClass {
         "status": status,
         "endDate": _dateTimeString(endDate),
       };
+
+  Map<String, dynamic> toJsonBidUp(String amount, int bidder_id) => {
+        "amount": amount,
+        "bidder_id": bidder_id,
+      };
 }
