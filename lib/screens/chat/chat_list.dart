@@ -80,7 +80,7 @@ class ChatListState extends State<ChatList> {
     String lastMessage;
     ChatClass chat =  new ChatClass(usuario: usuario, miId: _miId, producto: item,
       visible: new List.from(document['visible']), docId: document.documentID, 
-      lastMessage: document['ultimoMensaje']);
+      lastMessage: document['ultimoMensaje'], lastMessageDate: document['fechaUltimoMensaje'].toDate());
     return chat;
   }
 
@@ -93,11 +93,88 @@ class ChatListState extends State<ChatList> {
                 onPressed: () {},
                 color: Colors.red,
               ),
-              onPress: () {},
+              onPress: () {
+                  print('Hello');
+                  _showDialogDeleteChat(chat);
+              },
               backgroudColor: Colors.transparent),
         ], child: ChatTile(chat)
     ));
 
+  }
+
+  void _showDialogDeleteChat(ChatClass chat) {
+    // flutter defined function
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text("¿Seguro que quiere eliminar el chat?",
+              style: TextStyle(
+                  fontSize: 18.0,
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold)),
+          
+          content:  Container(
+            height: 120,
+            child: Column(
+            children: <Widget>[
+              new Text(
+              chat.producto.title + ' - ' + chat.usuario.nombre + ' ' + chat.usuario.apellidos,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  fontSize: 16.0,
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold)),
+              Container(
+                padding: EdgeInsets.only(top: 10.0),
+                child: new Text(
+                  "Si pulsa \"Eliminar\" la conversación desaparerá de su lista de chats.",
+                  style: TextStyle(
+                      fontSize: 15.0,
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold))
+              )
+            ],
+          ),
+          ),
+          
+          
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            new FlatButton(
+              child: new Text("Cancelar",
+                  style: TextStyle(
+                      fontSize: 16.0,
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold)),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            new FlatButton(
+              child: new Text("Eliminar",
+                  style: TextStyle(
+                      fontSize: 16.0,
+                      color: Colors.red,
+                      fontWeight: FontWeight.bold)),
+              onPressed: () {
+                var nuevaListaVisible = chat.visible;
+                nuevaListaVisible.remove(_miId);
+                Firestore.instance.runTransaction((transaction) async {
+                  await transaction.set(Firestore.instance.collection("chat").document(chat.docId), 
+                    {'idAnunciante' : chat.usuario.userId, 'idCliente' : _miId,
+                    'idProducto' : chat.producto.itemId, 'visible' : nuevaListaVisible,
+                    'ultimoMensaje' : chat.lastMessage, 'fechaUltimoMensaje' : chat.lastMessageDate});   
+                });
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
 

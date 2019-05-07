@@ -1,30 +1,15 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_database/firebase_database.dart';
-import 'package:firebase_database/ui/firebase_animated_list.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:selit/class/usuario_class.dart';
 import 'package:selit/util/storage.dart';
 import 'package:selit/widgets/profile_picture.dart';
 import 'package:selit/class/chat_class.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:image_picker/image_picker.dart';
 
 import 'package:selit/widgets/chats/message_sent.dart';
 import 'package:selit/widgets/chats/message_received.dart';
-
-final analytics = new FirebaseAnalytics();
-final auth = FirebaseAuth.instance;
-
-var currentUserEmail;
-var _scaffoldContext;
 
 class ChatScreen extends StatefulWidget {
   final ChatClass chat;
@@ -41,11 +26,10 @@ class ChatScreenState extends State<ChatScreen> {
   final TextEditingController _textEditingController =
       new TextEditingController();
   bool _isComposingMessage = false;
-  final reference = FirebaseDatabase.instance.reference().child('messages');
 
   ChatClass _chat;
-  UsuarioClass _usuario;
   int _miId;
+  var _scaffoldContext;
 
   ChatScreenState(ChatClass chat) {
     this._chat = chat;
@@ -66,26 +50,6 @@ class ChatScreenState extends State<ChatScreen> {
     TextStyle(fontSize: 14.0, color: Colors.black);
   static final _styleTitle =
       TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold);
-
-/*
-  void _leerIdUsuario() async {
-    int idAnunciante = _chat.usuarioAnunciante.userId;
-    int miId = await Storage.loadUserId();
-    print('Mi id ' + miId.toString());
-    print('Id Anunciante ' + idAnunciante.toString());
-    if (miId == idAnunciante) {
-      setState(() {
-        _usuario = _chat.usuarioCliente;
-      }
-    );
-    }
-    else{
-      setState(() {
-        _usuario = _chat.usuarioAnunciante;
-      });
-    }
-  }
-  */
 
   @override
   Widget build(BuildContext context) {
@@ -155,30 +119,6 @@ class ChatScreenState extends State<ChatScreen> {
         body: new Container(
           child: new Column(
             children: <Widget>[
-
-              //Para debug del estilo de los mensajes
-              //TODO: borrar cuando se obtengan los mensajes de firebase.
-              //MessageReceivedTile('Mensaje recibido...', '18:00'),
-              //MessageSentTile('Mensaje enviado...', '18:00'),
-
-              //TODO: Descomentar para obtener mensajes de firebase.
-              /*
-              new Flexible(
-                child: new FirebaseAnimatedList(
-                  query: reference,
-                  padding: const EdgeInsets.all(8.0),
-                  reverse: true,
-                  sort: (a, b) => b.key.compareTo(a.key),
-                  //comparing timestamp of messages to check which one would appear first
-                  itemBuilder: (_, DataSnapshot messageSnapshot,
-                      Animation<double> animation, int i) {
-                    return new ChatMessageListItem(
-                      messageSnapshot: messageSnapshot,
-                      animation: animation,
-                    );
-                  },
-                ),
-              ),*/
               Expanded(
                 child: Container(
                   child: StreamBuilder(
@@ -274,33 +214,6 @@ class ChatScreenState extends State<ChatScreen> {
           margin: const EdgeInsets.symmetric(horizontal: 8.0),
           child: new Row(
             children: <Widget>[
-              new Container(
-                margin: new EdgeInsets.symmetric(horizontal: 4.0),
-                child: new IconButton(
-                    icon: new Icon(
-                      Icons.photo_camera,
-                      color: Theme.of(context).accentColor,
-                    ),
-                    onPressed: () async {
-              
-
-                      /*
-                      await _ensureLoggedIn();
-                      File imageFile = await ImagePicker.pickImage();
-                      int timestamp = new DateTime.now().millisecondsSinceEpoch;
-                      StorageReference storageReference = FirebaseStorage
-                          .instance
-                          .ref()
-                          .child("img_" + timestamp.toString() + ".jpg");
-                      StorageUploadTask uploadTask =
-                          storageReference.put(imageFile);
-                      Uri downloadUrl = (await uploadTask.future).downloadUrl;
-                      _sendMessage(
-                          messageText: null, imageUrl: downloadUrl.toString());
-
-                          */
-                    }),
-              ),
               new Flexible(
                 child: new TextField(
                   controller: _textEditingController,
@@ -311,7 +224,7 @@ class ChatScreenState extends State<ChatScreen> {
                   },
                   onSubmitted: _textMessageSubmitted,
                   decoration:
-                      new InputDecoration.collapsed(hintText: "Send a message"),
+                      new InputDecoration.collapsed(hintText: "Envía un mensaje"),
                 ),
               ),
               new Container(

@@ -12,9 +12,10 @@ class ChatClass {
   List<dynamic> visible;
   String docId;
   String lastMessage;
+  DateTime lastMessageDate;
   
 
   ChatClass({this.usuario, this.miId, this.producto, 
-    this.visible, this.docId, this.lastMessage});
+    this.visible, this.docId, this.lastMessage, this.lastMessageDate});
   
 }
