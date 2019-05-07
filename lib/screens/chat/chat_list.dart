@@ -76,6 +76,17 @@ class ChatListState extends State<ChatList> {
     }
     // Obtener UsuarioClass del otro usuario
     UsuarioClass usuario = await UsuarioRequest.getUserById(idOtro);
+
+    String lastMessage;
+    var streamSub2 = Firestore.instance.collection('chat').document(document.documentID)
+      .collection('mensaje').limit(1).snapshots().listen(
+      (data) {
+        lastMessage = data.documents[0]['contenido'];
+        print('Last message: ' + lastMessage);
+      } 
+    );
+    streamSub2.cancel();
+    //print('Ultimo mensaje: ' + document('mensaje')[0]['contenido']);
     ChatClass chat =  new ChatClass(usuario: usuario, miId: _miId, producto: item,
       visible: new List.from(document['visible']), docId: document.documentID);
     return chat;
