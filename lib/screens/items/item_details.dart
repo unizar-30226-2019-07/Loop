@@ -1,9 +1,12 @@
 import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoder/geocoder.dart';
+import 'package:selit/class/chat_class.dart';
 import 'package:selit/class/item_class.dart';
 import 'package:carousel_pro/carousel_pro.dart';
 import 'package:selit/class/items/filter_list_class.dart';
+import 'package:selit/screens/chat/chat.dart';
 import 'package:selit/screens/items/edit_item.dart';
 import 'package:selit/util/storage.dart';
 import 'package:selit/util/api/usuario_request.dart';
@@ -27,6 +30,8 @@ class _ItemDetails extends State<ItemDetails> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   ItemClass _item;
+
+  int miId;
 
   List<ImageProvider> _images = [];
 
@@ -111,6 +116,7 @@ class _ItemDetails extends State<ItemDetails> {
   }
 
   static Widget _buildEditConditional;
+  Widget _buildChatConditional = Container();
 
   void showInSnackBar(String value, Color alfa) {
     FocusScope.of(context).requestFocus(new FocusNode());
@@ -239,14 +245,46 @@ class _ItemDetails extends State<ItemDetails> {
         ));
   }
 
+  Widget _buildChatButton() {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(15.0, 5.0, 15.0, 25.0),
+      child: SizedBox(
+        width: double.infinity,
+        child: new RaisedButton(
+        padding: const EdgeInsets.all(10.0),
+        elevation: 1,
+        textColor: Colors.white,
+        color: Theme.of(context).primaryColor,
+        onPressed: () {
+          iniciarChat();
+        },
+        child: new Text('Iniciar chat',
+            style: TextStyle(
+                fontSize: 21.0,
+                color: Colors.white,
+                fontWeight: FontWeight.bold)),
+      ),
+    ),);
+  }
+
   final _blendColor = Color.alphaBlend(Color(0x552B2B2B), Color(0xFFC0392B));
 
   void _leerIdUsuario() async {
     int idItem = _item.owner.userId;
-    int miId = await Storage.loadUserId();
+    miId = await Storage.loadUserId();
+    print('Mi id ' + miId.toString());
+    print('Id item ' + idItem.toString());
     if (miId == idItem) {
+      print('Construir editar');
       setState(() {
         _buildEditConditional = _buildEditButton();
+      }
+    );
+    }
+    else{
+      print('Construir chat');
+      setState(() {
+        _buildChatConditional = _buildChatButton();
       });
     }
   }
@@ -310,6 +348,57 @@ class _ItemDetails extends State<ItemDetails> {
         ),
       ),
     );
+  }
+  void iniciarChat() async {
+    String docId = 'p' + _item.itemId.toString() + '_a' + 
+      _item.owner.userId.toString() + '_c' + miId.toString();
+
+    Firestore.instance.collection('chat').document(docId).get().then((document){
+      if(document == null){
+        print('CREAR NUEVO CHAT');
+        // Se crea el chat
+        Firestore.instance.runTransaction((transaction) async {
+          await transaction.set(Firestore.instance.collection("chat").document(docId), 
+            {'idAnunciante' : _item.owner.userId, 'idCliente' : miId, 'idProducto' : _item.itemId,
+              'visible' : [miId]});
+        });
+        List<int> visible = new List<int>();
+        visible.add(miId);
+        ChatClass chat =  new ChatClass(usuario: _item.owner, miId: miId, producto: _item,
+          visible: visible, docId: docId);
+        Navigator.push(context, MaterialPageRoute(builder: (context) => ChatScreen(chat)));
+      }
+      else{
+        print('CHAT EXISTENTE');
+        // Ya existe el chat (hay que preservar los valores de visible)
+        ChatClass chat =  new ChatClass(usuario: _item.owner, miId: miId, producto: _item,
+          visible: List.from(document.data['visible']), docId: docId);
+        Navigator.push(context, MaterialPageRoute(builder: (context) => ChatScreen(chat)));
+      }
+    });
+  /*
+    var document = await Firestore.instance.collection('chat').document(docId).get();
+    if(document.data == null){
+      print('CREAR NUEVO CHAT');
+      // Se crea el chat
+      Firestore.instance.runTransaction((transaction) async {
+        await transaction.set(Firestore.instance.collection("chat").document(docId), 
+          {'idAnunciante' : _item.owner.userId, 'idCliente' : miId, 'idProducto' : _item.itemId,
+            'visible' : [miId]});
+      });
+      List<int> visible = new List<int>();
+      visible.add(miId);
+      ChatClass chat =  new ChatClass(usuario: _item.owner, miId: miId, producto: _item,
+        visible: visible, docId: docId);
+      Navigator.push(context, MaterialPageRoute(builder: (context) => ChatScreen(chat)));
+    }
+    else{
+      // Ya existe el chat (hay que preservar los valores de visible)
+      ChatClass chat =  new ChatClass(usuario: _item.owner, miId: miId, producto: _item,
+        visible: List.from(document.data[0]['visible']), docId: docId);
+      Navigator.push(context, MaterialPageRoute(builder: (context) => ChatScreen(chat)));
+    }    
+    */
   }
 
   @override
@@ -536,6 +625,7 @@ class _ItemDetails extends State<ItemDetails> {
                     ),
                   ),
                 ),
+                _buildChatConditional,
                 _cameraPosition == null
                     ? Container()
                     : _buildOwnerMap(_cameraPosition)

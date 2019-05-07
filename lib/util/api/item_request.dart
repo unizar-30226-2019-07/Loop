@@ -191,4 +191,32 @@ class ItemRequest {
       throw (APIConfig.getErrorString(response));
     }
   }
+
+    /// Obtener un producto en base a su Id
+  static Future<ItemClass> getItembyId(
+      {@required int itemId}) async {
+
+    //String _paramsString = '?lat=0.0&lng=0.0';
+
+    // Esperar la respuesta de la petición
+    http.Response response = await http
+        .get('${APIConfig.BASE_URL}/products/$itemId?lat=0.0&lng=0.0', headers: {
+      HttpHeaders.contentTypeHeader: ContentType.json.toString(),
+      HttpHeaders.authorizationHeader: await Storage.loadToken(),
+    });
+
+    if (response.statusCode == 200) {
+      
+      String token = await Storage.loadToken();
+      ItemClass product = ItemClass.fromJsonProducts(json.jsonDecode(response.body), token);
+      return product;
+    } else {
+      print('Status code: ' + response.statusCode.toString());
+      throw(APIConfig.getErrorString(response));
+    }
+  }
+
+
 }
+
+
