@@ -478,7 +478,7 @@ class _ItemDetails extends State<ItemDetails> {
               color: Color.alphaBlend(Color(0x552B2B2B), Color(0xFFC0392B)),
               width: 2.0),
           borderRadius: BorderRadius.circular(10.0)),
-      title: Text('Información de la puja', style: _styleDialogTitle),
+      title: Text('Información de la subasta', style: _styleDialogTitle),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
@@ -557,6 +557,8 @@ class _ItemDetails extends State<ItemDetails> {
     final TextStyle descriptionStyle = theme.textTheme.subhead;
     // Item en venta o no (también tener en cuenta si es nulo)
     bool _itemEnVenta = (_item?.status ?? "en venta") == "en venta";
+    // Subasta fuera de fecha o no
+    bool _subastaEnFecha = _item?.endDate?.isAfter(DateTime.now()) ;
     // Ubicación del dueño
     CameraPosition _cameraPosition;
     if (_item?.owner?.locationLat != null &&
@@ -578,7 +580,7 @@ class _ItemDetails extends State<ItemDetails> {
     }
     return new Scaffold(
       key: _scaffoldKey,
-      floatingActionButton: _item.type == "auction"
+      floatingActionButton: _item.type == "auction" && _subastaEnFecha
           ? new FloatingActionButton(
               elevation: 8.0,
               child: new Icon(Icons.attach_money),
@@ -754,11 +756,20 @@ class _ItemDetails extends State<ItemDetails> {
                                                             ? Theme.of(context)
                                                                 .primaryColor
                                                             : _blendColor,
-                                                    label: Text(
+                                                    label: 
+                                                    _item.type == "auction"
+                                                    ?Text(
+                                                        _subastaEnFecha
+                                                            ? 'Subasta activa'
+                                                            : 'Subasta cerrada',
+                                                        style: styleTagWhite)
+                                                    :Text(
                                                         _itemEnVenta
                                                             ? 'En venta'
                                                             : 'Vendido',
-                                                        style: styleTagWhite),
+                                                        style: styleTagWhite)
+                                                    
+                                                    ,
                                                   )),
                                             ],
                                           ),

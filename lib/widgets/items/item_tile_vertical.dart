@@ -78,7 +78,7 @@ class ItemTileVertical extends StatelessWidget {
                                 size: Size(double.infinity, 30.0),
                                 child: Align(
                                   alignment: Alignment.bottomRight,
-                                  child: Text('${_item?.price} ${_item?.currency}',
+                                  child: Text('${_item?.type == "auction" && _item?.lastBid != null ? _item?.lastBid?.amount  : _item?.price} ${_item?.currency}',
                                     textAlign: TextAlign.end,
                                     style: _stylePrice.copyWith(
                                         color:

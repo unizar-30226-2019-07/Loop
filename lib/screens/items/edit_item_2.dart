@@ -22,14 +22,12 @@ class _EditItemState2 extends State<EditItem2> {
 
   ///Controladores de campos del formulario
   final TextEditingController _priceController = new TextEditingController();
-  final TextEditingController _limitController = new TextEditingController();
 
   //Lista opciones divisa
   List<String> _divisas = <String>['', 'EUR', 'USD'];
   String _divisa = '';
 
   //Lista opciones categoria
-  List<String> _tiposPrecio = <String>['sale', 'auction'];
   String _tipoPrecio = 'sale';
 
   ItemClass _item;
@@ -46,6 +44,8 @@ class _EditItemState2 extends State<EditItem2> {
     _priceController.text = item.price.toString();
     _divisa = item.currency;
     _buttonFunction = createItem;
+    _tipoPrecio= item.type == "auction" ? "auction" : "sale";
+    _selectedDate= item.endDate;
   }
 
   /// Titulos
@@ -60,8 +60,6 @@ class _EditItemState2 extends State<EditItem2> {
 
   static final _styleButton = TextStyle(fontSize: 19.0, color: Colors.white);
 
-  ///Selector de fecha
-  DateTime selectedDate = DateTime.now();
 
   String _dateString(DateTime fecha) {
     return '${fecha.day} / ${fecha.month} / ${fecha.year}';
@@ -138,10 +136,11 @@ class _EditItemState2 extends State<EditItem2> {
       if (_priceController.text.length < 1 ||
           formattedPrice == null ||
           _tipoPrecio == '' ||
-          _divisa == '' ||
-          _limitController.text.length < 1) {
-        showInSnackBar("Rellena todos los campos correctamente", Colors.yellow);
+          _divisa == ''
+          ) {
+        showInSnackBar("Rellena todos los campos correctamente 2", Colors.yellow);
       } else {
+        
         _item.updateAuction(
             type: _tipoPrecio, price: formattedPrice, currency: _divisa, endDate: _selectedDate);
 
@@ -164,6 +163,7 @@ class _EditItemState2 extends State<EditItem2> {
           _buttonFunction = createItem;
           Navigator.of(context).pop();
         });
+        
       }
     }
   }
@@ -266,39 +266,7 @@ class _EditItemState2 extends State<EditItem2> {
                     ],
                   ),
                 ),
-                Padding(
-                  padding: EdgeInsets.only(
-                    top: 25,
-                  ),
-                  child: new FormField(
-                    builder: (FormFieldState state) {
-                      return InputDecorator(
-                        decoration: InputDecoration(
-                          labelText: 'Tipo',
-                        ),
-                        isEmpty: _tipoPrecio == '',
-                        child: new DropdownButtonHideUnderline(
-                          child: new DropdownButton(
-                            value: _tipoPrecio,
-                            isDense: true,
-                            onChanged: (String newValue) {
-                              setState(() {
-                                _tipoPrecio = newValue;
-                                state.didChange(newValue);
-                              });
-                            },
-                            items: _tiposPrecio.map((String value) {
-                              return new DropdownMenuItem(
-                                value: value,
-                                child: new Text(value),
-                              );
-                            }).toList(),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
+                
               ])),
         )
       ],
@@ -442,6 +410,7 @@ class _EditItemState2 extends State<EditItem2> {
                       Divider(),
                       wImgTitle,
                       wAge,
+                      Divider(),
                       new Container(
                           margin: EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 30.0),
                           child: RaisedButton(
