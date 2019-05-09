@@ -27,9 +27,9 @@ class ItemRequest {
 
     print("Parametros: $_otherParameters");
 
-
     http.Response response;
-    if (_params["type"] == "sale") { // productos
+    if (_params["type"] == "sale") {
+      // productos
       // Esperar la respuesta de la petición
       print('ITEM API PLAY ▶');
       response = await http
@@ -38,7 +38,8 @@ class ItemRequest {
         HttpHeaders.authorizationHeader: await Storage.loadToken(),
       });
       print('ITEM API STOP ◼');
-    } else { // subastas
+    } else {
+      // subastas
       // Esperar la respuesta de la petición
       print('ITEM API PLAY ▶');
       response = await http
@@ -54,12 +55,14 @@ class ItemRequest {
     if (response.statusCode == 200) {
       List<ItemClass> products = new List<ItemClass>();
       String token = await Storage.loadToken();
-      if (_params["type"] == "sale") { // productos
+      if (_params["type"] == "sale") {
+        // productos
         (json.jsonDecode(response.body) as List<dynamic>)
             .forEach((productJson) {
           products.add(ItemClass.fromJsonProducts(productJson, token));
         });
-      } else { // subastas
+      } else {
+        // subastas
         (json.jsonDecode(response.body) as List<dynamic>)
             .forEach((productJson) {
           products.add(ItemClass.fromJsonAuctions(productJson, token));
@@ -178,7 +181,6 @@ class ItemRequest {
 
   /// Eliminar producto
   static Future<void> delete(ItemClass item) async {
-    
     int _productId = item.itemId;
     final response = await http.delete(
       '${APIConfig.BASE_URL}/${item.type == "sale" ? "products" : "auctions"}/$_productId',
@@ -193,9 +195,9 @@ class ItemRequest {
     }
   }
 
-
   /// Pujar
-  static Future<void> bidUp(ItemClass item, String amount, int bidder_id) async {
+  static Future<void> bidUp(
+      ItemClass item, String amount, int bidder_id) async {
     int _productId = item.itemId;
     print(json.jsonEncode(item.toJsonBidUp(amount, bidder_id)));
     print(_productId);
@@ -205,7 +207,8 @@ class ItemRequest {
         HttpHeaders.contentTypeHeader: ContentType.json.toString(),
         HttpHeaders.authorizationHeader: await Storage.loadToken(),
       },
-      body: json.utf8.encode(json.jsonEncode(item.toJsonBidUp(amount, bidder_id))),
+      body: json.utf8
+          .encode(json.jsonEncode(item.toJsonBidUp(amount, bidder_id))),
     );
     print(response.statusCode);
     if (response.statusCode != 201) {
@@ -213,29 +216,36 @@ class ItemRequest {
     }
   }
 
-    /// Obtener un producto en base a su Id
+  /// Obtener un producto en base a su Id
   static Future<ItemClass> getItembyId(
-      {@required int itemId}) async {
-
+      {@required int itemId, @required String type}) async {
     //String _paramsString = '?lat=0.0&lng=0.0';
 
     // Esperar la respuesta de la petición
-    http.Response response = await http
-        .get('${APIConfig.BASE_URL}/products/$itemId?lat=0.0&lng=0.0', headers: {
-      HttpHeaders.contentTypeHeader: ContentType.json.toString(),
-      HttpHeaders.authorizationHeader: await Storage.loadToken(),
-    });
+    http.Response response = await http.get(
+        '${APIConfig.BASE_URL}/${type == "sale" ? "products" : "auctions"}/$itemId?lat=0.0&lng=0.0',
+        headers: {
+          HttpHeaders.contentTypeHeader: ContentType.json.toString(),
+          HttpHeaders.authorizationHeader: await Storage.loadToken(),
+        });
 
     if (response.statusCode == 200) {
-      
       String token = await Storage.loadToken();
-      ItemClass product = ItemClass.fromJsonProducts(json.jsonDecode(response.body), token);
+      ItemClass product;
+      if (type == "sale") {
+        // productos
+        product =
+            ItemClass.fromJsonProducts(json.jsonDecode(response.body), token);
+      } else {
+        // subastas
+        product =
+            ItemClass.fromJsonAuctions(json.jsonDecode(response.body), token);
+      }
+
       return product;
     } else {
       print('Status code: ' + response.statusCode.toString());
-      throw(APIConfig.getErrorString(response));
+      throw (APIConfig.getErrorString(response));
     }
   }
 }
-
-

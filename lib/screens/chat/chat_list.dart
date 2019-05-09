@@ -69,7 +69,7 @@ class ChatListState extends State<ChatList> {
     );
     streamSub.cancel();
     // Pedir datos a la api para crear ChatClass
-    ItemClass item = await ItemRequest.getItembyId(itemId: document['idProducto']);
+    ItemClass item = await ItemRequest.getItembyId(itemId: document['idProducto'], type: "sale");
     int idOtro = document['idAnunciante'];
     if(_miId == idOtro){
       idOtro = document['idCliente'];
