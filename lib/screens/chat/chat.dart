@@ -23,8 +23,7 @@ class ChatScreen extends StatefulWidget {
 }
 
 class ChatScreenState extends State<ChatScreen> {
-  final TextEditingController _textEditingController =
-      new TextEditingController();
+  TextEditingController _textEditingController = new TextEditingController();
   bool _isComposingMessage = false;
 
   ChatClass _chat;
@@ -168,18 +167,18 @@ class ChatScreenState extends State<ChatScreen> {
   CupertinoButton getIOSSendButton() {
     return new CupertinoButton(
       child: new Text("Send"),
-      onPressed: _isComposingMessage
-          ? () => _textMessageSubmitted(_textEditingController.text)
-          : null,
+      onPressed: (){
+        _sendMessage(messageText: _textEditingController.text);
+      },
     );
   }
 
   IconButton getDefaultSendButton() {
     return new IconButton(
       icon: new Icon(Icons.send),
-      onPressed: _isComposingMessage
-          ? () => _textMessageSubmitted(_textEditingController.text)
-          : null,
+      onPressed: (){
+        _sendMessage(messageText: _textEditingController.text);
+      },
     );
   }
 
@@ -211,18 +210,13 @@ class ChatScreenState extends State<ChatScreen> {
               : Theme.of(context).disabledColor,
         ),
         child: new Container(
-          margin: const EdgeInsets.symmetric(horizontal: 8.0),
+          margin: const EdgeInsets.only(left: 8.0),
           child: new Row(
             children: <Widget>[
               new Flexible(
                 child: new TextField(
+                  maxLines: 1,
                   controller: _textEditingController,
-                  onChanged: (String messageText) {
-                    setState(() {
-                      _isComposingMessage = messageText.length > 0;
-                    });
-                  },
-                  onSubmitted: _textMessageSubmitted,
                   decoration:
                       new InputDecoration.collapsed(hintText: "Envía un mensaje"),
                 ),
@@ -238,38 +232,35 @@ class ChatScreenState extends State<ChatScreen> {
         ));
   }
 
-  Future<Null> _textMessageSubmitted(String text) async {
-    _textEditingController.clear();
-
-    setState(() {
-      _isComposingMessage = false;
-    });
-    _sendMessage(messageText: text, imageUrl: null);
-  }
-
-  Future _sendMessage({String messageText, String imageUrl}) async {
-    print('Enviando mensaje');
-    // Falta poner visible al otro si no lo esta
-    if(!_chat.visible.contains(_chat.usuario.userId)){
-      _chat.visible.add(_chat.usuario.userId);
-      print('Cambiando visibilidad');
-      Firestore.instance.runTransaction((transaction) async {
-        await transaction.set(Firestore.instance.collection("chat").document(_chat.docId), 
-          {'idAnunciante' : _chat.usuario.userId, 'idCliente' : _miId,
-          'idProducto' : _chat.producto.itemId, 'visible' : _chat.visible});   
+  void _sendMessage({String messageText}) async {
+    messageText = messageText.trim();
+    if(messageText.isNotEmpty){
+      _textEditingController.clear();
+      print('Enviando mensaje');
+      // Falta poner visible al otro si no lo esta
+      if(!_chat.visible.contains(_chat.usuario.userId)){
+        _chat.visible.add(_chat.usuario.userId);
+        print('Cambiando visibilidad');
+        Firestore.instance.runTransaction((transaction) async {
+          await transaction.set(Firestore.instance.collection("chat").document(_chat.docId), 
+            {'idAnunciante' : _chat.usuario.userId, 'idCliente' : _miId,
+            'idProducto' : _chat.producto.itemId, 'visible' : _chat.visible});   
+        });
+      }
+      var fecha = DateTime.now();
+      // Mensaje en colleccion mensajes
+      await Firestore.instance.collection("chat").document(_chat.docId).collection("mensaje").document().setData({
+        'contenido' : messageText, 'estado' : 'enviado',
+          'fecha' : fecha, 'idEmisor' : _miId
       });
-    }
-    var fecha = DateTime.now();
-    // Mensaje en colleccion mensajes
-    await Firestore.instance.collection("chat").document(_chat.docId).collection("mensaje").document().setData({
-      'contenido' : messageText, 'estado' : 'enviado',
-        'fecha' : fecha, 'idEmisor' : _miId
-    });
-    Firestore.instance.runTransaction((transaction) async {
-        await transaction.set(Firestore.instance.collection("chat").document(_chat.docId), 
-          {'idAnunciante' : _chat.usuario.userId, 'idCliente' : _miId,
-          'idProducto' : _chat.producto.itemId, 'visible' : _chat.visible,
-          'ultimoMensaje' : messageText, 'fechaUltimoMensaje' : fecha});   
-     });
+      Firestore.instance.runTransaction((transaction) async {
+          await transaction.set(Firestore.instance.collection("chat").document(_chat.docId), 
+            {'idAnunciante' : _chat.usuario.userId, 'idCliente' : _miId,
+            'idProducto' : _chat.producto.itemId, 'visible' : _chat.visible,
+            'ultimoMensaje' : messageText, 'fechaUltimoMensaje' : fecha});   
+      });
+    } 
   }
+
+
 }

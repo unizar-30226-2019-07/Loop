@@ -94,7 +94,6 @@ class ChatListState extends State<ChatList> {
                 color: Colors.red,
               ),
               onPress: () {
-                  print('Hello');
                   _showDialogDeleteChat(chat);
               },
               backgroudColor: Colors.transparent),
