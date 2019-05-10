@@ -51,10 +51,9 @@ class ChatListState extends State<ChatList> {
 
   Future<ChatClass> _getChatData(BuildContext context, DocumentSnapshot document) async {
     print('GEEEEEET DATAAAAA -> ' + document.documentID);
-    var streamSub = Firestore.instance.collection('chat').document(document.documentID).collection('mensaje')
-      .where('estado', isEqualTo: 'enviado').snapshots().listen(
-      (data) {
-        data.documents.forEach((messageDocument){
+    Firestore.instance.collection('chat').document(document.documentID).collection('mensaje')
+      .where('estado', isEqualTo: 'enviado').getDocuments().then((QuerySnapshot data){
+        data.documents.forEach((messageDocument){  
           // Cambiar a recibido solo los mensajes del otro usuario
           if(messageDocument['idEmisor'] != _miId){
             Firestore.instance.runTransaction((transaction) async {
@@ -65,9 +64,7 @@ class ChatListState extends State<ChatList> {
               });
           }
         });
-      } 
-    );
-    streamSub.cancel();
+      });
     // Pedir datos a la api para crear ChatClass
     ItemClass item = await ItemRequest.getItembyId(itemId: document['idProducto'],
       type: document['tipoProducto']);
