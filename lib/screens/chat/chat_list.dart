@@ -69,7 +69,8 @@ class ChatListState extends State<ChatList> {
     );
     streamSub.cancel();
     // Pedir datos a la api para crear ChatClass
-    ItemClass item = await ItemRequest.getItembyId(itemId: document['idProducto'], type: "sale");
+    ItemClass item = await ItemRequest.getItembyId(itemId: document['idProducto'],
+      type: document['tipoProducto']);
     int idOtro = document['idAnunciante'];
     if(_miId == idOtro){
       idOtro = document['idCliente'];
@@ -77,10 +78,11 @@ class ChatListState extends State<ChatList> {
     // Obtener UsuarioClass del otro usuario
     UsuarioClass usuario = await UsuarioRequest.getUserById(idOtro);
 
-    String lastMessage;
     ChatClass chat =  new ChatClass(usuario: usuario, miId: _miId, producto: item,
       visible: new List.from(document['visible']), docId: document.documentID, 
-      lastMessage: document['ultimoMensaje'], lastMessageDate: document['fechaUltimoMensaje'].toDate());
+      lastMessage: document['ultimoMensaje'], lastMessageDate: document['fechaUltimoMensaje'].toDate(),
+      tipoProducto: document['tipoProducto']);
+    print('Tipo producto: ' + chat.tipoProducto);
     return chat;
   }
 
@@ -165,7 +167,8 @@ class ChatListState extends State<ChatList> {
                   await transaction.set(Firestore.instance.collection("chat").document(chat.docId), 
                     {'idAnunciante' : chat.usuario.userId, 'idCliente' : _miId,
                     'idProducto' : chat.producto.itemId, 'visible' : nuevaListaVisible,
-                    'ultimoMensaje' : chat.lastMessage, 'fechaUltimoMensaje' : chat.lastMessageDate});   
+                    'ultimoMensaje' : chat.lastMessage, 'fechaUltimoMensaje' : chat.lastMessageDate,
+                    'tipoProducto' : chat.tipoProducto});   
                 });
                 Navigator.of(context).pop();
               },

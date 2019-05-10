@@ -244,7 +244,8 @@ class ChatScreenState extends State<ChatScreen> {
         Firestore.instance.runTransaction((transaction) async {
           await transaction.set(Firestore.instance.collection("chat").document(_chat.docId), 
             {'idAnunciante' : _chat.usuario.userId, 'idCliente' : _miId,
-            'idProducto' : _chat.producto.itemId, 'visible' : _chat.visible});   
+            'idProducto' : _chat.producto.itemId, 'visible' : _chat.visible,
+            'ultimoMensaje' : _chat.lastMessage, 'fechaUltimoMensaje' : _chat.lastMessageDate, 'tipoProducto': _chat.tipoProducto});   
         });
       }
       var fecha = DateTime.now();
@@ -257,7 +258,7 @@ class ChatScreenState extends State<ChatScreen> {
           await transaction.set(Firestore.instance.collection("chat").document(_chat.docId), 
             {'idAnunciante' : _chat.usuario.userId, 'idCliente' : _miId,
             'idProducto' : _chat.producto.itemId, 'visible' : _chat.visible,
-            'ultimoMensaje' : messageText, 'fechaUltimoMensaje' : fecha});   
+            'ultimoMensaje' : messageText, 'fechaUltimoMensaje' : fecha, 'tipoProducto': _chat.tipoProducto});   
       });
     } 
   }
