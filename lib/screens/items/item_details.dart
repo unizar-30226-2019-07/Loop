@@ -16,6 +16,7 @@ import 'package:selit/widgets/profile_picture.dart';
 import 'package:selit/util/bar_color.dart';
 import 'package:selit/widgets/star_rating.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 /// Detalles de un item/producto en venta: título, descripción, precio,
 /// imágenes, etc. También se muestra información acerca de su usuario
@@ -108,10 +109,9 @@ class _ItemDetails extends State<ItemDetails> {
       },
     );
 
-    return
-        await ItemRequest.getItembyId(itemId: _item.itemId, type: _item.type)
-            .then((itemReloaded) {
-              setState(() => _item = itemReloaded);
+    return await ItemRequest.getItembyId(itemId: _item.itemId, type: _item.type)
+        .then((itemReloaded) {
+      setState(() => _item = itemReloaded);
       Navigator.of(context).pop();
     }).catchError((error) {
       if (error == "Unauthorized" || error == "Forbidden") {
@@ -215,6 +215,7 @@ class _ItemDetails extends State<ItemDetails> {
           showInSnackBar("No hay conexión a internet", _colorStatusBarBad);
         }
         _buttonFunction = pujar;
+        Navigator.of(context).pop();
         Navigator.of(context).pop();
       });
     }
@@ -350,6 +351,30 @@ class _ItemDetails extends State<ItemDetails> {
         ));
   }
 
+  Widget _buildChatButtonGanador() {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(15.0, 5.0, 15.0, 25.0),
+      child: SizedBox(
+        width: double.infinity,
+        child: new RaisedButton(
+          padding: const EdgeInsets.all(10.0),
+          elevation: 1,
+          textColor: Colors.white,
+          color: Theme.of(context).primaryColor,
+          onPressed: () {
+            iniciarChatGanador();
+          },
+          child: new Text('Chat con ganador',
+              style: TextStyle(
+                  fontSize: 21.0,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold)),
+        ),
+      ),
+    );
+  }
+
+
   Widget _buildChatButton() {
     return Container(
       padding: const EdgeInsets.fromLTRB(15.0, 5.0, 15.0, 25.0),
@@ -386,6 +411,11 @@ class _ItemDetails extends State<ItemDetails> {
       setState(() {
         _buildEditConditional = _buildEditButton();
       });
+
+      if(_item.type == "auction" && !_item.endDate.isAfter(DateTime.now()) ){
+        _buildChatConditional = _buildChatButtonGanador();
+      }
+
     } else {
       print('Construir chat');
       setState(() {
@@ -531,6 +561,59 @@ class _ItemDetails extends State<ItemDetails> {
     */
   }
 
+  void iniciarChatGanador() async {
+    String docId = 'p' +
+        _item.itemId.toString() +
+        '_a' +
+        _item.lastBid.bidder.userId.toString() +
+        '_c' +
+        miId.toString();
+
+    Firestore.instance
+        .collection('chat')
+        .document(docId)
+        .get()
+        .then((document) {
+      if (document == null) {
+        print('CREAR NUEVO CHAT');
+        // Se crea el chat
+        Firestore.instance.runTransaction((transaction) async {
+          await transaction
+              .set(Firestore.instance.collection("chat").document(docId), {
+            'idAnunciante': _item.lastBid.bidder.userId,
+            'idCliente': miId,
+            'idProducto': _item.itemId,
+            'visible': [miId],
+            'ultimoMensaje': '',
+            'fechaUltimoMensaje': DateTime.now()
+          });
+        });
+        List<int> visible = new List<int>();
+        visible.add(miId);
+        ChatClass chat = new ChatClass(
+            usuario: _item.lastBid.bidder,
+            miId: miId,
+            producto: _item,
+            visible: visible,
+            docId: docId,
+            lastMessage: '');
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => ChatScreen(chat)));
+      } else {
+        print('CHAT EXISTENTE');
+        // Ya existe el chat (hay que preservar los valores de visible)
+        ChatClass chat = new ChatClass(
+            usuario: _item.lastBid.bidder,
+            miId: miId,
+            producto: _item,
+            visible: List.from(document.data['visible']),
+            docId: docId);
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => ChatScreen(chat)));
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     AlertDialog dialog = AlertDialog(
@@ -645,7 +728,7 @@ class _ItemDetails extends State<ItemDetails> {
       floatingActionButton: _item.type == "auction" && _subastaEnFecha
           ? new FloatingActionButton(
               elevation: 8.0,
-              child: new Icon(Icons.attach_money),
+              child: new Icon(FontAwesomeIcons.gavel),
               backgroundColor: Theme.of(context).primaryColor,
               onPressed: () =>
                   showDialog(context: context, builder: (context) => dialog),
@@ -820,8 +903,15 @@ class _ItemDetails extends State<ItemDetails> {
                                                               bottom: 8.0,
                                                               right: 10.0),
                                                       child: Chip(
-                                                        backgroundColor:
-                                                            _itemEnVenta
+                                                        backgroundColor: _item
+                                                                    .type ==
+                                                                "auction"
+                                                            ? _subastaEnFecha
+                                                                ? Theme.of(
+                                                                        context)
+                                                                    .primaryColor
+                                                                : _blendColor
+                                                            : _itemEnVenta
                                                                 ? Theme.of(
                                                                         context)
                                                                     .primaryColor
