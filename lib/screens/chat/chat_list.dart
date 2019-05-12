@@ -51,10 +51,9 @@ class ChatListState extends State<ChatList> {
 
   Future<ChatClass> _getChatData(BuildContext context, DocumentSnapshot document) async {
     print('GEEEEEET DATAAAAA -> ' + document.documentID);
-    var streamSub = Firestore.instance.collection('chat').document(document.documentID).collection('mensaje')
-      .where('estado', isEqualTo: 'enviado').snapshots().listen(
-      (data) {
-        data.documents.forEach((messageDocument){
+    Firestore.instance.collection('chat').document(document.documentID).collection('mensaje')
+      .where('estado', isEqualTo: 'enviado').getDocuments().then((QuerySnapshot data){
+        data.documents.forEach((messageDocument){  
           // Cambiar a recibido solo los mensajes del otro usuario
           if(messageDocument['idEmisor'] != _miId){
             Firestore.instance.runTransaction((transaction) async {
@@ -65,11 +64,10 @@ class ChatListState extends State<ChatList> {
               });
           }
         });
-      } 
-    );
-    streamSub.cancel();
+      });
     // Pedir datos a la api para crear ChatClass
-    ItemClass item = await ItemRequest.getItembyId(itemId: document['idProducto'], type: "sale");
+    ItemClass item = await ItemRequest.getItembyId(itemId: document['idProducto'],
+      type: document['tipoProducto']);
     int idOtro = document['idAnunciante'];
     if(_miId == idOtro){
       idOtro = document['idCliente'];
@@ -77,10 +75,11 @@ class ChatListState extends State<ChatList> {
     // Obtener UsuarioClass del otro usuario
     UsuarioClass usuario = await UsuarioRequest.getUserById(idOtro);
 
-    String lastMessage;
     ChatClass chat =  new ChatClass(usuario: usuario, miId: _miId, producto: item,
       visible: new List.from(document['visible']), docId: document.documentID, 
-      lastMessage: document['ultimoMensaje'], lastMessageDate: document['fechaUltimoMensaje'].toDate());
+      lastMessage: document['ultimoMensaje'], lastMessageDate: document['fechaUltimoMensaje'].toDate(),
+      tipoProducto: document['tipoProducto']);
+    print('Tipo producto: ' + chat.tipoProducto);
     return chat;
   }
 
@@ -94,7 +93,6 @@ class ChatListState extends State<ChatList> {
                 color: Colors.red,
               ),
               onPress: () {
-                  print('Hello');
                   _showDialogDeleteChat(chat);
               },
               backgroudColor: Colors.transparent),
@@ -166,7 +164,8 @@ class ChatListState extends State<ChatList> {
                   await transaction.set(Firestore.instance.collection("chat").document(chat.docId), 
                     {'idAnunciante' : chat.usuario.userId, 'idCliente' : _miId,
                     'idProducto' : chat.producto.itemId, 'visible' : nuevaListaVisible,
-                    'ultimoMensaje' : chat.lastMessage, 'fechaUltimoMensaje' : chat.lastMessageDate});   
+                    'ultimoMensaje' : chat.lastMessage, 'fechaUltimoMensaje' : chat.lastMessageDate,
+                    'tipoProducto' : chat.tipoProducto});   
                 });
                 Navigator.of(context).pop();
               },

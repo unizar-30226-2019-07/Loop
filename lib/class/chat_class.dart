@@ -13,9 +13,11 @@ class ChatClass {
   String docId;
   String lastMessage;
   DateTime lastMessageDate;
+  String tipoProducto;
   
 
   ChatClass({this.usuario, this.miId, this.producto, 
-    this.visible, this.docId, this.lastMessage, this.lastMessageDate});
+    this.visible, this.docId, this.lastMessage, this.lastMessageDate,
+    this.tipoProducto});
   
 }
