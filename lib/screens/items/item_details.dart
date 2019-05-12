@@ -374,7 +374,6 @@ class _ItemDetails extends State<ItemDetails> {
     );
   }
 
-
   Widget _buildChatButton() {
     return Container(
       padding: const EdgeInsets.fromLTRB(15.0, 5.0, 15.0, 25.0),
@@ -412,10 +411,14 @@ class _ItemDetails extends State<ItemDetails> {
         _buildEditConditional = _buildEditButton();
       });
 
-      if(_item.type == "auction" && !_item.endDate.isAfter(DateTime.now()) ){
+      if(_item.lastBid.bidder!= null){
+        if (_item.type == "auction" &&
+          !_item.endDate.isAfter(DateTime.now()) &&
+          _item.lastBid.bidder.userId != miId) {
         _buildChatConditional = _buildChatButtonGanador();
+        }
       }
-
+      
     } else {
       print('Construir chat');
       setState(() {
@@ -523,28 +526,27 @@ class _ItemDetails extends State<ItemDetails> {
             visible: visible,
             docId: docId,
             lastMessageDate: fechaActual,
-            lastMessage: '', 
+            lastMessage: '',
             tipoProducto: _item.type);
         Navigator.push(
             context, MaterialPageRoute(builder: (context) => ChatScreen(chat)));
-      }
-      else {
+      } else {
         List<int> listaVisible = List.from(document.data['visible']);
         print('CHAT EXISTENTE');
-        if(!document['visible'].contains(miId)){
+        if (!document['visible'].contains(miId)) {
           listaVisible.add(miId);
           print('Cambiando visibilidad');
           Firestore.instance.runTransaction((transaction) async {
-            await transaction.set(Firestore.instance.collection("chat").document(docId), 
-              {
-                            'idAnunciante': _item.owner.userId,
+            await transaction
+                .set(Firestore.instance.collection("chat").document(docId), {
+              'idAnunciante': _item.owner.userId,
               'idCliente': miId,
               'idProducto': _item.itemId,
               'visible': [miId, _item.owner.userId],
               'ultimoMensaje': document.data['ultimoMensaje'],
               'fechaUltimoMensaje': document['fechaUltimoMensaje'],
               'tipoProducto': _item.type,
-              });   
+            });
           });
         }
         // Ya existe el chat (hay que preservar los valores de visible)
@@ -577,9 +579,10 @@ class _ItemDetails extends State<ItemDetails> {
         .document(docId)
         .get()
         .then((document) {
-      if (document == null) {
+      if (!document.exists) {
         print('CREAR NUEVO CHAT');
         // Se crea el chat
+        var fechaActual = DateTime.now();
         Firestore.instance.runTransaction((transaction) async {
           await transaction
               .set(Firestore.instance.collection("chat").document(docId), {
@@ -588,7 +591,8 @@ class _ItemDetails extends State<ItemDetails> {
             'idProducto': _item.itemId,
             'visible': [miId],
             'ultimoMensaje': '',
-            'fechaUltimoMensaje': DateTime.now()
+            'fechaUltimoMensaje': fechaActual,
+            'tipoProducto': _item.type,
           });
         });
         List<int> visible = new List<int>();
@@ -599,18 +603,41 @@ class _ItemDetails extends State<ItemDetails> {
             producto: _item,
             visible: visible,
             docId: docId,
-            lastMessage: '');
+            lastMessageDate: fechaActual,
+            lastMessage: '',
+            tipoProducto: _item.type);
         Navigator.push(
             context, MaterialPageRoute(builder: (context) => ChatScreen(chat)));
       } else {
+        List<int> listaVisible = List.from(document.data['visible']);
         print('CHAT EXISTENTE');
+        if (!document['visible'].contains(miId)) {
+          listaVisible.add(miId);
+          print('Cambiando visibilidad');
+          Firestore.instance.runTransaction((transaction) async {
+            await transaction
+                .set(Firestore.instance.collection("chat").document(docId), {
+              'idAnunciante': _item.lastBid.bidder.userId,
+              'idCliente': miId,
+              'idProducto': _item.itemId,
+              'visible': [miId, _item.lastBid.bidder.userId],
+              'ultimoMensaje': document.data['ultimoMensaje'],
+              'fechaUltimoMensaje': document['fechaUltimoMensaje'],
+              'tipoProducto': _item.type,
+            });
+          });
+        }
         // Ya existe el chat (hay que preservar los valores de visible)
         ChatClass chat = new ChatClass(
             usuario: _item.lastBid.bidder,
             miId: miId,
             producto: _item,
-            visible: List.from(document.data['visible']),
-            docId: docId);
+            visible: listaVisible,
+            docId: docId,
+            lastMessageDate: document['fechaUltimoMensaje'].toDate(),
+            lastMessage: document.data['ultimoMensaje'],
+            tipoProducto: _item.type);
+        print('Tipo producto: ' + chat.tipoProducto);
         Navigator.push(
             context, MaterialPageRoute(builder: (context) => ChatScreen(chat)));
       }
@@ -924,7 +951,12 @@ class _ItemDetails extends State<ItemDetails> {
                                                             ? Text(
                                                                 _subastaEnFecha
                                                                     ? 'Subasta activa'
-                                                                    : 'Subasta cerrada',
+                                                                    : _item.lastBid == null
+                                                                        ? 'Subasta cerrada'
+                                                                        : _item.lastBid.bidder.userId ==
+                                                                            miId
+                                                                        ? 'Subasta ganada'
+                                                                        : 'Subasta perdida',
                                                                 style:
                                                                     styleTagWhite)
                                                             : Text(

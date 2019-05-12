@@ -600,7 +600,6 @@ class _ProfileState extends State<Profile> {
               curve: Curves.bounceIn,
               overlayColor: Colors.black,
               overlayOpacity: 0.5,
-              tooltip: 'Speed Dial',
               heroTag: 'speed-dial-hero-tag',
               backgroundColor: Theme.of(context).primaryColor,
               foregroundColor: Colors.white,
