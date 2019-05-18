@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:selit/class/usuario_class.dart';
+import 'package:selit/util/api/usuario_request.dart';
 import 'package:selit/widgets/profile_picture.dart';
 import 'package:selit/widgets/star_rating.dart';
 import 'package:selit/util/bar_color.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 /// Pantalla para realizar informe sobre otro usuario
 /// Formulario que informa sobre quién es el usuario que se va a reportar,
@@ -26,21 +28,91 @@ class _ReportUserState extends State<ReportUser> {
       fontWeight: FontWeight.bold, fontSize: 20.0, color: Colors.black);
   static final _styleButton = TextStyle(fontSize: 19.0, color: Colors.white);
 
+  /// Botones para seleccionar razón
+  static final _styleFilterButton =
+      TextStyle(fontSize: 18.0, color: Colors.black);
+
+  /// Texto del título del alertdialog
+  static final _styleDialogTitle = TextStyle(
+      fontSize: 19.0, color: Colors.white, fontWeight: FontWeight.bold);
+
+  /// Texto de los botones del alertdialog, para cuando esta seleccionado y no
+  static final _styleDialogButtonsUnselected =
+      TextStyle(fontSize: 18.0, color: Colors.white);
+  static final _styleDialogButtonsSelected =
+      TextStyle(fontSize: 18.0, color: Colors.black);
+
   final TextEditingController _infoController = new TextEditingController();
 
   /// Color más oscuro que el rojo principal
   final _blendColor = Color.alphaBlend(Color(0x552B2B2B), Color(0xFFC0392B));
+  final Color _colorStatusBarBad = Colors.red.withOpacity(0.5);
 
   UsuarioClass _otherUser;
 
+  static final List<String> reasons = [
+    'Sospecha de fraude',
+    'No acudió a la cita',
+    'Mal comportamiento',
+    'Artículo defectuoso'
+  ];
+  // ID razón seleccionada para el reporte
+  int _selectedReason;
+  Function _sendFunction;
+
   // Constructor
-  _ReportUserState(this._otherUser);
+  _ReportUserState(this._otherUser) {
+    _selectedReason = -1;
+    _sendFunction = _onPressedSend;
+  }
 
   void _onPressedSend() {
-    if (_infoController.text == '') {
+    // Diálogo "cargando..." para evitar repetir
+    _sendFunction = null;
+    showDialog(
+      barrierDismissible: false, // JUST MENTION THIS LINE
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+            content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            CircularProgressIndicator(
+                strokeWidth: 5.0,
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.black)),
+            Container(
+                margin: EdgeInsets.only(top: 15.0), child: Text('Cargando...')),
+          ],
+        ));
+      },
+    );
+
+    if (_infoController.text == '' ||
+        _selectedReason < 0 ||
+        _selectedReason >= reasons.length) {
       showInSnackBar("Rellena todos los campos correctamente", Colors.yellow);
+      Navigator.of(context).pop(); // alertDialog
+      _sendFunction = _onPressedSend;
     } else {
-      print('Usuario con id ${_otherUser.userId} con razón ${_infoController.text}');
+      UsuarioRequest.reportUser(
+              reportedUserId: _otherUser.userId,
+              asunto: reasons[_selectedReason],
+              desc: _infoController.text)
+          .then((_) {
+            Navigator.of(context).pop(); // alertDialog
+            Navigator.of(context).pop(); // fuera de la pantalla
+          })
+          .catchError((error) {
+            if (error == "Precondition Failed") {
+              showInSnackBar("Ya has reportado a este usuario antes", _colorStatusBarBad);
+            } else {
+              showInSnackBar("Ha ocurrido un problema", _colorStatusBarBad);
+            }
+            print('Error al reportar usuario: $error');
+            Navigator.of(context).pop(); // alertDialog
+            _sendFunction = _onPressedSend;
+      });
     }
   }
 
@@ -56,6 +128,61 @@ class _ReportUserState extends State<ReportUser> {
       backgroundColor: alfa,
       duration: Duration(seconds: 3),
     ));
+  }
+
+  // Botón que pide "asunto" del reporte
+  Widget _buildReasonButton() {
+    // Crear la lista con las opciones a elegir
+    List<Widget> buttonOptions = [];
+    for (var i = 0; i < reasons.length; i++) {
+      buttonOptions.add(SizedBox.fromSize(
+          size: Size(double.infinity, 40.0),
+          child: Container(
+              margin: EdgeInsets.all(2),
+              child: FlatButton(
+                color: _selectedReason == i ? Colors.grey[200] : _blendColor,
+                child: Text(reasons[i],
+                    style: _selectedReason == i
+                        ? _styleDialogButtonsSelected
+                        : _styleDialogButtonsUnselected),
+                onPressed: () {
+                  setState(() => _selectedReason = i);
+                  Navigator.of(context).pop();
+                },
+              ))));
+    }
+
+    // Diálogo a mostrar cuando se pulsa el boton
+    AlertDialog dialog = AlertDialog(
+      backgroundColor: Theme.of(context).primaryColor,
+      shape: RoundedRectangleBorder(
+          side: BorderSide(color: _blendColor, width: 2.0),
+          borderRadius: BorderRadius.circular(10.0)),
+      title: Text('Razón del informe', style: _styleDialogTitle),
+      content: Column(mainAxisSize: MainAxisSize.min, children: buttonOptions),
+    );
+
+    return RaisedButton(
+      child: Row(
+        children: <Widget>[
+          Expanded(
+            child: Text(
+                _selectedReason == -1
+                    ? 'Selecciona una razón...'
+                    : reasons[_selectedReason],
+                style: _styleFilterButton),
+          ),
+          Icon(FontAwesomeIcons.chevronRight, color: Colors.black, size: 16.0),
+        ],
+      ),
+      color: Colors.grey[50],
+      onPressed: () =>
+          showDialog(context: context, builder: (context) => dialog),
+      shape: RoundedRectangleBorder(
+        side: BorderSide(color: Colors.grey[300], width: 2.0),
+        borderRadius: BorderRadius.circular(5.0),
+      ),
+    );
   }
 
   Widget _buildReportForm() {
@@ -153,7 +280,11 @@ class _ReportUserState extends State<ReportUser> {
           ),
         ),
         Container(
-          margin: EdgeInsets.symmetric(horizontal: 15.0, vertical: 20.0),
+          margin: EdgeInsets.fromLTRB(15.0, 15.0, 15.0, 5.0),
+          child: _buildReasonButton(),
+        ),
+        Container(
+          margin: EdgeInsets.symmetric(horizontal: 15.0, vertical: 5.0),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(10.0),
             child: Container(
@@ -166,7 +297,7 @@ class _ReportUserState extends State<ReportUser> {
                   padding: EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 10.0),
                   child: TextFormField(
                     decoration: InputDecoration(
-                      labelText: 'Razón del informe',
+                      labelText: 'Descripción del informe',
                       alignLabelWithHint: true,
                     ),
                     maxLength: 300,
@@ -180,15 +311,16 @@ class _ReportUserState extends State<ReportUser> {
           ),
         ),
         SizedBox(
-          width: double.infinity,
-          child: Container(
-            margin: EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 20.0),
-            child: RaisedButton(
-              color: Theme.of(context).primaryColor,
-              padding: EdgeInsets.symmetric(vertical: 7.0, horizontal: 20.0),
-              child: Text('Enviar informe', style: _styleButton),
-              onPressed: _onPressedSend,
-            ))),
+            width: double.infinity,
+            child: Container(
+                margin: EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 20.0),
+                child: RaisedButton(
+                  color: Theme.of(context).primaryColor,
+                  padding:
+                      EdgeInsets.symmetric(vertical: 7.0, horizontal: 20.0),
+                  child: Text('Enviar informe', style: _styleButton),
+                  onPressed: _sendFunction,
+                ))),
       ],
     ));
   }

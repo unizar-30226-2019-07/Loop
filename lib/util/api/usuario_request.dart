@@ -221,4 +221,37 @@ class UsuarioRequest {
       throw (APIConfig.getErrorString(response));
     }
   }
+
+  /// Añadir informe acerca de un usuario (se supone que el que realiza el informe/reporte
+  /// es el usuario que está logueado en curso [Storage.loadUserId()] y está reportando
+  /// al usuario [reportedUserId])
+  static Future<void> reportUser(
+      {int reportedUserId, String asunto, String desc}) async {
+    String token = await Storage.loadToken();
+    int idUsuario = await Storage.loadUserId();
+
+    // Json a enviar
+    DateTime fechaActual = DateTime.now();
+    Map<String, dynamic> reportData = {
+      "id_evaluado": reportedUserId,
+      "id_informador": idUsuario,
+      "asunto": asunto,
+      "descripcion": desc,
+      "fecha_realizacion": '${fechaActual.year}-'
+          '${fechaActual.month.toString().padLeft(2, '0')}-'
+          '${fechaActual.day.toString().padLeft(2, '0')}'
+    };
+
+    final response =
+        await http.post('${APIConfig.BASE_URL}/reports/$reportedUserId/report',
+            headers: {
+              HttpHeaders.contentTypeHeader: ContentType.json.toString(),
+              HttpHeaders.authorizationHeader: token,
+            },
+            body: json.jsonEncode(reportData));
+
+    if (response.statusCode != 200) {
+      throw (APIConfig.getErrorString(response));
+    }
+  }
 }

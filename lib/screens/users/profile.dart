@@ -87,6 +87,7 @@ class _ProfileState extends State<Profile> {
     _user = null;
     _ubicacionCiudad = null;
     _ubicacionResto = null;
+    _loggedUserId = null;
     _loadProfile(_userId).then((_) => _loadProfileItems());
     Storage.loadUserId().then((id) {
       print(id);
@@ -206,35 +207,65 @@ class _ProfileState extends State<Profile> {
     }
   }
 
-  // TODO borrar, esto es (deberia ser) temporal
-  // principalmente porque el botón no aparece cuando debería aparecer
+  // Botón de editar perfil
+  Widget _buildEditProfileButton() {
+    return Container(
+        margin: EdgeInsets.only(right: 15),
+        child: GestureDetector(
+            onTap: _onPressedEditProfile,
+            child: ClipRRect(
+                borderRadius: BorderRadius.circular(4.0),
+                child: Container(
+                    padding: EdgeInsets.all(2.0),
+                    color: _blendColor,
+                    alignment: Alignment.centerRight,
+                    width: 130.0,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: <Widget>[
+                        Container(
+                          margin: EdgeInsets.only(right: 5),
+                          child:
+                              Icon(Icons.edit, color: Colors.white, size: 18.0),
+                        ),
+                        Container(
+                            margin: EdgeInsets.only(right: 10),
+                            child:
+                                Text('Editar perfil', style: _styleEditProfile))
+                      ],
+                    )))));
+  }
+
+  // Botón de reportar usuario
   Widget _buildReportButton() {
     return Container(
-      margin: EdgeInsets.only(right: 15),
-      child: GestureDetector(
-          onTap: () => Navigator.of(context).pushNamed('/report-user', arguments: _user),
-          onLongPress: () => Navigator.of(context).pushNamed('/rate-user', arguments: _user),
-          child: ClipRRect(
-              borderRadius: BorderRadius.circular(4.0),
-              child: Container(
-                  padding: EdgeInsets.all(2.0),
-                  color: _blendColor,
-                  alignment: Alignment.centerRight,
-                  width: 159.0,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: <Widget>[
-                      Container(
-                        margin: EdgeInsets.only(left: 5, right: 5),
-                        child: Icon(Icons.report_problem,
-                            color: Colors.white, size: 18.0),
-                      ),
-                      Container(
-                          margin: EdgeInsets.only(right: 5),
-                          child: Text('Reportar usuario',
-                              style: _styleEditProfile))
-                    ],
-                  )))));
+        margin: EdgeInsets.only(right: 15),
+        child: GestureDetector(
+            onTap: () => Navigator.of(context)
+                .pushNamed('/report-user', arguments: _user),
+            onLongPress: () =>
+                Navigator.of(context).pushNamed('/rate-user', arguments: _user),
+            child: ClipRRect(
+                borderRadius: BorderRadius.circular(4.0),
+                child: Container(
+                    padding: EdgeInsets.all(2.0),
+                    color: _blendColor,
+                    alignment: Alignment.centerRight,
+                    width: 159.0,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: <Widget>[
+                        Container(
+                          margin: EdgeInsets.only(left: 5, right: 5),
+                          child: Icon(Icons.report_problem,
+                              color: Colors.white, size: 18.0),
+                        ),
+                        Container(
+                            margin: EdgeInsets.only(right: 5),
+                            child: Text('Reportar usuario',
+                                style: _styleEditProfile))
+                      ],
+                    )))));
   }
 
   /// Constructor para los botones "en venta" y "vendido"
@@ -302,35 +333,12 @@ class _ProfileState extends State<Profile> {
       ),
     );
 
-    Widget wEditProfile = (_user?.userId == null ||
-            _loggedUserId == null ||
-            _user.userId != _loggedUserId)
-        ? _buildReportButton()
-        : Container(
-            margin: EdgeInsets.only(right: 15),
-            child: GestureDetector(
-                onTap: _onPressedEditProfile,
-                child: ClipRRect(
-                    borderRadius: BorderRadius.circular(4.0),
-                    child: Container(
-                        padding: EdgeInsets.all(2.0),
-                        color: _blendColor,
-                        alignment: Alignment.centerRight,
-                        width: 130.0,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: <Widget>[
-                            Container(
-                              margin: EdgeInsets.only(right: 5),
-                              child: Icon(Icons.edit,
-                                  color: Colors.white, size: 18.0),
-                            ),
-                            Container(
-                                margin: EdgeInsets.only(right: 10),
-                                child: Text('Editar perfil',
-                                    style: _styleEditProfile))
-                          ],
-                        )))));
+    Widget wTopLeftButton = (_user?.userId == null ||
+            _loggedUserId == null)
+        ? Container()
+        : _user.userId == _loggedUserId
+          ? _buildEditProfileButton()
+          : _buildReportButton();
 
     Widget wLocation = _ubicacionCiudad == null || _ubicacionResto == null
         ? Container()
@@ -382,11 +390,11 @@ class _ProfileState extends State<Profile> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: <Widget>[
-              wEditProfile,
+              wTopLeftButton,
               Container(
                   alignment: Alignment.centerLeft,
                   padding: EdgeInsets.only(
-                      top: wEditProfile == Container() ? 25 : 10),
+                      top: wTopLeftButton == Container() ? 25 : 10),
                   child: Text(_user?.nombre ?? '',
                       overflow: TextOverflow.ellipsis,
                       style: _styleNombre,
