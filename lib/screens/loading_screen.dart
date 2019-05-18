@@ -30,7 +30,6 @@ class _LoadingScreenState extends State<LoadingScreen> {
   }
 
   void _showErrorDialog(BuildContext context) {
-    // TODO comprobar si el usuario tiene internet
     AlertDialog dialogo = AlertDialog(
       title: Text('Error al iniciar sesión'),
       content: Text('No se ha podido conectar al servidor'),

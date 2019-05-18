@@ -3,7 +3,6 @@ import 'package:flutter_range_slider/flutter_range_slider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:selit/screens/items/item_list.dart';
 import 'package:selit/class/items/filter_list_class.dart';
-import 'package:selit/util/bar_color.dart';
 import 'dart:async';
 
 /// Listado de filtros de la lista de items, diseñado para acompañar

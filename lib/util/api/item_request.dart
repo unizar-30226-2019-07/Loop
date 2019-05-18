@@ -197,9 +197,9 @@ class ItemRequest {
 
   /// Pujar
   static Future<void> bidUp(
-      ItemClass item, String amount, int bidder_id) async {
+      ItemClass item, String amount, int bidderId) async {
     int _productId = item.itemId;
-    print(json.jsonEncode(item.toJsonBidUp(amount, bidder_id)));
+    print(json.jsonEncode(item.toJsonBidUp(amount, bidderId)));
     print(_productId);
     final response = await http.post(
       '${APIConfig.BASE_URL}/auctions/$_productId/bid',
@@ -208,7 +208,7 @@ class ItemRequest {
         HttpHeaders.authorizationHeader: await Storage.loadToken(),
       },
       body: json.utf8
-          .encode(json.jsonEncode(item.toJsonBidUp(amount, bidder_id))),
+          .encode(json.jsonEncode(item.toJsonBidUp(amount, bidderId))),
     );
     print(response.statusCode);
     if (response.statusCode != 201) {

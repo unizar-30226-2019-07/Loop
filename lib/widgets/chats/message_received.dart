@@ -7,12 +7,6 @@ class MessageReceivedTile extends StatelessWidget {
 
   MessageReceivedTile(this.mensaje, this.hora);
 
-  static final _styleTitle =
-      TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold);
-  static final _styleDescription =
-      TextStyle(fontSize: 12.0, color: Colors.grey[700]);
-  // Nota: stylePrice usa el color rojo de la aplicación (ver más abajo)
-
   static const double height = 75.0;
 
   @override

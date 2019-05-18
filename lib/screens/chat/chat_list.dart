@@ -1,5 +1,3 @@
-import 'dart:collection';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:selit/class/item_class.dart';
@@ -10,7 +8,6 @@ import 'package:selit/widgets/chats/chat_tile.dart';
 import 'package:selit/class/chat_class.dart';
 import 'package:selit/util/api/usuario_request.dart';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:selit/widgets/chats/chat_tile_loading.dart';
 import 'package:selit/widgets/chats/swipe_widget.dart';
 

@@ -23,8 +23,6 @@ class _RateUserState extends State<RateUser> {
 
   static final _styleTitle = const TextStyle(
       fontWeight: FontWeight.bold, fontSize: 22.0, color: Colors.white);
-  static final _styleWarning = const TextStyle(
-      fontWeight: FontWeight.bold, fontSize: 16.0, color: Colors.white);
   static final TextStyle _styleCardDescription = const TextStyle(
       fontWeight: FontWeight.bold, fontSize: 20.0, color: Colors.black);
   static final TextStyle _styleCardProduct = const TextStyle(
@@ -40,7 +38,6 @@ class _RateUserState extends State<RateUser> {
   final TextEditingController _infoController = new TextEditingController();
 
   /// Color más oscuro que el rojo principal
-  final _blendColor = Color.alphaBlend(Color(0x552B2B2B), Color(0xFFC0392B));
   final Color _colorStatusBarBad = Colors.red.withOpacity(0.5);
 
   ItemClass _referencedItem;

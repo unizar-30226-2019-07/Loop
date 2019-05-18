@@ -15,13 +15,8 @@ class ChatTile extends StatelessWidget {
       TextStyle(fontSize: 14.0, color: Colors.grey[700]);
   static final _styleUsuario =
       TextStyle(fontSize: 14.0, color: Colors.black);
-  // Nota: stylePrice usa el color rojo de la aplicación (ver más abajo)
-  static final _stylePrice =
-      TextStyle(fontSize: 16.0, fontWeight: FontWeight.w900);
 
   static const double height = 86.0;
-
-  
 
   @override
   Widget build(BuildContext context) {

@@ -56,7 +56,7 @@ class UsuarioClass {
             userId: json['idUsuario'],
             nombre: json['first_name'],
             apellidos: json['last_name'],
-            reviews: 30, // TODO esperar a que se implemente en la API
+            reviews: 30, // TODO leer de GET /users/{user_id}/reviews (???)
             numeroEstrellas: json['rating'],
             nacimiento: json['birth_date'] == null
                 ? null

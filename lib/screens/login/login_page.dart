@@ -9,8 +9,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:selit/util/bar_color.dart';
 import 'package:location/location.dart';
 
-import 'package:selit/screens/debug_main.dart';
-
 final int splashDuration = 2;
 double locationLat, locationLng;
 
@@ -178,25 +176,8 @@ class _LoginPageState extends State<LoginPage>
                 mainAxisSize: MainAxisSize.max,
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
-                  Container(
-                    alignment: FractionalOffset(1.0, 0.0),
-                    child: GestureDetector(
-                      onTap: () {
-                        // TODO X de la esquina superior derecha de la pantalla
-                        // ya no debería estar, no se usa
-                        Navigator.of(context).push(
-                          MaterialPageRoute(builder: (context) => DebugMain()),
-                        );
-                      },
-                      child: Icon(
-                        FontAwesomeIcons.times,
-                        size: 40.0,
-                        color: Colors.white70,
-                      ),
-                    ),
-                  ),
                   Padding(
-                    padding: EdgeInsets.only(top: 5.0),
+                    padding: EdgeInsets.only(top: 35.0),
                     child: new Image(
                         width: 150.0,
                         height: 177.0,

@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:selit/class/chat_class.dart';
-import 'package:selit/screens/chat/chat.dart';
-import 'package:selit/widgets/profile_picture.dart';
 
 class MessageSentTile extends StatelessWidget {
 
@@ -12,15 +9,6 @@ class MessageSentTile extends StatelessWidget {
 
   MessageSentTile(this.mensaje, this.hora, this.estado);
 
-  static final _styleTitle = TextStyle(
-    fontSize: 18.0,
-    fontWeight: FontWeight.bold,
-    color: Colors.white,
-  );
-  static final _styleDescription = TextStyle(
-    fontSize: 12.0,
-    color: Colors.white,
-  );
   static const double height = 75.0;
 
   @override

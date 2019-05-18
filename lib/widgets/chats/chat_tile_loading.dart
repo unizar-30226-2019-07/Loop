@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:selit/class/chat_class.dart';
-import 'package:selit/screens/chat/chat.dart';
-import 'package:selit/widgets/profile_picture.dart';
 
 class ChatTileLoading extends StatelessWidget {
 
@@ -11,13 +8,8 @@ class ChatTileLoading extends StatelessWidget {
       TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold);
   static final _styleDescription =
       TextStyle(fontSize: 14.0, color: Colors.grey[700]);
-  // Nota: stylePrice usa el color rojo de la aplicación (ver más abajo)
-  static final _stylePrice =
-      TextStyle(fontSize: 16.0, fontWeight: FontWeight.w900);
 
   static const double height = 86.0;
-
-  
 
   @override
   Widget build(BuildContext context) {

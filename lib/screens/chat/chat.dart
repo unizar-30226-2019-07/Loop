@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -28,7 +26,7 @@ class ChatScreenState extends State<ChatScreen> {
 
   ChatClass _chat;
   int _miId;
-  var _scaffoldContext;
+  // var _scaffoldContext;
 
   ChatScreenState(ChatClass chat) {
     this._chat = chat;
@@ -149,7 +147,7 @@ class ChatScreenState extends State<ChatScreen> {
                 child: _buildTextComposer(),
               ),
               new Builder(builder: (BuildContext context) {
-                _scaffoldContext = context;
+                // _scaffoldContext = context;
                 return new Container(width: 0.0, height: 0.0);
               })
             ],

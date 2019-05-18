@@ -22,7 +22,7 @@ class _NewItemState2 extends State<NewItem2> {
 
   ///Controladores de campos del formulario
   final TextEditingController _priceController = new TextEditingController();
-  final TextEditingController _limitController = new TextEditingController();
+  //final TextEditingController _limitController = new TextEditingController();
 
   //Lista opciones divisa
   List<String> _divisas = <String>['', 'EUR', 'USD'];
