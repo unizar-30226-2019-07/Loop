@@ -27,6 +27,7 @@ class ItemClass {
   bool favorited; // si está en la lista de deseados
   DateTime endDate; //Fecha de finalización   yyyy-MM-dd
   LastBid lastBid;
+  UsuarioClass buyer;
 
   // Callback al acutalizar el producto
   Function(Function(List<ItemClass>)) _updateListCallback;
@@ -50,8 +51,9 @@ class ItemClass {
       this.owner,
       this.media,
       this.favorited,
-      this.endDate, 
-      this.lastBid})
+      this.endDate,
+      this.lastBid,
+      this.buyer})
       : assert(type == null || type == "sale" || type == "auction",
             'Tipo inválido para un item (venta/subasta)'),
         assert(status == null || status == "en venta" || status == "vendido",
@@ -104,8 +106,11 @@ class ItemClass {
             numLikes: json['nfav'],
             favorited: json['in_wishlist'],
             owner: UsuarioClass.fromJson(json['owner'], tokenHeader),
-            media: _getImages(json['media'], tokenHeader));
-  
+            media: _getImages(json['media'], tokenHeader),
+            buyer: json['buyer'] == null
+                ? null
+                : UsuarioClass.fromJson(json['buyer'], tokenHeader));
+
   /// Constructor a partir de JSON (auctions)
   ItemClass.fromJsonAuctions(Map<String, dynamic> json, String tokenHeader)
       : this(
@@ -114,8 +119,8 @@ class ItemClass {
             title: json['title'],
             description: json['description'],
             published: json['published'] == null
-               ? null
-               : DateFormat("yyyy-MM-dd").parse(json['published']),
+                ? null
+                : DateFormat("yyyy-MM-dd").parse(json['published']),
             locationLat: json['location']['lat'],
             locationLng: json['location']['lng'],
             distance: json['distance'],
@@ -129,12 +134,14 @@ class ItemClass {
             owner: UsuarioClass.fromJson(json['owner'], tokenHeader),
             endDate: json['endDate'] == null
                 ? null
-               : DateFormat("yyyy-MM-dd").parse(json['endDate']),
+                : DateFormat("yyyy-MM-dd").parse(json['endDate']),
             lastBid: json['lastBid'] == null
-              ? null
-              : LastBid.fromJson(json['lastBid'], tokenHeader),
-            media: _getImages(json['media'], tokenHeader)
-           );
+                ? null
+                : LastBid.fromJson(json['lastBid'], tokenHeader),
+            media: _getImages(json['media'], tokenHeader),
+            buyer: json['buyer'] == null
+                ? null
+                : UsuarioClass.fromJson(json['buyer'], tokenHeader));
 
   void update({String type, double price, String currency}) {
     this.type = type;
@@ -143,15 +150,11 @@ class ItemClass {
   }
 
   void updateAuction(
-      {String type,
-      double price,
-      String currency,
-      DateTime endDate}) {
+      {String type, double price, String currency, DateTime endDate}) {
     this.type = type;
     this.price = price;
     this.currency = currency;
     this.endDate = endDate;
-
   }
 
   void setUpdateListCallback(Function(Function(List<ItemClass>)) function) {
@@ -216,9 +219,8 @@ class ItemClass {
       };
 
   String _dateTimeString(DateTime fecha) {
-    return '${fecha.year}-${fecha.month.toString().padLeft(2, '0')}-${fecha.day.toString().padLeft(2
-    , '0')}';
-  } 
+    return '${fecha.year}-${fecha.month.toString().padLeft(2, '0')}-${fecha.day.toString().padLeft(2, '0')}';
+  }
 
   Map<String, dynamic> toJsonEditAuction() => {
         "type": type,

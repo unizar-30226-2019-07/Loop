@@ -22,7 +22,7 @@ class ItemRequest {
     if (size != null) _params.putIfAbsent("\$size", () => size.toString());
     if (page != null) _params.putIfAbsent("\$page", () => page.toString());
 
-    String _otherParameters = '?lat=$lat&lng=$lng&token=yes';
+    String _otherParameters = '?lat=$lat&lng=$lng&token=yes&status=en venta';
     _params.forEach((key, value) => _otherParameters += '&$key=$value');
 
     print("Parametros: $_otherParameters");
@@ -64,8 +64,12 @@ class ItemRequest {
       } else {
         // subastas
         (json.jsonDecode(response.body) as List<dynamic>)
-            .forEach((productJson) {
-          products.add(ItemClass.fromJsonAuctions(productJson, token));
+            .forEach((auctionJson) {
+          ItemClass auction = ItemClass.fromJsonAuctions(auctionJson, token);
+          bool _subastaEnFecha = auction.endDate.isAfter(DateTime.now());
+          if (_subastaEnFecha) {
+            products.add(auction);
+          }
         });
       }
       return products;
@@ -90,11 +94,12 @@ class ItemRequest {
 
     // Esperar la respuesta de la petición
     print('ITEM USER PLAY ▶');
-    http.Response responseProducts = await http
-        .get('${APIConfig.BASE_URL}/products$_paramsString&status=$_statusParam', headers: {
-      HttpHeaders.contentTypeHeader: ContentType.json.toString(),
-      HttpHeaders.authorizationHeader: await Storage.loadToken(),
-    });
+    http.Response responseProducts = await http.get(
+        '${APIConfig.BASE_URL}/products$_paramsString&status=$_statusParam',
+        headers: {
+          HttpHeaders.contentTypeHeader: ContentType.json.toString(),
+          HttpHeaders.authorizationHeader: await Storage.loadToken(),
+        });
     http.Response responseAuctions = await http
         .get('${APIConfig.BASE_URL}/auctions$_paramsString', headers: {
       HttpHeaders.contentTypeHeader: ContentType.json.toString(),
@@ -156,7 +161,6 @@ class ItemRequest {
     );
 
     if (response.statusCode != 201) {
-      print(response.statusCode);
       throw (APIConfig.getErrorString(response));
     }
   }
@@ -227,7 +231,6 @@ class ItemRequest {
       body:
           json.utf8.encode(json.jsonEncode(item.toJsonBidUp(amount, bidderId))),
     );
-    print(response.statusCode);
     if (response.statusCode != 201) {
       throw (APIConfig.getErrorString(response));
     }
@@ -236,7 +239,6 @@ class ItemRequest {
   /// Obtener un producto en base a su Id
   static Future<ItemClass> getItembyId(
       {@required int itemId, @required String type}) async {
-
     // Esperar la respuesta de la petición
     http.Response response = await http.get(
         '${APIConfig.BASE_URL}/${type == "sale" ? "products" : "auctions"}/$itemId',
@@ -266,7 +268,8 @@ class ItemRequest {
   }
 
   /// Sumar uno al número de visitas de un item
-  static Future<void> viewItem({@required int itemId, @required String type}) async {
+  static Future<void> viewItem(
+      {@required int itemId, @required String type}) async {
     // Esperar la respuesta de la petición
     http.Response response = await http.head(
         '${APIConfig.BASE_URL}/${type == "sale" ? "products" : "auctions"}/$itemId',
@@ -279,4 +282,22 @@ class ItemRequest {
     }
   }
 
+  /// Marcar un producto como vendido
+  static Future<void> markItemAsSold(
+      {@required ItemClass item, @required int buyerId}) async {
+    // Esperar la respuesta de la petición
+    Map itemMap = item.toJsonEdit();
+    itemMap['buyer_id'] = buyerId;
+
+    http.Response response =
+        await http.put('${APIConfig.BASE_URL}/products/${item.itemId}/sell',
+            headers: {
+              HttpHeaders.contentTypeHeader: ContentType.json.toString(),
+              HttpHeaders.authorizationHeader: await Storage.loadToken(),
+            },
+            body: json.jsonEncode(itemMap));
+    if (response.statusCode != 200) {
+      throw (APIConfig.getErrorString(response));
+    }
+  }
 }

@@ -80,6 +80,11 @@ class _ProfileState extends State<Profile> {
     setState(() => actualizacion(_itemsEnVenta));
   }
 
+  // Callback llamado por los objetos al ser actualizados
+  void updateItemsVendidos(Function(List<ItemClass>) actualizacion) {
+    setState(() => actualizacion(_itemsVendidos));
+  }
+
   /// Usuario a mostrar en el perfil (null = placeholder)
   static UsuarioClass _user;
   int _loggedUserId;
@@ -176,6 +181,8 @@ class _ProfileState extends State<Profile> {
               status: "vendido")
           .then((itemsVendidos) {
         if (!_cancelled) {
+          // Callback para cuando se actualicen
+          itemsVendidos.forEach((item) => item.setUpdateListCallback(updateItemsVendidos));
           setState(() {
             if (itemsVendidos.isEmpty) {
               _itemsVendidosEmpty = true;

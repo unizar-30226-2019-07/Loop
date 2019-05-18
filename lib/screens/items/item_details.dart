@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:intl/intl.dart';
 import 'package:selit/class/chat_class.dart';
+import 'package:selit/class/usuario_class.dart';
 import 'package:selit/class/item_class.dart';
 import 'package:carousel_pro/carousel_pro.dart';
 import 'package:selit/class/items/filter_list_class.dart';
@@ -68,6 +69,7 @@ class _ItemDetails extends State<ItemDetails> {
   String _ubicacionCompleta;
 
   final Color _colorStatusBarBad = Colors.red.withOpacity(0.5);
+  final _blendColor = Color.alphaBlend(Color(0x552B2B2B), Color(0xFFC0392B));
 
   // Constructor
   _ItemDetails(this._item) {
@@ -322,16 +324,150 @@ class _ItemDetails extends State<ItemDetails> {
     );
   }
 
+  /// Devolver una lista con los usuarios que han abierto chat al vendedor del producto
+  List<UsuarioClass> _getChatUsers() {
+    // TODO devolver la lista de los que han abierto chat
+    return [
+      UsuarioClass(userId: 1, nombre: 'Juan', apellidos: 'Juanez 1'),
+      UsuarioClass(userId: 2, nombre: 'Juan', apellidos: 'Juanez 2'),
+      UsuarioClass(userId: 3, nombre: 'Juan', apellidos: 'Juanez 3'),
+    ];
+  }
+
+  void _markAsSold(int buyerId) {
+    ItemRequest.markItemAsSold(item: _item, buyerId: buyerId).then((_) {
+      showInSnackBar("Objeto marcado como vendido", _colorStatusBarGood);
+      setState(() => _item.status = "vendido");
+      // Callback del item
+      _item.updateList((List<ItemClass> list) => list.remove(_item));
+      _buildEditConditional = _buildEditButton();
+      Navigator.of(context).pop();
+    }).catchError((error) {
+      if (error == "Conflict") {
+        showInSnackBar("Este producto ya está vendido", _colorStatusBarBad);
+      } else if (error == "Not Found") {
+        showInSnackBar(
+            "No se ha encontrado al usuario comprador", _colorStatusBarBad);
+      } else if (error == "Forbidden") {
+        showInSnackBar(
+            "No tienes permiso para editar este producto", _colorStatusBarBad);
+      } else {
+        print('Error al marcar como vendido: $error');
+        showInSnackBar("Ha ocurrido un problema", _colorStatusBarBad);
+      }
+      Navigator.of(context).pop();
+    });
+  }
+
+  void _showMarkAsSoldDialog() {
+    List<UsuarioClass> posiblesUsuarios = _getChatUsers();
+
+    if (posiblesUsuarios.isEmpty) {
+      showInSnackBar("No has chateado con nadie", _colorStatusBarBad);
+    } else {
+      List<Widget> buttonOptions = [];
+      posiblesUsuarios.forEach((usuario) {
+        buttonOptions.add(SizedBox.fromSize(
+            size: Size(double.infinity, 64.0),
+            child: Container(
+                margin: EdgeInsets.all(2),
+                child: Card(
+                  clipBehavior: Clip.antiAlias,
+                  elevation: 2.0,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                      side: BorderSide(color: Colors.grey[300], width: 2.0)),
+                  child: InkWell(
+                    onTap: () => _markAsSold(usuario.userId),
+                    splashColor: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withOpacity(0.05),
+                    highlightColor: Colors.transparent,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      children: <Widget>[
+                        SizedBox.fromSize(
+                          size: Size(50.0, 50.0),
+                          child: Container(
+                            padding: EdgeInsets.all(2.0),
+                            child: ProfilePicture(usuario.profileImage),
+                          ),
+                        ),
+                        Expanded(
+                          child: Container(
+                              padding: EdgeInsets.all(10.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Container(
+                                    child: Text(
+                                      usuario.nombre + ' ' + usuario.apellidos,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .subhead
+                                          .copyWith(
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.black),
+                                    ),
+                                  ),
+                                ],
+                              )),
+                        )
+                      ],
+                    ),
+                  ),
+                ))));
+      });
+
+      AlertDialog dialog = AlertDialog(
+        backgroundColor: Theme.of(context).primaryColor,
+        shape: RoundedRectangleBorder(
+            side: BorderSide(color: _blendColor, width: 2.0),
+            borderRadius: BorderRadius.circular(10.0)),
+        title: Text('Selecciona el comprador...', style: _styleDialogTitle),
+        content: SizedBox.fromSize(
+            size: Size(double.infinity, 285.0),
+            child: ListView.builder(
+              itemCount: buttonOptions.length,
+              itemBuilder: (ctx, i) => buttonOptions[i],
+            )),
+      );
+
+      showDialog(context: context, builder: (context) => dialog);
+    }
+  }
+
+  Widget _buildMarkAsSoldButton() {
+    return Container(
+        margin: EdgeInsets.fromLTRB(15.0, 15.0, 15.0, 0.0),
+        child: SizedBox(
+            width: double.infinity,
+            child: RaisedButton(
+              padding: const EdgeInsets.all(8.0),
+              textColor: Colors.white,
+              color: Theme.of(context).primaryColor,
+              onPressed: _showMarkAsSoldDialog,
+              child: new Text('Marcar como vendido',
+                  style: TextStyle(
+                      fontSize: 18.0,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold)),
+            )));
+  }
+
   Widget _buildEditButton() {
     return Container(
-        margin: EdgeInsets.only(top: 15),
+        margin: EdgeInsets.only(top: 5),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
             new RaisedButton(
               padding: const EdgeInsets.all(8.0),
               textColor: Colors.white,
-              color: Theme.of(context).primaryColor,
+              color: _blendColor,
               onPressed: () {
                 Navigator.push(
                     context,
@@ -427,32 +563,37 @@ class _ItemDetails extends State<ItemDetails> {
     );
   }
 
-  final _blendColor = Color.alphaBlend(Color(0x552B2B2B), Color(0xFFC0392B));
-
   void _leerIdUsuario() async {
-    int idItem = _item.owner.userId;
+    int idItem = _item.owner?.userId;
     miId = await Storage.loadUserId();
     print('Mi id ' + miId.toString());
     print('Id item ' + idItem.toString());
 
-    if (miId == idItem) {
-      print('Construir editar');
-      setState(() {
-        _buildEditConditional = _buildEditButton();
-      });
+    if (_item.itemId > 0) {
+      if (miId == idItem) {
+        print('Construir editar');
+        setState(() {
+          _buildEditConditional = Column(children: <Widget>[
+            _item?.type == "sale" && _item?.status == "en venta"
+                ? _buildMarkAsSoldButton()
+                : Container(),
+            _buildEditButton(),
+          ]);
+        });
 
-      if (_item?.lastBid?.bidder != null) {
-        if (_item.type == "auction" &&
-            !_item.endDate.isAfter(DateTime.now()) &&
-            _item.lastBid.bidder.userId != miId) {
-          _buildChatConditional = _buildChatButtonGanador();
+        if (_item?.lastBid?.bidder != null) {
+          if (_item.type == "auction" &&
+              !_item.endDate.isAfter(DateTime.now()) &&
+              _item.lastBid.bidder.userId != miId) {
+            _buildChatConditional = _buildChatButtonGanador();
+          }
         }
+      } else {
+        print('Construir chat');
+        setState(() {
+          _buildChatConditional = _buildChatButton();
+        });
       }
-    } else {
-      print('Construir chat');
-      setState(() {
-        _buildChatConditional = _buildChatButton();
-      });
     }
   }
 
@@ -1093,7 +1234,9 @@ class _ItemDetails extends State<ItemDetails> {
                       ),
                     ),
                     _buildChatConditional,
-                    _buildRateButton(), // TODO comprobaciones de que lo puede valorar
+                    _item?.buyer?.userId == miId
+                        ? _buildRateButton()
+                        : Container(),
                     _cameraPosition == null
                         ? Container()
                         : _buildOwnerMap(_cameraPosition)

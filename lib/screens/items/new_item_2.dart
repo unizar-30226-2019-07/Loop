@@ -9,7 +9,7 @@ import 'package:selit/util/api/item_request.dart';
 class NewItem2 extends StatefulWidget {
   final ItemClass item;
 
-  /// UsuarioClass del usuario a editar
+  /// ItemClass del item a editar
   NewItem2({@required this.item});
 
   @override

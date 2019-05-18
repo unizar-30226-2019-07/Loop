@@ -102,6 +102,8 @@ class _NewItemState extends State<NewItem> {
           description: _descriptionController.text,
           locationLat: _user.locationLat,
           locationLng: _user.locationLng,
+          status: "en venta",
+          distance: 0,
           category: FilterListClass.categoryNames.keys
               .where((k) => FilterListClass.categoryNames[k] == _categoria)
               .first,
