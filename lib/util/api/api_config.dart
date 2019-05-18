@@ -5,7 +5,7 @@ import 'dart:convert' as json;
 class APIConfig {
 
   /// URL base a conectar (con puerto)
-  static const BASE_URL = 'http://selit.naval.cat:8080';
+  static const BASE_URL = 'https://selit.naval.cat:8443';
 
   static Map _errorCodes = {
     400: "Bad Request",
