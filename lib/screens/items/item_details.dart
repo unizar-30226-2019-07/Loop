@@ -82,6 +82,11 @@ class _ItemDetails extends State<ItemDetails> {
     _favoriteFunction = _favoritePressed;
     _esFavorito = (_item?.favorited == true);
     _favorite = _esFavorito ? Icons.favorite : Icons.favorite_border;
+
+    // Sumar uno al numero de visitas
+    ItemRequest.viewItem(itemId: _item.itemId, type: _item.type).catchError(
+        (error) =>
+            print('Ocurrio un error al sumar visitas a un producto: $error'));
   }
 
   Function _favoriteFunction; // callback al presionar el corazón
@@ -436,7 +441,7 @@ class _ItemDetails extends State<ItemDetails> {
         _buildEditConditional = _buildEditButton();
       });
 
-      if (_item.lastBid.bidder != null) {
+      if (_item?.lastBid?.bidder != null) {
         if (_item.type == "auction" &&
             !_item.endDate.isAfter(DateTime.now()) &&
             _item.lastBid.bidder.userId != miId) {

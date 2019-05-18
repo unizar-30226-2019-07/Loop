@@ -236,11 +236,10 @@ class ItemRequest {
   /// Obtener un producto en base a su Id
   static Future<ItemClass> getItembyId(
       {@required int itemId, @required String type}) async {
-    //String _paramsString = '?lat=0.0&lng=0.0';
 
     // Esperar la respuesta de la petición
     http.Response response = await http.get(
-        '${APIConfig.BASE_URL}/${type == "sale" ? "products" : "auctions"}/$itemId?lat=0.0&lng=0.0',
+        '${APIConfig.BASE_URL}/${type == "sale" ? "products" : "auctions"}/$itemId',
         headers: {
           HttpHeaders.contentTypeHeader: ContentType.json.toString(),
           HttpHeaders.authorizationHeader: await Storage.loadToken(),
@@ -265,4 +264,19 @@ class ItemRequest {
       throw (APIConfig.getErrorString(response));
     }
   }
+
+  /// Sumar uno al número de visitas de un item
+  static Future<void> viewItem({@required int itemId, @required String type}) async {
+    // Esperar la respuesta de la petición
+    http.Response response = await http.head(
+        '${APIConfig.BASE_URL}/${type == "sale" ? "products" : "auctions"}/$itemId',
+        headers: {
+          HttpHeaders.contentTypeHeader: ContentType.json.toString(),
+          HttpHeaders.authorizationHeader: await Storage.loadToken(),
+        });
+    if (response.statusCode != 200) {
+      throw (APIConfig.getErrorString(response));
+    }
+  }
+
 }
