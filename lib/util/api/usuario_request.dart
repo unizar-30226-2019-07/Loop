@@ -1,6 +1,7 @@
 import 'package:selit/class/usuario_class.dart';
 import 'package:selit/class/item_class.dart';
 import 'package:selit/class/token_class.dart';
+import 'package:selit/class/rating_class.dart';
 import 'package:selit/util/api/api_config.dart';
 import 'package:selit/util/storage.dart';
 import 'package:http/http.dart' as http;
@@ -290,4 +291,27 @@ class UsuarioRequest {
       throw (APIConfig.getErrorString(response));
     }
   }
+
+  /// Obtener los ratings de un usuario
+  static Future<List<RatingClass>> getRatingsFromUser(
+      {int userId}) async {
+
+    final response =
+        await http.get('${APIConfig.BASE_URL}/users/$userId/reviews',
+            headers: {
+              HttpHeaders.contentTypeHeader: ContentType.json.toString(),
+              HttpHeaders.authorizationHeader: await Storage.loadToken(),
+            });
+
+    if (response.statusCode == 200) {
+      List<RatingClass> ratings = new List<RatingClass>();
+      (json.jsonDecode(response.body) as List<dynamic>).forEach((itemJson) {
+        ratings.add(RatingClass.fromJson(itemJson));
+      });
+      return ratings;
+    } else {
+      throw (APIConfig.getErrorString(response));
+    }
+  }
+
 }

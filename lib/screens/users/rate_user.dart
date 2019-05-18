@@ -113,7 +113,7 @@ class _RateUserState extends State<RateUser> {
     ));
   }
 
-  Widget _buildReportForm() {
+  Widget _buildRateForm() {
     return SingleChildScrollView(
         child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -278,7 +278,7 @@ class _RateUserState extends State<RateUser> {
           key: _scaffoldKey,
           backgroundColor: Colors.transparent,
           body: SafeArea(
-            child: _buildReportForm(),
+            child: _buildRateForm(),
           )),
     ]);
   }

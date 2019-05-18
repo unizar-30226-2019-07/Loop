@@ -6,6 +6,7 @@ import 'package:selit/screens/users/profile.dart';
 import 'package:selit/screens/users/wishes.dart';
 import 'package:selit/screens/users/rate_user.dart';
 import 'package:selit/screens/users/report_user.dart';
+import 'package:selit/screens/users/rating_list.dart';
 import 'package:selit/screens/users/edit_profile.dart';
 import 'package:selit/screens/login/login_page.dart';
 import 'package:selit/screens/items/item_list.dart';
@@ -30,6 +31,8 @@ class Routes {
         _buildRoute(settings, new RateUser(referencedItem: settings.arguments)),
     '/report-user': (settings) =>
         _buildRoute(settings, new ReportUser(otherUser: settings.arguments)),
+    '/rating-list': (settings) =>
+        _buildRoute(settings, new RatingList(user: settings.arguments)),
     '/login-page': (settings) => _buildRoute(settings, new LoginPage()),
     '/items-list': (settings) => _buildRoute(settings, new ItemList()),
     '/item-details': (settings) =>

@@ -160,7 +160,8 @@ class _ProfileState extends State<Profile> {
           .then((itemsVenta) {
         if (!_cancelled) {
           // Callback para cuando se actualicen
-          itemsVenta.forEach((item) => item.setUpdateListCallback(updateItemsVenta));
+          itemsVenta
+              .forEach((item) => item.setUpdateListCallback(updateItemsVenta));
           // Acutalizar vista en la pantalla
           setState(() {
             if (itemsVenta.isEmpty) {
@@ -182,7 +183,8 @@ class _ProfileState extends State<Profile> {
           .then((itemsVendidos) {
         if (!_cancelled) {
           // Callback para cuando se actualicen
-          itemsVendidos.forEach((item) => item.setUpdateListCallback(updateItemsVendidos));
+          itemsVendidos.forEach(
+              (item) => item.setUpdateListCallback(updateItemsVendidos));
           setState(() {
             if (itemsVendidos.isEmpty) {
               _itemsVendidosEmpty = true;
@@ -200,6 +202,10 @@ class _ProfileState extends State<Profile> {
 
   void _onPressedEditProfile() {
     Navigator.of(context).pushNamed('/edit-profile', arguments: _user);
+  }
+
+  void _onPressedViewReviews() {
+    Navigator.of(context).pushNamed('/rating-list', arguments: _user);
   }
 
   // Pulsación del boton "en venta"
@@ -337,21 +343,28 @@ class _ProfileState extends State<Profile> {
             _user?.reviews == null
                 ? Container(margin: EdgeInsets.only(top: 40))
                 : Container(
-                    margin: EdgeInsets.only(top: 5, bottom: 15),
-                    alignment: Alignment.center,
-                    child: Text('${_user?.reviews} reviews',
-                        style: _styleReviews, textAlign: _textAlignment))
+                    margin: EdgeInsets.fromLTRB(3.0, 5.0, 3.0, 10.0),
+                    child: GestureDetector(
+                        onTap: _user.reviews > 0 ? _onPressedViewReviews : null,
+                        child: ClipRRect(
+                            borderRadius: BorderRadius.circular(4.0),
+                            child: Container(
+                                padding: EdgeInsets.all(2.0),
+                                color: _blendColor,
+                                alignment: Alignment.center,
+                                width: 130.0,
+                                child: Text('${_user.reviews} reviews',
+                                    style: _styleReviews))))),
           ],
         ),
       ),
     );
 
-    Widget wTopLeftButton = (_user?.userId == null ||
-            _loggedUserId == null)
+    Widget wTopLeftButton = (_user?.userId == null || _loggedUserId == null)
         ? Container()
         : _user.userId == _loggedUserId
-          ? _buildEditProfileButton()
-          : _buildReportButton();
+            ? _buildEditProfileButton()
+            : _buildReportButton();
 
     Widget wLocation = _ubicacionCiudad == null || _ubicacionResto == null
         ? Container()
@@ -633,8 +646,8 @@ class _ProfileState extends State<Profile> {
                   label: 'Añadir producto',
                   //labelStyle: TextTheme(fontSize: 18.0),
                   onTap: () {
-                    Navigator.of(context)
-                        .pushNamed('/new-item', arguments: <dynamic>[_user, updateItemsVenta]);
+                    Navigator.of(context).pushNamed('/new-item',
+                        arguments: <dynamic>[_user, updateItemsVenta]);
                   },
                 ),
                 SpeedDialChild(
