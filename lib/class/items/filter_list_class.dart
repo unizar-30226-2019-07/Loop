@@ -23,6 +23,7 @@ class FilterListClass {
     'Más cercanos',
     'Más baratos',
     'Más caros',
+    'Más populares',
     'Novedades'
   ];
 
@@ -181,6 +182,7 @@ class FilterListClass {
       'distance ASC',
       'price ASC',
       'price DESC',
+      'views DESC',
       'published DESC'
     ];
     map.putIfAbsent("\$sort", () => _sortList[orderId]);
