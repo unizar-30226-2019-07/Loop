@@ -54,7 +54,8 @@ class _ReportUserState extends State<ReportUser> {
     'Sospecha de fraude',
     'No acudió a la cita',
     'Mal comportamiento',
-    'Artículo defectuoso'
+    'Artículo defectuoso',
+    'Otros'
   ];
   // ID razón seleccionada para el reporte
   int _selectedReason;
