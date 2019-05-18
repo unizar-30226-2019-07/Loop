@@ -86,26 +86,44 @@ class ItemRequest {
     String _paramsString = '?lat=$userLat&lng=$userLng&distance=99999999.9';
     // Si status no es ni "en venta" ni "vendido", default a "en venta"
     String _statusParam = status == "vendido" ? status : "en venta";
-    _paramsString += "&owner=$userId&status=$_statusParam";
+    _paramsString += "&owner=$userId";
 
     // Esperar la respuesta de la petición
     print('ITEM USER PLAY ▶');
-    http.Response response = await http
-        .get('${APIConfig.BASE_URL}/products$_paramsString', headers: {
+    http.Response responseProducts = await http
+        .get('${APIConfig.BASE_URL}/products$_paramsString&status=$_statusParam', headers: {
+      HttpHeaders.contentTypeHeader: ContentType.json.toString(),
+      HttpHeaders.authorizationHeader: await Storage.loadToken(),
+    });
+    http.Response responseAuctions = await http
+        .get('${APIConfig.BASE_URL}/auctions$_paramsString', headers: {
       HttpHeaders.contentTypeHeader: ContentType.json.toString(),
       HttpHeaders.authorizationHeader: await Storage.loadToken(),
     });
     print('ITEM USER STOP ◼');
 
-    if (response.statusCode == 200) {
+    if (responseProducts.statusCode == 200 &&
+        responseAuctions.statusCode == 200) {
       List<ItemClass> products = new List<ItemClass>();
       String token = await Storage.loadToken();
-      (json.jsonDecode(response.body) as List<dynamic>).forEach((productJson) {
+      (json.jsonDecode(responseProducts.body) as List<dynamic>)
+          .forEach((productJson) {
         products.add(ItemClass.fromJsonProducts(productJson, token));
+      });
+      (json.jsonDecode(responseAuctions.body) as List<dynamic>)
+          .forEach((auctionJson) {
+        ItemClass subasta = ItemClass.fromJsonAuctions(auctionJson, token);
+        bool _subastaEnFecha = subasta.endDate.isAfter(DateTime.now());
+        if ((_statusParam == "vendido" && !_subastaEnFecha) ||
+            (_statusParam == "en venta" && _subastaEnFecha)) {
+          products.add(subasta);
+        }
       });
       return products;
     } else {
-      throw (APIConfig.getErrorString(response));
+      throw (APIConfig.getErrorString(responseProducts.statusCode == 200
+          ? responseProducts
+          : responseAuctions));
     }
   }
 
@@ -196,8 +214,7 @@ class ItemRequest {
   }
 
   /// Pujar
-  static Future<void> bidUp(
-      ItemClass item, String amount, int bidderId) async {
+  static Future<void> bidUp(ItemClass item, String amount, int bidderId) async {
     int _productId = item.itemId;
     print(json.jsonEncode(item.toJsonBidUp(amount, bidderId)));
     print(_productId);
@@ -207,8 +224,8 @@ class ItemRequest {
         HttpHeaders.contentTypeHeader: ContentType.json.toString(),
         HttpHeaders.authorizationHeader: await Storage.loadToken(),
       },
-      body: json.utf8
-          .encode(json.jsonEncode(item.toJsonBidUp(amount, bidderId))),
+      body:
+          json.utf8.encode(json.jsonEncode(item.toJsonBidUp(amount, bidderId))),
     );
     print(response.statusCode);
     if (response.statusCode != 201) {

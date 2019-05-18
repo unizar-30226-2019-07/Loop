@@ -976,14 +976,14 @@ class _ItemDetails extends State<ItemDetails> {
                                                                 "auction"
                                                             ? Text(
                                                                 _subastaEnFecha
-                                                                    ? 'Subasta activa'
+                                                                    ? 'Activa'
                                                                     : _item.lastBid ==
                                                                             null
-                                                                        ? 'Subasta cerrada'
+                                                                        ? 'Cerrada'
                                                                         : _item.lastBid.bidder.userId ==
                                                                                 miId
-                                                                            ? 'Subasta ganada'
-                                                                            : 'Subasta perdida',
+                                                                            ? 'Ganada'
+                                                                            : 'Perdida',
                                                                 style:
                                                                     styleTagWhite)
                                                             : Text(
