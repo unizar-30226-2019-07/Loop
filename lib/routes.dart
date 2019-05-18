@@ -27,7 +27,7 @@ class Routes {
     '/whises': (settings) =>
         _buildRoute(settings, new Wishes(user: settings.arguments)),
     '/rate-user': (settings) =>
-        _buildRoute(settings, new RateUser(otherUser: settings.arguments)),
+        _buildRoute(settings, new RateUser(referencedItem: settings.arguments)),
     '/report-user': (settings) =>
         _buildRoute(settings, new ReportUser(otherUser: settings.arguments)),
     '/login-page': (settings) => _buildRoute(settings, new LoginPage()),

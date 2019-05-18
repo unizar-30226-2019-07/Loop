@@ -397,6 +397,28 @@ class _ItemDetails extends State<ItemDetails> {
     );
   }
 
+  Widget _buildRateButton() {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(15.0, 0.0, 15.0, 25.0),
+      child: SizedBox(
+        width: double.infinity,
+        child: new RaisedButton(
+          padding: const EdgeInsets.all(10.0),
+          elevation: 1,
+          textColor: Colors.white,
+          color: Theme.of(context).primaryColor,
+          onPressed: () =>
+              Navigator.of(context).pushNamed('/rate-user', arguments: _item),
+          child: new Text('Calificar usuario',
+              style: TextStyle(
+                  fontSize: 21.0,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold)),
+        ),
+      ),
+    );
+  }
+
   final _blendColor = Color.alphaBlend(Color(0x552B2B2B), Color(0xFFC0392B));
 
   void _leerIdUsuario() async {
@@ -411,14 +433,13 @@ class _ItemDetails extends State<ItemDetails> {
         _buildEditConditional = _buildEditButton();
       });
 
-      if(_item.lastBid.bidder!= null){
+      if (_item.lastBid.bidder != null) {
         if (_item.type == "auction" &&
-          !_item.endDate.isAfter(DateTime.now()) &&
-          _item.lastBid.bidder.userId != miId) {
-        _buildChatConditional = _buildChatButtonGanador();
+            !_item.endDate.isAfter(DateTime.now()) &&
+            _item.lastBid.bidder.userId != miId) {
+          _buildChatConditional = _buildChatButtonGanador();
         }
       }
-      
     } else {
       print('Construir chat');
       setState(() {
@@ -951,12 +972,13 @@ class _ItemDetails extends State<ItemDetails> {
                                                             ? Text(
                                                                 _subastaEnFecha
                                                                     ? 'Subasta activa'
-                                                                    : _item.lastBid == null
+                                                                    : _item.lastBid ==
+                                                                            null
                                                                         ? 'Subasta cerrada'
                                                                         : _item.lastBid.bidder.userId ==
-                                                                            miId
-                                                                        ? 'Subasta ganada'
-                                                                        : 'Subasta perdida',
+                                                                                miId
+                                                                            ? 'Subasta ganada'
+                                                                            : 'Subasta perdida',
                                                                 style:
                                                                     styleTagWhite)
                                                             : Text(
@@ -1061,6 +1083,7 @@ class _ItemDetails extends State<ItemDetails> {
                       ),
                     ),
                     _buildChatConditional,
+                    _buildRateButton(), // TODO comprobaciones de que lo puede valorar
                     _cameraPosition == null
                         ? Container()
                         : _buildOwnerMap(_cameraPosition)

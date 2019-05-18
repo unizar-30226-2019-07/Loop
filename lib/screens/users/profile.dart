@@ -243,8 +243,6 @@ class _ProfileState extends State<Profile> {
         child: GestureDetector(
             onTap: () => Navigator.of(context)
                 .pushNamed('/report-user', arguments: _user),
-            onLongPress: () =>
-                Navigator.of(context).pushNamed('/rate-user', arguments: _user),
             child: ClipRRect(
                 borderRadius: BorderRadius.circular(4.0),
                 child: Container(

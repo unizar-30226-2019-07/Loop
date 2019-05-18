@@ -203,7 +203,7 @@ class _ReportUserState extends State<ReportUser> {
               child: InkWell(
                 splashColor:
                     Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
-                onTap: () => print('tap'),
+                onTap: () => print('tap'), // TODO quitar
                 child: FlatButton(
                     onPressed: () =>
                         print('tap'), // TODO llevar a pantalla de "Normas"

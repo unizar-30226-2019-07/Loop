@@ -254,4 +254,34 @@ class UsuarioRequest {
       throw (APIConfig.getErrorString(response));
     }
   }
+
+  /// Realizar una valoracion acerca del producto [producto], para el usuario
+  /// que vende el producto [producto.owner] con un número de estrellas y comentario
+  static Future<void> rateUser(
+      {ItemClass producto, double estrellas, String comentario}) async {
+    String token = await Storage.loadToken();
+    int idUsuario = await Storage.loadUserId();
+    int idVendedor = producto.owner.userId;
+
+    // Json a enviar
+    Map<String, dynamic> rateData = {
+      "id_comprador": idUsuario,
+      "id_anunciante": idVendedor,
+      "valor": estrellas,
+      "comentario": comentario,
+      (producto.isAuction() ? "id_subasta" : "id_producto"): producto.itemId,
+    };
+
+    final response =
+        await http.post('${APIConfig.BASE_URL}/users/$idVendedor/reviews',
+            headers: {
+              HttpHeaders.contentTypeHeader: ContentType.json.toString(),
+              HttpHeaders.authorizationHeader: token,
+            },
+            body: json.jsonEncode(rateData));
+
+    if (response.statusCode != 200) {
+      throw (APIConfig.getErrorString(response));
+    }
+  }
 }
