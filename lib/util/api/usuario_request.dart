@@ -179,9 +179,15 @@ class UsuarioRequest {
 
     if (response.statusCode == 200) {
       List<ItemClass> wishlist = new List<ItemClass>();
-      (json.jsonDecode(response.body) as List<dynamic>).forEach((itemJson) {
-        wishlist.add(ItemClass.fromJsonProducts(itemJson, token));
-      });
+      if (auctions) {
+        (json.jsonDecode(response.body) as List<dynamic>).forEach((itemJson) {
+          wishlist.add(ItemClass.fromJsonAuctions(itemJson, token));
+        });
+      } else {
+        (json.jsonDecode(response.body) as List<dynamic>).forEach((itemJson) {
+          wishlist.add(ItemClass.fromJsonProducts(itemJson, token));
+        });
+      }
       return wishlist;
     } else {
       throw (APIConfig.getErrorString(response));

@@ -86,8 +86,8 @@ class ItemRequest {
       @required double userLat,
       @required double userLng,
       @required String status}) async {
-    // TODO workaround para ignorar la distancia de los objetos
-    String _paramsString = '?lat=$userLat&lng=$userLng&distance=99999999.9';
+    // Distancia alta para devolver todos los items
+    String _paramsString = '?lat=$userLat&lng=$userLng&distance=9999999999.9';
     // Si status no es ni "en venta" ni "vendido", default a "en venta"
     String _statusParam = status == "vendido" ? status : "en venta";
     _paramsString += "&owner=$userId";
