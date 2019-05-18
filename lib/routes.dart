@@ -35,7 +35,7 @@ class Routes {
     '/item-details': (settings) =>
         _buildRoute(settings, new ItemDetails(item: settings.arguments)),
     '/new-item': (settings) =>
-        _buildRoute(settings, new NewItem(user: settings.arguments)),
+        _buildRoute(settings, new NewItem.args(settings.arguments)),
     '/new-item2': (settings) =>
         _buildRoute(settings, new NewItem2(item: settings.arguments)),
     '/principal': (settings) => _buildRoute(settings, new Principal()),

@@ -75,6 +75,11 @@ class _ProfileState extends State<Profile> {
   bool _itemsVendidosEmpty = false; // diferenciar entre cargando y no hay
   bool _cancelled; // evitar bug al pedir objetos y cambiar de pantalla
 
+  // Callback llamado por los objetos al ser actualizados
+  void updateItemsVenta(Function(List<ItemClass>) actualizacion) {
+    setState(() => actualizacion(_itemsEnVenta));
+  }
+
   /// Usuario a mostrar en el perfil (null = placeholder)
   static UsuarioClass _user;
   int _loggedUserId;
@@ -149,6 +154,9 @@ class _ProfileState extends State<Profile> {
               status: "en venta")
           .then((itemsVenta) {
         if (!_cancelled) {
+          // Callback para cuando se actualicen
+          itemsVenta.forEach((item) => item.setUpdateListCallback(updateItemsVenta));
+          // Acutalizar vista en la pantalla
           setState(() {
             if (itemsVenta.isEmpty) {
               _itemsEnVentaEmpty = true;
@@ -619,7 +627,7 @@ class _ProfileState extends State<Profile> {
                   //labelStyle: TextTheme(fontSize: 18.0),
                   onTap: () {
                     Navigator.of(context)
-                        .pushNamed('/new-item', arguments: _user);
+                        .pushNamed('/new-item', arguments: <dynamic>[_user, updateItemsVenta]);
                   },
                 ),
                 SpeedDialChild(

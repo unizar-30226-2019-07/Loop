@@ -112,13 +112,14 @@ class _NewItemState2 extends State<NewItem2> {
           _tipoPrecio == '' ||
           _divisa == '') {
         showInSnackBar("Rellena todos los campos correctamente", Colors.yellow);
+        Navigator.of(context).pop(); // alertDialog
+        _buttonFunction = createItem;
       } else {
         _item.update(
             type: _tipoPrecio, price: formattedPrice, currency: _divisa);
 
         ItemRequest.create(_item).then((_) {
-          showInSnackBar(
-              "Datos actualizados correctamente", _colorStatusBarGood);
+          _item.updateList((List<ItemClass> list) => list.add(_item));
           Navigator.of(context).pop();
           Navigator.of(context).pop();
           Navigator.of(context).pop();

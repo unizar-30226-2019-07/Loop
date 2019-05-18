@@ -12,12 +12,15 @@ import 'package:selit/class/usuario_class.dart';
 /// Incluye tiítulo, descripción, categoría y fotos
 class NewItem extends StatefulWidget {
   final UsuarioClass user;
+  final Function(Function(List<ItemClass>)) callback;
+
+  NewItem(this.user, this.callback);
 
   /// UsuarioClass del usuario
-  NewItem({@required this.user});
+  NewItem.args(List arguments) : this(arguments[0], arguments[1]);
 
   @override
-  _NewItemState createState() => new _NewItemState(user);
+  _NewItemState createState() => new _NewItemState(user, callback);
 }
 
 class _NewItemState extends State<NewItem> {
@@ -41,11 +44,10 @@ class _NewItemState extends State<NewItem> {
 
   //Prpietario del producto
   UsuarioClass _user;
+  Function(Function(List<ItemClass>)) _addCallback;
 
   /// Constructor:
-  _NewItemState(UsuarioClass _user) {
-    this._user = _user;
-  }
+  _NewItemState(this._user, this._addCallback);
 
   /// Titulos
   static final _styleTitle = TextStyle(
@@ -106,6 +108,8 @@ class _NewItemState extends State<NewItem> {
           owner: _user,
           media: List.generate(
               nonNull.length, (i) => ImageClass.file(fileImage: nonNull[i])));
+
+      _item.setUpdateListCallback(_addCallback);
 
       Navigator.of(context).pushNamed('/new-item2', arguments: _item);
     }

@@ -44,8 +44,8 @@ class _EditItemState2 extends State<EditItem2> {
     _priceController.text = item.price.toString();
     _divisa = item.currency;
     _buttonFunction = createItem;
-    _tipoPrecio= item.type == "auction" ? "auction" : "sale";
-    _selectedDate= item.endDate;
+    _tipoPrecio = item.type == "auction" ? "auction" : "sale";
+    _selectedDate = item.endDate;
   }
 
   /// Titulos
@@ -60,10 +60,10 @@ class _EditItemState2 extends State<EditItem2> {
 
   static final _styleButton = TextStyle(fontSize: 19.0, color: Colors.white);
 
-
   String _dateString(DateTime fecha) {
     return '${fecha.day} / ${fecha.month} / ${fecha.year}';
   }
+
   void showInSnackBar(String value, Color alfa) {
     FocusScope.of(context).requestFocus(new FocusNode());
     _scaffoldKey.currentState?.removeCurrentSnackBar();
@@ -109,6 +109,8 @@ class _EditItemState2 extends State<EditItem2> {
           _tipoPrecio == '' ||
           _divisa == '') {
         showInSnackBar("Rellena todos los campos correctamente", Colors.yellow);
+        Navigator.of(context).pop(); // alertDialog
+        _buttonFunction = createItem;
       } else {
         _item.update(
             type: _tipoPrecio, price: formattedPrice, currency: _divisa);
@@ -117,6 +119,12 @@ class _EditItemState2 extends State<EditItem2> {
           print('Item actualizado');
           showInSnackBar(
               "Datos actualizados correctamente", _colorStatusBarGood);
+          // Callback del item
+          _item.updateList(
+              (List<ItemClass> list) => list.forEach((ItemClass listItem) {
+                    if (listItem.itemId == _item.itemId &&
+                        listItem.type == _item.type) listItem = _item;
+                  }));
           Navigator.of(context).pop();
           Navigator.of(context).pop();
           Navigator.of(context).pop();
@@ -124,8 +132,10 @@ class _EditItemState2 extends State<EditItem2> {
           if (error == "Unauthorized" || error == "Forbidden") {
             showInSnackBar("Acción no autorizada", _colorStatusBarBad);
           } else if (error == "Internal Server Error") {
-            showInSnackBar("Imagen no válida, prueba con otra", _colorStatusBarBad);
+            showInSnackBar(
+                "Imagen no válida, prueba con otra", _colorStatusBarBad);
           } else {
+            print("Error al actualizar item: $error");
             showInSnackBar("No hay conexión a internet", _colorStatusBarBad);
           }
           _buttonFunction = createItem;
@@ -136,13 +146,15 @@ class _EditItemState2 extends State<EditItem2> {
       if (_priceController.text.length < 1 ||
           formattedPrice == null ||
           _tipoPrecio == '' ||
-          _divisa == ''
-          ) {
-        showInSnackBar("Rellena todos los campos correctamente 2", Colors.yellow);
+          _divisa == '') {
+        showInSnackBar(
+            "Rellena todos los campos correctamente 2", Colors.yellow);
       } else {
-        
         _item.updateAuction(
-            type: _tipoPrecio, price: formattedPrice, currency: _divisa, endDate: _selectedDate);
+            type: _tipoPrecio,
+            price: formattedPrice,
+            currency: _divisa,
+            endDate: _selectedDate);
 
         ItemRequest.editAuction(_item).then((_) {
           print('Subasta actualizada');
@@ -155,7 +167,8 @@ class _EditItemState2 extends State<EditItem2> {
           if (error == "Unauthorized" || error == "Forbidden") {
             showInSnackBar("Acción no autorizada", _colorStatusBarBad);
           } else if (error == "Internal Server Error") {
-            showInSnackBar("Imagen no válida, prueba con otra", _colorStatusBarBad);
+            showInSnackBar(
+                "Imagen no válida, prueba con otra", _colorStatusBarBad);
           } else {
             print("Error: $error");
             showInSnackBar("No hay conexión a internet", _colorStatusBarBad);
@@ -163,7 +176,6 @@ class _EditItemState2 extends State<EditItem2> {
           _buttonFunction = createItem;
           Navigator.of(context).pop();
         });
-        
       }
     }
   }
@@ -266,7 +278,6 @@ class _EditItemState2 extends State<EditItem2> {
                     ],
                   ),
                 ),
-                
               ])),
         )
       ],
@@ -344,19 +355,19 @@ class _EditItemState2 extends State<EditItem2> {
           ),
         ));
 
-
     Widget wAge = Row(
       children: <Widget>[
         Expanded(
           flex: 8,
           child: Container(
-              margin: EdgeInsets.only(left: 15, right: 10, top:10),
+              margin: EdgeInsets.only(left: 15, right: 10, top: 10),
               child: RaisedButton(
                 color: Colors.grey[600],
                 onPressed: () async {
                   DateTime picked = await showDatePicker(
-                      context: context, 
-                      initialDate: _selectedDate ?? DateTime.now().add(new Duration(days: 0, hours: 1)),
+                      context: context,
+                      initialDate: _selectedDate ??
+                          DateTime.now().add(new Duration(days: 0, hours: 1)),
                       firstDate: DateTime.now(),
                       lastDate: DateTime(2030, 1));
                   setState(() {

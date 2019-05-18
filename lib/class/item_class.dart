@@ -28,6 +28,9 @@ class ItemClass {
   DateTime endDate; //Fecha de finalización   yyyy-MM-dd
   LastBid lastBid;
 
+  // Callback al acutalizar el producto
+  Function(Function(List<ItemClass>)) _updateListCallback;
+
   /// Constructor por defecto, comprobar que los atributos son correctos
   ItemClass(
       {this.itemId,
@@ -149,6 +152,16 @@ class ItemClass {
     this.currency = currency;
     this.endDate = endDate;
 
+  }
+
+  void setUpdateListCallback(Function(Function(List<ItemClass>)) function) {
+    _updateListCallback = function;
+  }
+
+  void updateList(Function(List<ItemClass>) updateListFunction) {
+    if (_updateListCallback != null) {
+      _updateListCallback(updateListFunction);
+    }
   }
 
   bool isAuction() {

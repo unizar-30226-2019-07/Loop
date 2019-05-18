@@ -296,6 +296,9 @@ class _ItemDetails extends State<ItemDetails> {
                       fontWeight: FontWeight.bold)),
               onPressed: () {
                 ItemRequest.delete(_item).then((_) {
+                  // Actualizar el listado
+                  _item
+                      .updateList((List<ItemClass> list) => list.remove(_item));
                   Navigator.of(context).pop();
                   Navigator.of(context).pop();
                 }).catchError((error) {
@@ -823,88 +826,90 @@ class _ItemDetails extends State<ItemDetails> {
                     Container(
                         //padding: const EdgeInsets.fromLTRB(16.0, 15.0, 16.0, 0.0),
                         // alignment: Alignment.centerLeft,
-                        child: Column(children: [
-                      Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Padding(
-                                padding:
-                                    const EdgeInsets.only(left: 15, top: 20),
-                                child: Text(
-                                  _item?.title ?? '',
+                        child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                          Padding(
+                              padding: const EdgeInsets.only(left: 15, top: 20),
+                              child: Text(_item?.title ?? '',
                                   style: styleTagTitle,
-                                ))
-                          ]),
-                      Row(
-                          crossAxisAlignment: _item.type == "auction"
-                              ? CrossAxisAlignment.end
-                              : CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            Column(children: [
-                              _item.type == "auction"
-                                  ? Container(
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis)),
+                          Row(
+                              crossAxisAlignment: _item.type == "auction"
+                                  ? CrossAxisAlignment.end
+                                  : CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                Column(children: [
+                                  _item.type == "auction"
+                                      ? Container(
+                                          padding: const EdgeInsets.only(
+                                              bottom: 0.0, left: 9, top: 0),
+                                          child: _item.type == "auction" &&
+                                                  _item.lastBid != null
+                                              ? Text(
+                                                  'Última puja',
+                                                  style: TextStyle(
+                                                      fontSize: 15.0,
+                                                      color: Colors.grey[600]),
+                                                )
+                                              : Text(
+                                                  'Precio salida',
+                                                  style: TextStyle(
+                                                      fontSize: 15.0,
+                                                      color: Colors.grey[600]),
+                                                ))
+                                      : Container(),
+                                  Container(
                                       padding: const EdgeInsets.only(
-                                          bottom: 0.0, left: 9, top: 0),
+                                          bottom: 0.0, left: 15, top: 0),
                                       child: _item.type == "auction" &&
                                               _item.lastBid != null
                                           ? Text(
-                                              'Última puja',
-                                              style: TextStyle(
-                                                  fontSize: 15.0,
-                                                  color: Colors.grey[600]),
+                                              '${_item?.lastBid?.amount ?? ''} ${_item?.currency ?? ''}',
+                                              style: styleTagBlack,
                                             )
                                           : Text(
-                                              'Precio salida',
-                                              style: TextStyle(
-                                                  fontSize: 15.0,
-                                                  color: Colors.grey[600]),
+                                              '${_item?.price ?? ''} ${_item?.currency ?? ''}',
+                                              style: styleTagBlack,
                                             ))
-                                  : Container(),
-                              Container(
-                                  padding: const EdgeInsets.only(
-                                      bottom: 0.0, left: 15, top: 0),
-                                  child: _item.type == "auction" &&
-                                          _item.lastBid != null
-                                      ? Text(
-                                          '${_item?.lastBid?.amount ?? ''} ${_item?.currency ?? ''}',
-                                          style: styleTagBlack,
-                                        )
-                                      : Text(
-                                          '${_item?.price ?? ''} ${_item?.currency ?? ''}',
-                                          style: styleTagBlack,
-                                        ))
-                            ]),
-                            Column(children: [
-                              SizedBox.fromSize(
-                                size: Size(60.0, 60.0),
-                                child: _favoriteFunction == null
-                                    ? Container(
-                                        margin: EdgeInsets.all(15.0),
-                                        child: CircularProgressIndicator(
-                                            strokeWidth: 4.0,
-                                            valueColor:
-                                                AlwaysStoppedAnimation<Color>(
-                                                    _esFavorito
-                                                        ? Colors.grey
-                                                        : Colors.red)))
-                                    : IconButton(
-                                        padding: _item.type == "auction"
-                                            ? const EdgeInsets.only(
-                                                bottom: 0.0, right: 10, top: 20)
-                                            : const EdgeInsets.only(
-                                                bottom: 0.0, right: 10, top: 0),
-                                        icon: Icon(_favorite),
-                                        color: Colors.red,
-                                        iconSize: 35.0,
-                                        tooltip: 'Favoritos',
-                                        splashColor: Colors.red,
-                                        onPressed: _favoriteFunction,
-                                      ),
-                              ),
-                            ]),
-                          ]),
-                    ])),
+                                ]),
+                                Column(children: [
+                                  SizedBox.fromSize(
+                                    size: Size(60.0, 60.0),
+                                    child: _favoriteFunction == null
+                                        ? Container(
+                                            margin: EdgeInsets.all(15.0),
+                                            child: CircularProgressIndicator(
+                                                strokeWidth: 4.0,
+                                                valueColor:
+                                                    AlwaysStoppedAnimation<
+                                                            Color>(
+                                                        _esFavorito
+                                                            ? Colors.grey
+                                                            : Colors.red)))
+                                        : IconButton(
+                                            padding: _item.type == "auction"
+                                                ? const EdgeInsets.only(
+                                                    bottom: 0.0,
+                                                    right: 10,
+                                                    top: 20)
+                                                : const EdgeInsets.only(
+                                                    bottom: 0.0,
+                                                    right: 10,
+                                                    top: 0),
+                                            icon: Icon(_favorite),
+                                            color: Colors.red,
+                                            iconSize: 35.0,
+                                            tooltip: 'Favoritos',
+                                            splashColor: Colors.red,
+                                            onPressed: _favoriteFunction,
+                                          ),
+                                  ),
+                                ]),
+                              ]),
+                        ])),
                     Divider(),
                     Container(
                         padding:
