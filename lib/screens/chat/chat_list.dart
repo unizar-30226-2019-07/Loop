@@ -79,7 +79,7 @@ class ChatListState extends State<ChatList> {
     print('Tipo producto: ' + chat.tipoProducto);
     return chat;
   }
-
+  
   Widget buildChatTile(BuildContext context, ChatClass chat) {
     return Container(
       child: OnSlide(items: <ActionItems>[
@@ -95,8 +95,8 @@ class ChatListState extends State<ChatList> {
               backgroudColor: Colors.transparent),
         ], child: ChatTile(chat)
     ));
-
   }
+
 
   void _showDialogDeleteChat(ChatClass chat) {
     // flutter defined function
@@ -231,7 +231,8 @@ class ChatListState extends State<ChatList> {
                                     return ChatTileLoading();
                                   default:
                                     if (snapshotFutureBuilder.hasError)
-                                      return new Text('Error: ${snapshotFutureBuilder.error}');
+                                      //return new Text('Error: ${snapshotFutureBuilder.error}');
+                                      return new Container();
                                     else
                                       return buildChatTile(context, snapshotFutureBuilder.data);
                                 }
