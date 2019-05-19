@@ -62,8 +62,6 @@ class _ItemDetails extends State<ItemDetails> {
   static final styleTagTitle = TextStyle(
       fontSize: 32.0, color: Colors.black, fontWeight: FontWeight.bold);
 
-  Function _buttonFunction; // inhabilidar boton
-
   // Mapas
   Completer<GoogleMapController> _controller = Completer();
   String _ubicacionCompleta;
@@ -73,7 +71,6 @@ class _ItemDetails extends State<ItemDetails> {
 
   // Constructor
   _ItemDetails(this._item) {
-    _buttonFunction = pujar;
     if (_item.media.isNotEmpty) {
       for (var imagen in _item.media) {
         _images.add(imagen.image.image);
@@ -84,6 +81,9 @@ class _ItemDetails extends State<ItemDetails> {
     _favoriteFunction = _favoritePressed;
     _esFavorito = (_item?.favorited == true);
     _favorite = _esFavorito ? Icons.favorite : Icons.favorite_border;
+    if (_item.type == "auction") {
+      _checkAuctionFinished();
+    }
 
     // Sumar uno al numero de visitas
     ItemRequest.viewItem(itemId: _item.itemId, type: _item.type).catchError(
@@ -118,7 +118,14 @@ class _ItemDetails extends State<ItemDetails> {
 
     return await ItemRequest.getItembyId(itemId: _item.itemId, type: _item.type)
         .then((itemReloaded) {
-      setState(() => _item = itemReloaded);
+      setState(() {
+        _item.price = itemReloaded.price;
+
+        if (_item.type == "auction") {
+          _item.lastBid = itemReloaded.lastBid;
+          _checkAuctionFinished();
+        }
+      });
       Navigator.of(context).pop();
     }).catchError((error) {
       if (error == "Unauthorized" || error == "Forbidden") {
@@ -180,7 +187,6 @@ class _ItemDetails extends State<ItemDetails> {
 
   void pujar() {
     // Diálogo "cargando..." para evitar repetir
-    _buttonFunction = null;
 
     showDialog(
       barrierDismissible: false, // JUST MENTION THIS LINE
@@ -208,9 +214,33 @@ class _ItemDetails extends State<ItemDetails> {
 
       ItemRequest.bidUp(_item, _pujaController.text, miId).then((_) {
         showInSnackBar("Puja realizada correctamente", _colorStatusBarGood);
-        Navigator.of(context).pop();
-        Navigator.of(context).pop();
-        //Navigator.of(context).pop();
+
+        //Se pide el item para obtener lastBid
+        ItemRequest.getItembyId(itemId: _item.itemId, type: _item.type)
+            .then((itemReloaded) {
+          setState(() {
+            _item.lastBid = itemReloaded.lastBid;
+            _item.price = itemReloaded.price;
+            _pujaController.text = '';
+          });
+          // Callback del item
+          _item.updateList(
+              (List<ItemClass> list) => list.forEach((ItemClass listItem) {
+                    if (listItem.itemId == _item.itemId &&
+                        listItem.type == _item.type) listItem = _item;
+                  }));
+
+          Navigator.of(context).pop();
+          Navigator.of(context).pop();
+        }).catchError((error) {
+          if (error == "Unauthorized" || error == "Forbidden") {
+            showInSnackBar("Acción no autorizada", _colorStatusBarBad);
+          } else {
+            print("Error: $error");
+            showInSnackBar("No hay conexión a internet", _colorStatusBarBad);
+          }
+          Navigator.of(context).pop();
+        });
       }).catchError((error) {
         if (error == "Unauthorized" || error == "Forbidden") {
           showInSnackBar("Acción no autorizada", _colorStatusBarBad);
@@ -221,7 +251,7 @@ class _ItemDetails extends State<ItemDetails> {
           print("Error: $error");
           showInSnackBar("No hay conexión a internet", _colorStatusBarBad);
         }
-        _buttonFunction = pujar;
+
         Navigator.of(context).pop();
         Navigator.of(context).pop();
       });
@@ -356,6 +386,25 @@ class _ItemDetails extends State<ItemDetails> {
         showInSnackBar("Ha ocurrido un problema", _colorStatusBarBad);
       }
       Navigator.of(context).pop();
+    });
+  }
+
+  void _checkAuctionFinished() {
+    ItemRequest.checkAuctionFinished(item: _item).then((lastBid) {
+      setState(() {
+        if (lastBid != null) {
+          _item.status = "vendido";
+        } else {
+          _item.status = "en venta";
+        }
+      });
+    }).catchError((error) {
+      print('Error al comprobar estado de subasta: $error');
+      /*showInSnackBar(
+          "Ha ocurrido un problema al comprobar el estado de la subasta",
+          _colorStatusBarBad);*/
+
+      //Navigator.of(context).pop();
     });
   }
 
@@ -890,7 +939,7 @@ class _ItemDetails extends State<ItemDetails> {
             color: Colors.white,
             child: Text('Pujar',
                 style: TextStyle(fontSize: 19.0, color: Colors.black)),
-            onPressed: _buttonFunction,
+            onPressed: pujar,
           )
         ],
       ),
@@ -903,7 +952,7 @@ class _ItemDetails extends State<ItemDetails> {
     // Item en venta o no (también tener en cuenta si es nulo)
     bool _itemEnVenta = (_item?.status ?? "en venta") == "en venta";
     // Subasta fuera de fecha o no
-    bool _subastaEnFecha = _item?.endDate?.isAfter(DateTime.now());
+
     // Ubicación del dueño
     CameraPosition _cameraPosition;
     if (_item?.owner?.locationLat != null &&
@@ -925,7 +974,7 @@ class _ItemDetails extends State<ItemDetails> {
     }
     return new Scaffold(
       key: _scaffoldKey,
-      floatingActionButton: _item.type == "auction" && _subastaEnFecha
+      floatingActionButton: _item.type == "auction" && _item.status != "vendido"
           ? new FloatingActionButton(
               elevation: 8.0,
               child: new Icon(FontAwesomeIcons.gavel),
@@ -1108,7 +1157,8 @@ class _ItemDetails extends State<ItemDetails> {
                                                         backgroundColor: _item
                                                                     .type ==
                                                                 "auction"
-                                                            ? _subastaEnFecha
+                                                            ? _item.status !=
+                                                                    "vendido"
                                                                 ? Theme.of(
                                                                         context)
                                                                     .primaryColor
@@ -1121,7 +1171,8 @@ class _ItemDetails extends State<ItemDetails> {
                                                         label: _item.type ==
                                                                 "auction"
                                                             ? Text(
-                                                                _subastaEnFecha
+                                                                _item.status !=
+                                                                        "vendido"
                                                                     ? 'Activa'
                                                                     : _item.lastBid ==
                                                                             null

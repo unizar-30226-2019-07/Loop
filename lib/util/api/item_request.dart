@@ -1,4 +1,5 @@
 import 'package:selit/class/item_class.dart';
+import 'package:selit/class/lastBid_class.dart';
 import 'package:selit/util/api/api_config.dart';
 import 'package:selit/util/storage.dart';
 import 'package:selit/class/items/filter_list_class.dart';
@@ -297,6 +298,30 @@ class ItemRequest {
             },
             body: json.jsonEncode(itemMap));
     if (response.statusCode != 200) {
+      throw (APIConfig.getErrorString(response));
+    }
+  }
+
+  /// Comprobar si subasta finalizada
+  static Future<LastBid> checkAuctionFinished(
+      {@required ItemClass item}) async {
+    // Esperar la respuesta de la petición
+
+    http.Response response = await http
+        .put('${APIConfig.BASE_URL}/auctions/${item.itemId}/sell', headers: {
+      HttpHeaders.contentTypeHeader: ContentType.json.toString(),
+      HttpHeaders.authorizationHeader: await Storage.loadToken(),
+    });
+
+    if (response.statusCode == 200) {
+      if (response.body != "") {
+        String token = await Storage.loadToken();
+        return LastBid.fromJson(json.jsonDecode(response.body), token);
+      } else {
+        return null;
+      }
+    } else {
+      print('Status code: ' + response.statusCode.toString());
       throw (APIConfig.getErrorString(response));
     }
   }
