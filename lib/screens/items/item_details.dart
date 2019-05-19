@@ -50,6 +50,8 @@ class _ItemDetails extends State<ItemDetails> {
 
   List<ImageProvider> _images = [];
 
+  List<UsuarioClass> posiblesUsuarios = new List<UsuarioClass>();
+
   static final styleTagWhite = TextStyle(
       fontSize: 18.0, color: Colors.white, fontWeight: FontWeight.bold);
 
@@ -77,6 +79,7 @@ class _ItemDetails extends State<ItemDetails> {
       }
     }
     _loadCoordinates();
+    _getChatUsers();
     // productos deseados
     _favoriteFunction = _favoritePressed;
     _esFavorito = (_item?.favorited == true);
@@ -355,13 +358,20 @@ class _ItemDetails extends State<ItemDetails> {
   }
 
   /// Devolver una lista con los usuarios que han abierto chat al vendedor del producto
-  List<UsuarioClass> _getChatUsers() {
+  void _getChatUsers() async {
+    List<UsuarioClass> listaClientes = new List<UsuarioClass>();
+    Firestore.instance.collection('chat').where('idProducto', isEqualTo: _item.itemId).
+        where('idAnunciante', isEqualTo: miId).getDocuments().then((QuerySnapshot data){
+        data.documents.forEach((document) async {  
+          listaClientes.add(await UsuarioRequest.getUserById(document['idCliente']));
+        });
+      });
     // TODO devolver la lista de los que han abierto chat
-    return [
-      UsuarioClass(userId: 1, nombre: 'Juan', apellidos: 'Juanez 1'),
-      UsuarioClass(userId: 2, nombre: 'Juan', apellidos: 'Juanez 2'),
-      UsuarioClass(userId: 3, nombre: 'Juan', apellidos: 'Juanez 3'),
-    ];
+    //if(listaClientes != posiblesUsuarios){
+    setState(() {
+       posiblesUsuarios = listaClientes;
+    });
+    
   }
 
   void _markAsSold(int buyerId) {
@@ -409,8 +419,6 @@ class _ItemDetails extends State<ItemDetails> {
   }
 
   void _showMarkAsSoldDialog() {
-    List<UsuarioClass> posiblesUsuarios = _getChatUsers();
-
     if (posiblesUsuarios.isEmpty) {
       showInSnackBar("No has chateado con nadie", _colorStatusBarBad);
     } else {
@@ -487,7 +495,7 @@ class _ItemDetails extends State<ItemDetails> {
 
       showDialog(context: context, builder: (context) => dialog);
     }
-  }
+}
 
   Widget _buildMarkAsSoldButton() {
     return Container(
