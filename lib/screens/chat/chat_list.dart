@@ -7,7 +7,6 @@ import 'package:selit/util/storage.dart';
 import 'package:selit/widgets/chats/chat_tile.dart';
 import 'package:selit/class/chat_class.dart';
 import 'package:selit/util/api/usuario_request.dart';
-import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 import 'package:selit/widgets/chats/chat_tile_loading.dart';
 import 'package:selit/widgets/chats/swipe_widget.dart';
 
@@ -177,7 +176,6 @@ class ChatListState extends State<ChatList> {
   @override
   Widget build(BuildContext context) {
     print('Mi id: ' + _miId.toString());
-    FlutterStatusbarcolor.setStatusBarColor(Colors.transparent);
     return Scaffold(
       appBar: new AppBar(
         title: new Text("Chats",
@@ -185,7 +183,7 @@ class ChatListState extends State<ChatList> {
                 fontSize: 22.0,
                 color: Colors.white,
                 fontWeight: FontWeight.bold)),
-        elevation: Theme.of(context).platform == TargetPlatform.iOS ? 0.0 : 4.0,
+        elevation: 0.0, // igualar al resto de vistas
       ),
       resizeToAvoidBottomInset: false,
       body: Container(

@@ -182,7 +182,6 @@ Widget _buildForm() {
 }
   @override
   Widget build(BuildContext context) {
-    BarColor.changeBarColor(color: Colors.transparent, whiteForeground: true);
     return Scaffold(
        key: _scaffoldKey,
         appBar: AppBar(

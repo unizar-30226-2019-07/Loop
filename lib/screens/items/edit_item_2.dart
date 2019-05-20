@@ -438,7 +438,6 @@ class _EditItemState2 extends State<EditItem2> {
 
   @override
   Widget build(BuildContext context) {
-    BarColor.changeBarColor(color: Colors.transparent, whiteForeground: true);
     return Scaffold(
       key: _scaffoldKey,
       resizeToAvoidBottomInset: true,

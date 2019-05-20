@@ -463,7 +463,6 @@ class _NewItemState2 extends State<NewItem2> {
 
   @override
   Widget build(BuildContext context) {
-    BarColor.changeBarColor(color: Colors.transparent, whiteForeground: false);
     return Scaffold(
       key: _scaffoldKey,
       resizeToAvoidBottomInset: true,

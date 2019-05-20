@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:selit/util/storage.dart';
+import 'package:selit/util/bar_color.dart';
 import 'package:selit/widgets/fancy_bottom_navigation.dart';
 import 'package:selit/screens/items/item_list.dart';
 import 'package:selit/screens/settings/settings.dart';
@@ -41,6 +42,8 @@ class _Principal extends State<Principal> {
 
 	@override
 	Widget build(BuildContext context) {
+    BarColor.changeBarColor(
+        color: Theme.of(context).primaryColor, whiteForeground: true);
 		return Scaffold(
 			body: screenList[_currentPage], // Pantalla en curso
       resizeToAvoidBottomInset: false,

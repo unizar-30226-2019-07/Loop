@@ -953,8 +953,6 @@ class _ItemDetails extends State<ItemDetails> {
       ),
     );
 
-    BarColor.changeBarColor(
-        color: Theme.of(context).primaryColor, whiteForeground: true);
     final ThemeData theme = Theme.of(context);
     final TextStyle descriptionStyle = theme.textTheme.subhead;
     // Item en venta o no (también tener en cuenta si es nulo)

@@ -7,7 +7,6 @@ import 'package:selit/util/storage.dart';
 class Settings extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    BarColor.changeBarColor(color: Colors.transparent, whiteForeground: true);
     return Scaffold(
         appBar: AppBar(
           leading: Container(),

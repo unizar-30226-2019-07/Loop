@@ -11,11 +11,8 @@ class BarColor {
       // workaround para varias peticiones simultaneas
       changing = true;
       await FlutterStatusbarcolor.setStatusBarColor(color);
-      await FlutterStatusbarcolor.setStatusBarWhiteForeground(
-          whiteForeground);
+      await FlutterStatusbarcolor.setStatusBarWhiteForeground(whiteForeground);
       changing = false;
-    } else {
-      print('error');
     }
   }
 }

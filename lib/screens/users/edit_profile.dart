@@ -685,9 +685,6 @@ class _EditProfileState extends State<EditProfile> {
 
   @override
   Widget build(BuildContext context) {
-    BarColor.changeBarColor(
-        color: Theme.of(context).primaryColor,
-        whiteForeground: true);
     return Scaffold(key: _scaffoldKey, body: _buildForm());
   }
 }

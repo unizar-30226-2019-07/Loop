@@ -271,7 +271,6 @@ class _WishesState extends State<Wishes> {
 
   @override
   Widget build(BuildContext context) {
-    BarColor.changeBarColor(color: Colors.transparent, whiteForeground: true);
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: Container(

@@ -327,7 +327,6 @@ class _ReportUserState extends State<ReportUser> {
 
   @override
   Widget build(BuildContext context) {
-    BarColor.changeBarColor(color: Colors.transparent, whiteForeground: true);
     return Stack(children: <Widget>[
       Scaffold(
         resizeToAvoidBottomInset: false,

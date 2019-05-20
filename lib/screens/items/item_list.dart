@@ -328,7 +328,6 @@ class _ItemListState extends State<ItemList> {
   }
   @override
   Widget build(BuildContext context) {
-    BarColor.changeBarColor(color: Colors.transparent, whiteForeground: false);
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: Container(
