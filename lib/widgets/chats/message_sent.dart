@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 class MessageSentTile extends StatelessWidget {
 
   final String mensaje;
@@ -10,6 +10,15 @@ class MessageSentTile extends StatelessWidget {
   MessageSentTile(this.mensaje, this.hora, this.estado);
 
   static const double height = 75.0;
+
+  Widget iconoEstado(String estado){
+    if(estado == 'enviado'){
+      return new Icon(FontAwesomeIcons.check, size: 15, color: Colors.white);
+    }
+    else{ // estado == recibido
+      return new Icon(FontAwesomeIcons.checkDouble, size: 15, color: Colors.white);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,12 +67,8 @@ class MessageSentTile extends StatelessWidget {
                                     mainAxisSize: MainAxisSize.min,
                                     children: <Widget>[
                                       Container(
-                                        margin: const EdgeInsets.only(right: 20.0),
-                                        child: new Text(estado,
-                                      style: new TextStyle(
-                                          fontSize: 12.0,
-                                          color: Colors.white70,
-                                          fontWeight: FontWeight.w100))),
+                                        margin: const EdgeInsets.only(right: 20.0, bottom: 5.0),
+                                        child: iconoEstado(estado)),
                                       new Text(hora,
                                       style: new TextStyle(
                                           fontSize: 12.0,
