@@ -626,7 +626,8 @@ class _ItemDetails extends State<ItemDetails> {
     int idItem = _item.owner?.userId;
     miId = await Storage.loadUserId();
     print('Mi id ' + miId.toString());
-    print('Id item ' + idItem.toString());
+    print('Id owener item ' + idItem.toString());
+    print('Id item ' + _item.itemId.toString());
 
     if (_item.itemId > 0) {
       if (miId == idItem) {
@@ -856,6 +857,7 @@ class _ItemDetails extends State<ItemDetails> {
             });
           });
         }
+        print('CHECK 1');
         // Ya existe el chat (hay que preservar los valores de visible)
         ChatClass chat = new ChatClass(
             usuario: _item.lastBid.bidder,

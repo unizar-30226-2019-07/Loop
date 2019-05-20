@@ -33,6 +33,7 @@ class ChatScreenState extends State<ChatScreen> {
     if (_miId == null){
       _miId = -1; //Quitar null porque sino hará query de todos los chats
     }
+    print('CHECK iniciando');
     _leerIdUsuario();
   }
 
@@ -50,7 +51,7 @@ class ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Widget itemImage = _chat.producto.media[0] == null
+    Widget itemImage = _chat.producto.media.isEmpty || _chat.producto.media[0] == null
         ? Container()
         : Container(
             padding: const EdgeInsets.only(top: 3.0, bottom: 3.0, right: 10.0),
