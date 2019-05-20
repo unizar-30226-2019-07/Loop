@@ -359,15 +359,20 @@ class _ItemDetails extends State<ItemDetails> {
   /// Devolver una lista con los usuarios que han abierto chat al vendedor del producto
   void _getChatUsers() async {
     List<UsuarioClass> listaClientes = new List<UsuarioClass>();
-    Firestore.instance.collection('chat').where('idProducto', isEqualTo: _item.itemId).
-        where('idAnunciante', isEqualTo: miId).
-          where('tipoProducto', isEqualTo: 'sale').getDocuments().then((QuerySnapshot data){
-        data.documents.forEach((document) async {  
-          listaClientes.add(await UsuarioRequest.getUserById(document['idCliente']));
-        });
+    Firestore.instance
+        .collection('chat')
+        .where('idProducto', isEqualTo: _item.itemId)
+        .where('idAnunciante', isEqualTo: miId)
+        .where('tipoProducto', isEqualTo: 'sale')
+        .getDocuments()
+        .then((QuerySnapshot data) {
+      data.documents.forEach((document) async {
+        listaClientes
+            .add(await UsuarioRequest.getUserById(document['idCliente']));
       });
+    });
     setState(() {
-       posiblesUsuarios = listaClientes;
+      posiblesUsuarios = listaClientes;
     });
   }
 
@@ -492,7 +497,7 @@ class _ItemDetails extends State<ItemDetails> {
 
       showDialog(context: context, builder: (context) => dialog);
     }
-}
+  }
 
   Widget _buildMarkAsSoldButton() {
     return Container(
@@ -794,10 +799,10 @@ class _ItemDetails extends State<ItemDetails> {
     String docId = 'p' +
         _item.itemId.toString() +
         '_a' +
-         miId.toString()+
+        miId.toString() +
         '_c' +
         _item.lastBid.bidder.userId.toString();
-        
+
     Firestore.instance
         .collection('chat')
         .document(docId)
@@ -1178,7 +1183,9 @@ class _ItemDetails extends State<ItemDetails> {
                                                                         "vendido"
                                                                     ? 'Activa'
                                                                     : _item.lastBid ==
-                                                                            null
+                                                                                null ||
+                                                                            miId ==
+                                                                                _item.owner.userId
                                                                         ? 'Cerrada'
                                                                         : _item.lastBid.bidder.userId ==
                                                                                 miId
