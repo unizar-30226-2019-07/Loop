@@ -303,7 +303,7 @@ class ItemRequest {
   }
 
   /// Comprobar si subasta finalizada
-  static Future<LastBid> checkAuctionFinished(
+  static Future<bool> checkAuctionFinished(
       {@required ItemClass item}) async {
     // Esperar la respuesta de la petición
 
@@ -315,10 +315,9 @@ class ItemRequest {
 
     if (response.statusCode == 200) {
       if (response.body != "") {
-        String token = await Storage.loadToken();
-        return LastBid.fromJson(json.jsonDecode(response.body), token);
+        return true;
       } else {
-        return null;
+        return false;
       }
     } else {
       print('Status code: ' + response.statusCode.toString());

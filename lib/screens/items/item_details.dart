@@ -390,9 +390,9 @@ class _ItemDetails extends State<ItemDetails> {
   }
 
   void _checkAuctionFinished() {
-    ItemRequest.checkAuctionFinished(item: _item).then((lastBid) {
+    ItemRequest.checkAuctionFinished(item: _item).then((terminada) {
       setState(() {
-        if (lastBid != null) {
+        if (terminada) {
           _item.status = "vendido";
         } else {
           _item.status = "en venta";
@@ -400,9 +400,9 @@ class _ItemDetails extends State<ItemDetails> {
       });
     }).catchError((error) {
       print('Error al comprobar estado de subasta: $error');
-      /*showInSnackBar(
+      showInSnackBar(
           "Ha ocurrido un problema al comprobar el estado de la subasta",
-          _colorStatusBarBad);*/
+          _colorStatusBarBad);
 
       //Navigator.of(context).pop();
     });
@@ -789,9 +789,13 @@ class _ItemDetails extends State<ItemDetails> {
     String docId = 'p' +
         _item.itemId.toString() +
         '_a' +
-        _item.lastBid.bidder.userId.toString() +
+         miId.toString()+
         '_c' +
-        miId.toString();
+        _item.lastBid.bidder.userId.toString();
+        
+        showInSnackBar(
+          "Ha llegado",
+          _colorStatusBarBad);
 
     Firestore.instance
         .collection('chat')
@@ -805,8 +809,8 @@ class _ItemDetails extends State<ItemDetails> {
         Firestore.instance.runTransaction((transaction) async {
           await transaction
               .set(Firestore.instance.collection("chat").document(docId), {
-            'idAnunciante': _item.lastBid.bidder.userId,
-            'idCliente': miId,
+            'idAnunciante': miId,
+            'idCliente': _item.lastBid.bidder.userId,
             'idProducto': _item.itemId,
             'visible': [miId],
             'ultimoMensaje': '',
@@ -836,8 +840,8 @@ class _ItemDetails extends State<ItemDetails> {
           Firestore.instance.runTransaction((transaction) async {
             await transaction
                 .set(Firestore.instance.collection("chat").document(docId), {
-              'idAnunciante': _item.lastBid.bidder.userId,
-              'idCliente': miId,
+              'idAnunciante': miId,
+              'idCliente': _item.lastBid.bidder.userId,
               'idProducto': _item.itemId,
               'visible': [miId, _item.lastBid.bidder.userId],
               'ultimoMensaje': document.data['ultimoMensaje'],
