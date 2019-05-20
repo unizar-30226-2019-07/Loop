@@ -112,10 +112,6 @@ class _ProfileState extends State<Profile> {
 
   Future<void> _loadRatings() async {
     UsuarioRequest.getRatingsFromUser(userId: _user.userId).then((list) {
-      list.forEach((item) {
-        print('cargado');
-        item.usuarioComprador = _user;
-      });
       setState(() {
         _user.setRatings(list);
       });

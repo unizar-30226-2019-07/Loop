@@ -62,11 +62,11 @@ class _WishesState extends State<Wishes> {
     if (_user?.locationLat == null || _user?.locationLng == null) {
       print('ERROR: Intentando cargar objetos sin tener un usuario');
     } else {
+      _cancelled = false;
       // Cargar los objetos deseados (productos y subastas) del usuario
       UsuarioRequest.getWishlist(
               auctions: false, lat: _user.locationLat, lng: _user.locationLng)
           .then((wishlistProducts) {
-        _cancelled = false;
         if (!_cancelled) {
           setState(() {
             if (wishlistProducts.isEmpty) {

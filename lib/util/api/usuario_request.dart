@@ -296,17 +296,19 @@ class UsuarioRequest {
   static Future<List<RatingClass>> getRatingsFromUser(
       {int userId}) async {
 
+    String token = await Storage.loadToken();
+
     final response =
         await http.get('${APIConfig.BASE_URL}/users/$userId/reviews',
             headers: {
               HttpHeaders.contentTypeHeader: ContentType.json.toString(),
-              HttpHeaders.authorizationHeader: await Storage.loadToken(),
+              HttpHeaders.authorizationHeader: token,
             });
 
     if (response.statusCode == 200) {
       List<RatingClass> ratings = new List<RatingClass>();
       (json.jsonDecode(response.body) as List<dynamic>).forEach((itemJson) {
-        ratings.add(RatingClass.fromJson(itemJson));
+        ratings.add(RatingClass.fromJson(itemJson, token));
       });
       return ratings;
     } else {

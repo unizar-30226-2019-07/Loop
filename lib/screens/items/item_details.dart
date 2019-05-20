@@ -78,7 +78,6 @@ class _ItemDetails extends State<ItemDetails> {
       }
     }
     _loadCoordinates();
-    _getChatUsers();
     // productos deseados
     _favoriteFunction = _favoritePressed;
     _esFavorito = (_item?.favorited == true);
@@ -91,6 +90,14 @@ class _ItemDetails extends State<ItemDetails> {
     ItemRequest.viewItem(itemId: _item.itemId, type: _item.type).catchError(
         (error) =>
             print('Ocurrio un error al sumar visitas a un producto: $error'));
+  }
+
+  @override
+  void initState() {
+    _buildEditConditional = null;
+    _leerIdUsuario();
+    _getChatUsers();
+    super.initState();
   }
 
   Function _favoriteFunction; // callback al presionar el corazón
@@ -655,13 +662,6 @@ class _ItemDetails extends State<ItemDetails> {
         });
       }
     }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _buildEditConditional = null;
-    _leerIdUsuario();
   }
 
   /// Mapa que indica donde esta el usuario dueño
