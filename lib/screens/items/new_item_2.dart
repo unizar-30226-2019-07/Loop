@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/percent_indicator.dart';
-import 'package:selit/util/bar_color.dart';
 import 'package:selit/class/item_class.dart';
 import 'package:selit/util/api/item_request.dart';
 
@@ -82,7 +81,7 @@ class _NewItemState2 extends State<NewItem2> {
 
   void createItem() {
     // Diálogo "cargando..." para evitar repetir
-    _buttonFunction = null;
+    setState(() => _buttonFunction = null);
     showDialog(
       barrierDismissible: false, // JUST MENTION THIS LINE
       context: context,
@@ -113,7 +112,7 @@ class _NewItemState2 extends State<NewItem2> {
           _divisa == '') {
         showInSnackBar("Rellena todos los campos correctamente", Colors.yellow);
         Navigator.of(context).pop(); // alertDialog
-        _buttonFunction = createItem;
+        setState(() => _buttonFunction = createItem);
       } else {
         _item.update(
             type: _tipoPrecio, price: formattedPrice, currency: _divisa);
@@ -132,7 +131,7 @@ class _NewItemState2 extends State<NewItem2> {
             print("Error: $error");
             showInSnackBar("No hay conexión a internet", _colorStatusBarBad);
           }
-          _buttonFunction = createItem;
+          setState(() => _buttonFunction = createItem);
           Navigator.of(context).pop();
         });
       }
@@ -166,7 +165,7 @@ class _NewItemState2 extends State<NewItem2> {
             print("Error: $error");
             showInSnackBar("No hay conexión a internet", _colorStatusBarBad);
           }
-          _buttonFunction = createItem;
+          setState(() => _buttonFunction = createItem);
           Navigator.of(context).pop();
         });
       }

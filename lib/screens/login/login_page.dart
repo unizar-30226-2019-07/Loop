@@ -9,7 +9,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:selit/util/bar_color.dart';
 import 'package:location/location.dart';
 
-final int splashDuration = 2;
+final int splashDuration = 1;
 double locationLat, locationLng;
 
 class LoginPage extends StatefulWidget {
@@ -72,6 +72,14 @@ class _LoginPageState extends State<LoginPage>
     });
   }
 
+  _LoginPageState() {
+    _loginButtonFunction = _tryLogin;
+    // no se da valor a _registerButtonFunction, primero toma ubicación
+  }
+
+  Function _loginButtonFunction;
+  Function _registerButtonFunction;
+
   /// Intenta hacer login de un usuario con email y contraseña
   /// según lo escrito en los campos de texto
   /// Si se loguea correctamente, se almacena el token, se informa al usuario
@@ -79,6 +87,7 @@ class _LoginPageState extends State<LoginPage>
   /// Si no se loguea correctamente, muestra un aviso al usuario de que
   /// no se ha podido iniciar sesión correctamente
   void _tryLogin() async {
+    setState(() => _loginButtonFunction = null);
     UsuarioRequest.login(
             loginEmailController.text, loginPasswordController.text)
         .then((loginToken) {
@@ -96,10 +105,11 @@ class _LoginPageState extends State<LoginPage>
         showInSnackBar(
             "Ha ocurrido un error en el servidor", _colorStatusBarBad);
       }
+      print('LOGIN ERROR LOGIN ERROR');
+      setState(() => _loginButtonFunction = _tryLogin);
     });
   }
 
-  Function _signUpCallback;
   Color _signUpButtonColor = Colors.grey[800]; // Desactivado
 
   /// Hacer registro de usuario con los campos del formulario
@@ -118,9 +128,14 @@ class _LoginPageState extends State<LoginPage>
     if (signupLastNameController.text.length < 1 ||
         signupNameController.text.length < 1 ||
         !validateEmail(signupEmailController.text)) {
-      showInSnackBar("Rellena toodos los campos correctamente", Colors.yellow);
+      showInSnackBar("Rellena todos los campos correctamente", Colors.yellow);
       return;
     }
+    
+    setState(() {
+      _registerButtonFunction = null;
+      _signUpButtonColor = Colors.grey[800];
+    });
 
     // Crear un objeto de la clase UsuarioClass para pasar datos de usuario
     UsuarioClass registeredUser = new UsuarioClass(
@@ -141,6 +156,10 @@ class _LoginPageState extends State<LoginPage>
       } else {
         showInSnackBar("No hay conexión a internet", _colorStatusBarBad);
       }
+      setState(() {
+        _registerButtonFunction = _trySignUp;
+        _signUpButtonColor = Theme.of(context).primaryColorDark;
+      });
     });
   }
 
@@ -200,21 +219,24 @@ class _LoginPageState extends State<LoginPage>
                             left = Colors.black;
                           });
                         } else if (i == 1) {
-                          Location locationService = new Location();
-                          // Intentar obtener la localización del usuario
-                          try {
-                            LocationData data =
-                                await locationService.getLocation();
-                            locationLat = data.latitude;
-                            locationLng = data.longitude;
-                            setState(() {
-                              _signUpCallback = _trySignUp;
-                              _signUpButtonColor =
-                                  Theme.of(context).primaryColorDark;
-                            });
-                          } on PlatformException catch (_) {
-                            showInSnackBar(
-                                "Es necesaria la localización", Colors.red);
+                          
+                          if (locationLat == null || locationLng == null) {
+                            Location locationService = new Location();
+                            // Intentar obtener la localización del usuario
+                            try {
+                              LocationData data =
+                                  await locationService.getLocation();
+                              locationLat = data.latitude;
+                              locationLng = data.longitude;
+                              setState(() {
+                                _registerButtonFunction = _trySignUp;
+                                _signUpButtonColor =
+                                    Theme.of(context).primaryColorDark;
+                              });
+                            } on PlatformException catch (_) {
+                              showInSnackBar(
+                                  "Es necesaria la localización", Colors.red);
+                            }
                           }
 
                           setState(() {
@@ -441,7 +463,7 @@ class _LoginPageState extends State<LoginPage>
                           fontFamily: "NunitoBold"),
                     ),
                   ),
-                  onPressed: _tryLogin,
+                  onPressed: _loginButtonFunction,
                 ),
               ),
             ],
@@ -639,9 +661,10 @@ class _LoginPageState extends State<LoginPage>
                 ),
                 child: MaterialButton(
                     color: _signUpButtonColor,
+                    disabledColor: _signUpButtonColor,
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 10.0, horizontal: 42.0),
+                      padding: const EdgeInsets.fromLTRB(
+                          42.0, 10.0, 42.0, 10.0),
                       child: Text(
                         "UNIRSE",
                         style: TextStyle(
@@ -650,7 +673,7 @@ class _LoginPageState extends State<LoginPage>
                             fontFamily: "NunitoBold"),
                       ),
                     ),
-                    onPressed: _signUpCallback),
+                    onPressed: _registerButtonFunction),
               ),
             ],
           ),

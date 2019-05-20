@@ -5,7 +5,6 @@ import 'package:selit/class/item_class.dart';
 import 'package:selit/util/api/usuario_request.dart';
 import 'package:selit/util/bubble_indication_painter.dart';
 import 'package:selit/widgets/items/item_tile.dart';
-import 'package:selit/util/bar_color.dart';
 
 /// Lista de productos o subastas deseados por el usuario,
 /// en dos listas de igual forma que se muestra en el perfil

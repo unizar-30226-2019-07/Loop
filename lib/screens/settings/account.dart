@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:selit/util/storage.dart';
 import 'package:selit/util/api/usuario_request.dart';
-import 'package:selit/util/bar_color.dart';
 
 // Vista temporal con varios botones que llevan a diferentes vistas
 // de forma que se pueda acceder a ellas de alguna forma

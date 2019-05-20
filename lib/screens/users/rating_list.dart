@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:selit/class/rating_class.dart';
 import 'package:selit/widgets/profile_picture.dart';
 import 'package:selit/widgets/star_rating.dart';
-import 'package:selit/util/bar_color.dart';
 
 /// Pantalla para calificar otro usuario, con información sobre el
 /// usuario que va a ser calificado, un número de estrellas entre 1 y 5

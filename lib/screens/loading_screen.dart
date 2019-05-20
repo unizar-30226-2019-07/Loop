@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:selit/util/storage.dart';
+import 'package:selit/util/bar_color.dart';
 import 'package:selit/util/api/usuario_request.dart';
 
 /// Pantalla de carga hasta que se puede decidir si existe un
@@ -68,6 +69,8 @@ class _LoadingScreenState extends State<LoadingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    BarColor.changeBarColor(
+        color: Theme.of(context).primaryColorLight, whiteForeground: true);
     return Scaffold(
         body: Container(
             decoration: BoxDecoration(

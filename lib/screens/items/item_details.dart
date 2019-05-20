@@ -14,7 +14,6 @@ import 'package:selit/util/storage.dart';
 import 'package:selit/util/api/usuario_request.dart';
 import 'package:selit/util/api/item_request.dart';
 import 'package:selit/widgets/profile_picture.dart';
-import 'package:selit/util/bar_color.dart';
 import 'package:selit/widgets/star_rating.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -367,11 +366,9 @@ class _ItemDetails extends State<ItemDetails> {
           listaClientes.add(await UsuarioRequest.getUserById(document['idCliente']));
         });
       });
-    // TODO devolver la lista de los que han abierto chat
     setState(() {
        posiblesUsuarios = listaClientes;
     });
-    
   }
 
   void _markAsSold(int buyerId) {

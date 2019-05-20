@@ -11,7 +11,6 @@ import 'package:selit/util/storage.dart';
 import 'package:selit/widgets/items/item_tile.dart';
 import 'package:selit/widgets/star_rating.dart';
 import 'package:selit/widgets/profile_picture.dart';
-import 'package:selit/util/bar_color.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 
 /// Perfil de usuario: muestra sus datos, foto de perfil y
@@ -374,7 +373,7 @@ class _ProfileState extends State<Profile> {
                                 color: _blendColor,
                                 alignment: Alignment.center,
                                 width: 130.0,
-                                child: Text('${_user.ratings.length} reviews',
+                                child: Text('${_user.ratings.length} valoraciones',
                                     style: _styleReviews))))),
           ],
         ),

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:selit/util/bar_color.dart';
 import 'package:selit/util/storage.dart';
 
 // Vista temporal con varios botones que llevan a diferentes vistas

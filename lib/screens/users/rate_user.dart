@@ -4,7 +4,6 @@ import 'package:selit/util/api/usuario_request.dart';
 import 'package:selit/widgets/profile_picture.dart';
 import 'package:selit/widgets/star_rating.dart';
 import 'package:selit/widgets/star_rating_interactive.dart';
-import 'package:selit/util/bar_color.dart';
 
 /// Pantalla para calificar otro usuario, con información sobre el
 /// usuario que va a ser calificado, un número de estrellas entre 1 y 5

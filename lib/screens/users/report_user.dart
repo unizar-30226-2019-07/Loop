@@ -3,7 +3,6 @@ import 'package:selit/class/usuario_class.dart';
 import 'package:selit/util/api/usuario_request.dart';
 import 'package:selit/widgets/profile_picture.dart';
 import 'package:selit/widgets/star_rating.dart';
-import 'package:selit/util/bar_color.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 /// Pantalla para realizar informe sobre otro usuario
