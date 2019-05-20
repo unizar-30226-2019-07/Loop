@@ -361,13 +361,13 @@ class _ItemDetails extends State<ItemDetails> {
   void _getChatUsers() async {
     List<UsuarioClass> listaClientes = new List<UsuarioClass>();
     Firestore.instance.collection('chat').where('idProducto', isEqualTo: _item.itemId).
-        where('idAnunciante', isEqualTo: miId).getDocuments().then((QuerySnapshot data){
+        where('idAnunciante', isEqualTo: miId).
+          where('tipoProducto', isEqualTo: 'sale').getDocuments().then((QuerySnapshot data){
         data.documents.forEach((document) async {  
           listaClientes.add(await UsuarioRequest.getUserById(document['idCliente']));
         });
       });
     // TODO devolver la lista de los que han abierto chat
-    //if(listaClientes != posiblesUsuarios){
     setState(() {
        posiblesUsuarios = listaClientes;
     });
