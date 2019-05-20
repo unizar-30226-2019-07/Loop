@@ -59,7 +59,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
       _showErrorDialog(context);
     }).catchError((error) {
 
-      print('$error Redirect a login');
+      print('Redirect a login con error: $error');
       Storage.deleteToken();
       Navigator.of(context).pushReplacementNamed('/login-page');
     });
