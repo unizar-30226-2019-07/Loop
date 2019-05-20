@@ -798,10 +798,6 @@ class _ItemDetails extends State<ItemDetails> {
         '_c' +
         _item.lastBid.bidder.userId.toString();
         
-        showInSnackBar(
-          "Ha llegado",
-          _colorStatusBarBad);
-
     Firestore.instance
         .collection('chat')
         .document(docId)
