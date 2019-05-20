@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:selit/util/storage.dart';
 import 'package:selit/util/api/usuario_request.dart';
-import 'package:selit/util/bar_color.dart';
 
 // Vista temporal con varios botones que llevan a diferentes vistas
 // de forma que se pueda acceder a ellas de alguna forma
@@ -182,7 +181,6 @@ Widget _buildForm() {
 }
   @override
   Widget build(BuildContext context) {
-    BarColor.changeBarColor(color: Colors.transparent, whiteForeground: true);
     return Scaffold(
        key: _scaffoldKey,
         appBar: AppBar(

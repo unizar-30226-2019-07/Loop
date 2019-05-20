@@ -14,7 +14,6 @@ import 'package:selit/util/storage.dart';
 import 'package:selit/util/api/usuario_request.dart';
 import 'package:selit/util/api/item_request.dart';
 import 'package:selit/widgets/profile_picture.dart';
-import 'package:selit/util/bar_color.dart';
 import 'package:selit/widgets/star_rating.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -50,6 +49,8 @@ class _ItemDetails extends State<ItemDetails> {
 
   List<ImageProvider> _images = [];
 
+  List<UsuarioClass> posiblesUsuarios = new List<UsuarioClass>();
+
   static final styleTagWhite = TextStyle(
       fontSize: 18.0, color: Colors.white, fontWeight: FontWeight.bold);
 
@@ -77,6 +78,7 @@ class _ItemDetails extends State<ItemDetails> {
       }
     }
     _loadCoordinates();
+    _getChatUsers();
     // productos deseados
     _favoriteFunction = _favoritePressed;
     _esFavorito = (_item?.favorited == true);
@@ -355,13 +357,18 @@ class _ItemDetails extends State<ItemDetails> {
   }
 
   /// Devolver una lista con los usuarios que han abierto chat al vendedor del producto
-  List<UsuarioClass> _getChatUsers() {
-    // TODO devolver la lista de los que han abierto chat
-    return [
-      UsuarioClass(userId: 1, nombre: 'Juan', apellidos: 'Juanez 1'),
-      UsuarioClass(userId: 2, nombre: 'Juan', apellidos: 'Juanez 2'),
-      UsuarioClass(userId: 3, nombre: 'Juan', apellidos: 'Juanez 3'),
-    ];
+  void _getChatUsers() async {
+    List<UsuarioClass> listaClientes = new List<UsuarioClass>();
+    Firestore.instance.collection('chat').where('idProducto', isEqualTo: _item.itemId).
+        where('idAnunciante', isEqualTo: miId).
+          where('tipoProducto', isEqualTo: 'sale').getDocuments().then((QuerySnapshot data){
+        data.documents.forEach((document) async {  
+          listaClientes.add(await UsuarioRequest.getUserById(document['idCliente']));
+        });
+      });
+    setState(() {
+       posiblesUsuarios = listaClientes;
+    });
   }
 
   void _markAsSold(int buyerId) {
@@ -409,8 +416,6 @@ class _ItemDetails extends State<ItemDetails> {
   }
 
   void _showMarkAsSoldDialog() {
-    List<UsuarioClass> posiblesUsuarios = _getChatUsers();
-
     if (posiblesUsuarios.isEmpty) {
       showInSnackBar("No has chateado con nadie", _colorStatusBarBad);
     } else {
@@ -487,7 +492,7 @@ class _ItemDetails extends State<ItemDetails> {
 
       showDialog(context: context, builder: (context) => dialog);
     }
-  }
+}
 
   Widget _buildMarkAsSoldButton() {
     return Container(
@@ -949,8 +954,6 @@ class _ItemDetails extends State<ItemDetails> {
       ),
     );
 
-    BarColor.changeBarColor(
-        color: Theme.of(context).primaryColor, whiteForeground: true);
     final ThemeData theme = Theme.of(context);
     final TextStyle descriptionStyle = theme.textTheme.subhead;
     // Item en venta o no (también tener en cuenta si es nulo)

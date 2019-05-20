@@ -10,7 +10,6 @@ import 'package:selit/util/storage.dart';
 import 'package:selit/util/api/usuario_request.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:selit/util/bar_color.dart';
 
 /// Página de edición de perfil (formulario con los campos
 /// necesarios para modificar los atributos del usuario)
@@ -685,9 +684,6 @@ class _EditProfileState extends State<EditProfile> {
 
   @override
   Widget build(BuildContext context) {
-    BarColor.changeBarColor(
-        color: Theme.of(context).primaryColor,
-        whiteForeground: true);
     return Scaffold(key: _scaffoldKey, body: _buildForm());
   }
 }

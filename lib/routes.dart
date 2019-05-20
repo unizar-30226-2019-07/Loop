@@ -32,7 +32,7 @@ class Routes {
     '/report-user': (settings) =>
         _buildRoute(settings, new ReportUser(otherUser: settings.arguments)),
     '/rating-list': (settings) =>
-        _buildRoute(settings, new RatingList(user: settings.arguments)),
+        _buildRoute(settings, new RatingList(ratings: settings.arguments)),
     '/login-page': (settings) => _buildRoute(settings, new LoginPage()),
     '/items-list': (settings) => _buildRoute(settings, new ItemList()),
     '/item-details': (settings) =>

@@ -8,7 +8,6 @@ import 'package:selit/util/api/item_request.dart';
 import 'package:selit/util/storage.dart';
 import 'package:selit/class/item_class.dart';
 import 'package:selit/class/items/filter_list_class.dart';
-import 'package:selit/util/bar_color.dart';
 import 'dart:async';
 
 /// Listado de productos en venta, junto con una barra de búsqueda y una pantalla
@@ -328,7 +327,6 @@ class _ItemListState extends State<ItemList> {
   }
   @override
   Widget build(BuildContext context) {
-    BarColor.changeBarColor(color: Colors.transparent, whiteForeground: false);
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: Container(

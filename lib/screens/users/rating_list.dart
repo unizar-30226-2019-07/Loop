@@ -1,21 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:selit/class/usuario_class.dart';
 import 'package:selit/class/rating_class.dart';
-import 'package:selit/util/api/usuario_request.dart';
 import 'package:selit/widgets/profile_picture.dart';
 import 'package:selit/widgets/star_rating.dart';
-import 'package:selit/util/bar_color.dart';
 
 /// Pantalla para calificar otro usuario, con información sobre el
 /// usuario que va a ser calificado, un número de estrellas entre 1 y 5
 /// y un comentario adicional sobre la calificación.
 /// Con estos campos establecen un formulario a enviar
 class RatingList extends StatefulWidget {
-  final UsuarioClass user;
+  final List<RatingClass> ratings;
 
-  RatingList({@required this.user});
+  RatingList({@required this.ratings});
   @override
-  State<StatefulWidget> createState() => _RatingListState(user);
+  State<StatefulWidget> createState() => _RatingListState(ratings);
 }
 
 class _RatingListState extends State<RatingList> {
@@ -28,28 +25,10 @@ class _RatingListState extends State<RatingList> {
   static final TextStyle _styleCardTitle = const TextStyle(
       fontWeight: FontWeight.bold, fontSize: 20.0, color: Colors.black);
 
-  UsuarioClass _user;
-  List<RatingClass> ratings = [];
+  List<RatingClass> _ratings;
 
   // Constructor
-  _RatingListState(this._user) {
-        print('cargando');
-    _loadRatings();
-  }
-
-  void _loadRatings() async {
-    UsuarioRequest.getRatingsFromUser(userId: _user.userId).then((list) {
-      list.forEach((item) {
-        print('cargado');
-        item.usuarioComprador = _user;
-      });
-      setState(() {
-        ratings = list;
-      });
-    }).catchError((error) {
-      print('Error al obtener las calificaciones: $error');
-    });
-  }
+  _RatingListState(this._ratings);
 
   Widget _buildRatingsList() {
     return Column(
@@ -59,7 +38,7 @@ class _RatingListState extends State<RatingList> {
             margin: EdgeInsets.fromLTRB(20.0, 25.0, 0.0, 10.0),
             child: Text('Calificaciones ', style: _styleTitle)),
         Expanded(
-          child: ratings.isEmpty
+          child: _ratings.isEmpty
               ? Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
@@ -75,7 +54,7 @@ class _RatingListState extends State<RatingList> {
                               ])),
                     ])
               : ListView.builder(
-                  itemCount: ratings.length,
+                  itemCount: _ratings.length,
                   itemBuilder: (ctx, i) => Container(
                         margin: EdgeInsets.fromLTRB(15.0, 20.0, 15.0, 0.0),
                         child: ClipRRect(
@@ -94,7 +73,7 @@ class _RatingListState extends State<RatingList> {
                                         margin: EdgeInsets.only(right: 10.0),
                                         child: SizedBox.fromSize(
                                             size: Size(100, 100),
-                                            child: ProfilePicture(ratings[i]
+                                            child: ProfilePicture(_ratings[i]
                                                 .usuarioComprador
                                                 ?.profileImage)),
                                       ),
@@ -104,11 +83,11 @@ class _RatingListState extends State<RatingList> {
                                               CrossAxisAlignment.start,
                                           children: <Widget>[
                                             Text(
-                                                ratings[i]
+                                                _ratings[i]
                                                         .usuarioComprador
                                                         .nombre +
                                                     ' ' +
-                                                    ratings[i]
+                                                    _ratings[i]
                                                         .usuarioComprador
                                                         .apellidos,
                                                 style: _styleCardTitle,
@@ -117,7 +96,7 @@ class _RatingListState extends State<RatingList> {
                                                     TextOverflow.ellipsis),
                                             StarRating(
                                               starRating:
-                                                  ratings[i].numeroEstrellas,
+                                                  _ratings[i].numeroEstrellas,
                                               starColor: Colors.yellow[800],
                                               starSize: 30.0,
                                               profileView: false,
@@ -126,7 +105,7 @@ class _RatingListState extends State<RatingList> {
                                               margin:
                                                   EdgeInsets.only(top: 10.0),
                                               child: Text(
-                                                  '"${ratings[i].descripcion}"',
+                                                  '"${_ratings[i].descripcion}"',
                                                   style: _styleCardDescription
                                                       .copyWith(
                                                           color: Colors
@@ -149,7 +128,6 @@ class _RatingListState extends State<RatingList> {
 
   @override
   Widget build(BuildContext context) {
-    BarColor.changeBarColor(color: Colors.transparent, whiteForeground: true);
     return Stack(children: <Widget>[
       Scaffold(
         resizeToAvoidBottomInset: false,
