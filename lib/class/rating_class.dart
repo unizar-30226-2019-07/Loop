@@ -9,7 +9,7 @@ class RatingClass {
 
   RatingClass.fromJson(Map<String, dynamic> json, String token)
       : this(
-            usuarioComprador: UsuarioClass.fromJson(json['buyer'], token), // TODO esperar a que la API devuelva usuarioValorado
+            usuarioComprador: UsuarioClass.fromJson(json['buyer'], token),
             numeroEstrellas: json['valor'],
             descripcion: json['comentario']);
 }
