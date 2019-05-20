@@ -20,7 +20,7 @@ class ChatTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget image = _chat.producto.media[0] == null
+    Widget image = _chat.producto.media.isEmpty || _chat.producto.media[0] == null
                     ? Container()
                     : Container(
                         padding: const EdgeInsets.all(3.0),
