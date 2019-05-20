@@ -719,13 +719,23 @@ class _ItemDetails extends State<ItemDetails> {
   }
 
   void iniciarChat() async {
-    String docId = 'p' +
+    String docId;
+    if(_item.type == 'auction'){
+      docId = 's' +
         _item.itemId.toString() +
         '_a' +
         _item.owner.userId.toString() +
         '_c' +
         miId.toString();
-
+    }
+    else{
+      docId = 'p' +
+        _item.itemId.toString() +
+        '_a' +
+        _item.owner.userId.toString() +
+        '_c' +
+        miId.toString();
+    }
     Firestore.instance
         .collection('chat')
         .document(docId)
@@ -797,7 +807,8 @@ class _ItemDetails extends State<ItemDetails> {
   }
 
   void iniciarChatGanador() async {
-    String docId = 'p' +
+    // Siempre es subasta en este caso
+    String docId = 's' +
         _item.itemId.toString() +
         '_a' +
         miId.toString() +
