@@ -111,22 +111,21 @@ class _ProfileState extends State<Profile> {
     _cancelled = true;
   }
 
-  Future<void> _loadProfile(int _userId) async {
-    // Mostrar usuario placeholder mientras carga el real
-    _cancelled = false;
-    if (_user == null) {
-      String token = await Storage.loadToken();
-      await UsuarioRequest.getUserById(_userId).then((realUser) {
-        if (!_cancelled) {
-          setState(() {
-            realUser.token = token;
-            _user = realUser;
-          });
-        }
-      }).catchError((error) {
-        print('Error al cargar el perfil de usuario: $error');
+  Future<void> _loadRatings() async {
+    UsuarioRequest.getRatingsFromUser(userId: _user.userId).then((list) {
+      list.forEach((item) {
+        print('cargado');
+        item.usuarioComprador = _user;
       });
-    }
+      setState(() {
+        _user.setRatings(list);
+      });
+    }).catchError((error) {
+      print('Error al obtener las calificaciones: $error');
+    });
+  }
+
+  Future<void> _loadLocation() async {
     if (_user?.locationLat != null && _user?.locationLng != null) {
       // Se obtienen sus valores de ubicación
       final coordinates = new Coordinates(_user.locationLat, _user.locationLng);
@@ -142,6 +141,26 @@ class _ProfileState extends State<Profile> {
       } catch (e) {
         print('Error al obtener addresses: ' + e.toString());
       }
+    }
+  }
+
+  Future<void> _loadProfile(int _userId) async {
+    // Mostrar usuario placeholder mientras carga el real
+    _cancelled = false;
+    if (_user == null) {
+      String token = await Storage.loadToken();
+      await UsuarioRequest.getUserById(_userId).then((realUser) {
+        if (!_cancelled) {
+          setState(() {
+            realUser.token = token;
+            _user = realUser;
+          });
+          _loadRatings();
+          _loadLocation();
+        }
+      }).catchError((error) {
+        print('Error al cargar el perfil de usuario: $error');
+      });
     }
   }
 
@@ -205,7 +224,9 @@ class _ProfileState extends State<Profile> {
   }
 
   void _onPressedViewReviews() {
-    Navigator.of(context).pushNamed('/rating-list', arguments: _user);
+    if (_user?.ratings != null) {
+      Navigator.of(context).pushNamed('/rating-list', arguments: _user.ratings);
+    }
   }
 
   // Pulsación del boton "en venta"
@@ -340,12 +361,12 @@ class _ProfileState extends State<Profile> {
                       profileView: true,
                     ),
             ),
-            _user?.reviews == null
+            _user?.ratings == null
                 ? Container(margin: EdgeInsets.only(top: 40))
                 : Container(
                     margin: EdgeInsets.fromLTRB(3.0, 5.0, 3.0, 10.0),
                     child: GestureDetector(
-                        onTap: _user.reviews > 0 ? _onPressedViewReviews : null,
+                        onTap: _user.ratings.length > 0 ? _onPressedViewReviews : null,
                         child: ClipRRect(
                             borderRadius: BorderRadius.circular(4.0),
                             child: Container(
@@ -353,7 +374,7 @@ class _ProfileState extends State<Profile> {
                                 color: _blendColor,
                                 alignment: Alignment.center,
                                 width: 130.0,
-                                child: Text('${_user.reviews} reviews',
+                                child: Text('${_user.ratings.length} reviews',
                                     style: _styleReviews))))),
           ],
         ),

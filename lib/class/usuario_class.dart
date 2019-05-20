@@ -1,4 +1,5 @@
 import 'package:selit/class/image_class.dart';
+import 'package:selit/class/rating_class.dart';
 import 'package:intl/intl.dart';
 
 /// Datos de usuario registrado, ya sea para mostrarlos en el perfil
@@ -13,11 +14,11 @@ class UsuarioClass {
   String email;
   DateTime nacimiento;
   double numeroEstrellas;
-  int reviews;
   String token;
   double locationLat;
   double locationLng;
   ImageClass profileImage;
+  List<RatingClass> ratings;
 
   UsuarioClass(
       {this.userId,
@@ -26,15 +27,13 @@ class UsuarioClass {
       this.sexo,
       this.email,
       this.numeroEstrellas,
-      this.reviews,
       this.token,
       this.nacimiento,
       this.locationLat,
       this.locationLng,
-      this.profileImage})
-      : assert(reviews == null || reviews > 0,
-            'Un usuario no puede tener número de reviews negativo'),
-        assert(
+      this.profileImage,
+      this.ratings})
+      : assert(
             sexo == null ||
                 sexo == "hombre" ||
                 sexo == "mujer" ||
@@ -56,7 +55,6 @@ class UsuarioClass {
             userId: json['idUsuario'],
             nombre: json['first_name'],
             apellidos: json['last_name'],
-            reviews: 30, // TODO leer de GET /users/{user_id}/reviews (???)
             numeroEstrellas: json['rating'],
             nacimiento: json['birth_date'] == null
                 ? null
@@ -90,6 +88,10 @@ class UsuarioClass {
     this.locationLng = locationLng;
     this.nacimiento = nacimiento;
     this.profileImage = image;
+  }
+
+  void setRatings(List<RatingClass> ratings) {
+    this.ratings = ratings;
   }
 
   String _nacimientoString(DateTime fecha) {
