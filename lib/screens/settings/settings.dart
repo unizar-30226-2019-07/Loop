@@ -14,6 +14,7 @@ class _SettingsState extends State<Settings> {
   static final _styleTitle = const TextStyle(
       fontWeight: FontWeight.bold, fontSize: 22.0, color: Colors.white);
   static final _styleButton = TextStyle(fontSize: 19.0, color: Colors.white);
+  static final _styleCredits = TextStyle(fontSize: 13.0, color: Colors.grey);
   
   final Color _colorStatusBarGood = Colors.blue.withOpacity(0.5);
   final Color _colorStatusBarBad = Colors.red.withOpacity(0.5);
@@ -169,6 +170,10 @@ class _SettingsState extends State<Settings> {
             ),
           ]),
         ),
+      ),
+      Container(
+        margin: EdgeInsets.all(10.0),
+        child: Text('Selit! mobile v1.0\n(c) ALLENSHIP 2019', textAlign: TextAlign.center, style: _styleCredits)
       ),
       Container(
         margin: EdgeInsets.only(bottom: 20.0),

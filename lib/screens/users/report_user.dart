@@ -203,8 +203,7 @@ class _ReportUserState extends State<ReportUser> {
                 splashColor:
                     Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
                 child: FlatButton(
-                    onPressed: () =>
-                        print('tap'), // TODO llevar a pantalla de "Normas"
+                    onPressed: () => Navigator.of(context).pushNamed('/faq'),
                     color: _blendColor, // sombreado
                     padding: EdgeInsets.all(15.0),
                     child: Row(
