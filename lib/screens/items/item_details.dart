@@ -86,10 +86,12 @@ class _ItemDetails extends State<ItemDetails> {
       _checkAuctionFinished();
     }
 
-    // Sumar uno al numero de visitas
-    ItemRequest.viewItem(itemId: _item.itemId, type: _item.type).catchError(
-        (error) =>
-            print('Ocurrio un error al sumar visitas a un producto: $error'));
+    if (_item.itemId != null) {
+      // Sumar uno al numero de visitas
+      ItemRequest.viewItem(itemId: _item.itemId, type: _item.type).catchError(
+          (error) =>
+              print('Ocurrio un error al sumar visitas a un producto: $error'));
+    }
   }
 
   @override
@@ -580,13 +582,13 @@ class _ItemDetails extends State<ItemDetails> {
         width: double.infinity,
         child: new RaisedButton(
           padding: const EdgeInsets.all(10.0),
-          elevation: 1,
+          elevation: 4,
           textColor: Colors.white,
           color: Theme.of(context).primaryColor,
           onPressed: () {
             iniciarChatGanador();
           },
-          child: new Text('Chat con ganador',
+          child: new Text('Contactar con el ganador',
               style: TextStyle(
                   fontSize: 21.0,
                   color: Colors.white,
@@ -603,13 +605,13 @@ class _ItemDetails extends State<ItemDetails> {
         width: double.infinity,
         child: new RaisedButton(
           padding: const EdgeInsets.all(10.0),
-          elevation: 1,
+          elevation: 4,
           textColor: Colors.white,
           color: Theme.of(context).primaryColor,
           onPressed: () {
             iniciarChat();
           },
-          child: new Text('Iniciar chat',
+          child: new Text('Contactar con el vendedor',
               style: TextStyle(
                   fontSize: 21.0,
                   color: Colors.white,
@@ -626,12 +628,12 @@ class _ItemDetails extends State<ItemDetails> {
         width: double.infinity,
         child: new RaisedButton(
           padding: const EdgeInsets.all(10.0),
-          elevation: 1,
+          elevation: 4,
           textColor: Colors.white,
           color: Theme.of(context).primaryColor,
           onPressed: () =>
               Navigator.of(context).pushNamed('/rate-user', arguments: _item),
-          child: new Text('Calificar usuario',
+          child: new Text('Calificar al vendedor',
               style: TextStyle(
                   fontSize: 21.0,
                   color: Colors.white,
@@ -667,7 +669,7 @@ class _ItemDetails extends State<ItemDetails> {
             _buildChatConditional = _buildChatButtonGanador();
           }
         }
-      } else {
+      } else if (idItem != null) {
         print('Construir chat');
         setState(() {
           _buildChatConditional = _buildChatButton();
