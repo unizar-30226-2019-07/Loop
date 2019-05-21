@@ -124,7 +124,7 @@ class _EditItemState2 extends State<EditItem2> {
 
         _item.update(
             type: _tipoPrecio, price: formattedPrice, currency: _divisa);
-        
+
         ItemRequest.edit(_item).then((_) {
           print('Item actualizado');
           showInSnackBar(
@@ -377,8 +377,8 @@ class _EditItemState2 extends State<EditItem2> {
                   DateTime picked = await showDatePicker(
                       context: context,
                       initialDate: _selectedDate ??
-                          DateTime.now().add(new Duration(days: 0, hours: 1)),
-                      firstDate: DateTime.now(),
+                          DateTime.now().add(new Duration(days: 1, hours: 1)),
+                      firstDate: DateTime.now().add(new Duration(days: 1)),
                       lastDate: DateTime(2030, 1));
                   setState(() {
                     _selectedDate = picked;
