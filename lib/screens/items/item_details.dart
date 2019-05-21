@@ -506,11 +506,10 @@ class _ItemDetails extends State<ItemDetails> {
                 itemBuilder: (ctx, i) => buttonOptions[i],
               )),
               RaisedButton(
-                padding: EdgeInsets.symmetric(horizontal: 40.0),
-                color: Colors.grey[200],
-                onPressed: () => Navigator.of(context).pop(),
-                child: Text('Cerrar')
-              ),
+                  padding: EdgeInsets.symmetric(horizontal: 40.0),
+                  color: Colors.grey[200],
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text('Cerrar')),
             ],
           ),
         ),
@@ -992,14 +991,7 @@ class _ItemDetails extends State<ItemDetails> {
     if (_item?.owner?.locationLat != null &&
         _item?.owner?.locationLng != null &&
         _item?.owner?.userId != null) {
-      // Generar un numero ""aleatorio"" a partir del ID de usuario
-      // No es la mejor opción para mover la ubicación, pero por ahora sirve
-      // Mover +/- 0.004 la latitud y longitud
-      double randomLat = (200 - ((_item.owner.userId * 37 + 48) % 400)) / 50000;
-      double randomLng = (200 - ((_item.owner.userId * 83 + 21) % 400)) / 50000;
-      //print('Con ID ${_item.owner.userId} se mueve ($randomLat, $randomLng)');
-      LatLng movedLL = LatLng(_item.owner.locationLat + randomLat,
-          _item.owner.locationLng + randomLng);
+      LatLng movedLL = LatLng(_item.owner.locationLat, _item.owner.locationLng);
       // Posición de cámara para mostrarla en el mapa
       _cameraPosition = CameraPosition(
         target: movedLL,
