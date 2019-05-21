@@ -347,7 +347,7 @@ class _EditItemState2 extends State<EditItem2> {
           top: 17,
         ),
         child: Text(
-          'Fecha y hora límite',
+          'Fecha límite',
           style: new TextStyle(
             fontSize: 15,
             color: Colors.grey[600],
