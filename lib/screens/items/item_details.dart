@@ -469,7 +469,7 @@ class _ItemDetails extends State<ItemDetails> {
                                   Container(
                                     child: Text(
                                       usuario.nombre + ' ' + usuario.apellidos,
-                                      maxLines: 2,
+                                      maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                       style: Theme.of(context)
                                           .textTheme
@@ -495,11 +495,23 @@ class _ItemDetails extends State<ItemDetails> {
             borderRadius: BorderRadius.circular(10.0)),
         title: Text('Selecciona el comprador...', style: _styleDialogTitle),
         content: SizedBox.fromSize(
-            size: Size(double.infinity, 285.0),
-            child: ListView.builder(
-              itemCount: buttonOptions.length,
-              itemBuilder: (ctx, i) => buttonOptions[i],
-            )),
+          size: Size(double.infinity, 285.0),
+          child: Column(
+            children: <Widget>[
+              Expanded(
+                  child: ListView.builder(
+                itemCount: buttonOptions.length,
+                itemBuilder: (ctx, i) => buttonOptions[i],
+              )),
+              RaisedButton(
+                padding: EdgeInsets.symmetric(horizontal: 40.0),
+                color: Colors.grey[200],
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text('Cerrar')
+              ),
+            ],
+          ),
+        ),
       );
 
       showDialog(context: context, builder: (context) => dialog);
@@ -720,21 +732,20 @@ class _ItemDetails extends State<ItemDetails> {
 
   void iniciarChat() async {
     String docId;
-    if(_item.type == 'auction'){
+    if (_item.type == 'auction') {
       docId = 's' +
-        _item.itemId.toString() +
-        '_a' +
-        _item.owner.userId.toString() +
-        '_c' +
-        miId.toString();
-    }
-    else{
+          _item.itemId.toString() +
+          '_a' +
+          _item.owner.userId.toString() +
+          '_c' +
+          miId.toString();
+    } else {
       docId = 'p' +
-        _item.itemId.toString() +
-        '_a' +
-        _item.owner.userId.toString() +
-        '_c' +
-        miId.toString();
+          _item.itemId.toString() +
+          '_a' +
+          _item.owner.userId.toString() +
+          '_c' +
+          miId.toString();
     }
     Firestore.instance
         .collection('chat')
@@ -1198,7 +1209,8 @@ class _ItemDetails extends State<ItemDetails> {
                                                                     : _item.lastBid ==
                                                                                 null ||
                                                                             miId ==
-                                                                                _item.owner.userId
+                                                                                _item
+                                                                                    .owner.userId
                                                                         ? 'Cerrada'
                                                                         : _item.lastBid.bidder.userId ==
                                                                                 miId
