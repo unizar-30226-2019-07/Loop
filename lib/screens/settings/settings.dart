@@ -149,6 +149,21 @@ class _SettingsState extends State<Settings> {
                     color: Colors.grey[300],
                     padding: EdgeInsets.all(0.0),
                     child: ListTile(
+                        leading: Icon(Icons.info), 
+                        title: Text("FAQ"),
+                        onTap: () {
+                            Navigator.of(context).pushNamed('/faq');
+                          }),
+                  )),
+            ),
+            Container(
+              margin: EdgeInsets.all(3.0),
+              child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10.0),
+                  child: Container(
+                    color: Colors.grey[300],
+                    padding: EdgeInsets.all(0.0),
+                    child: ListTile(
                         leading: Icon(Icons.help), title: Text("Ayuda")),
                   )),
             ),
