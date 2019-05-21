@@ -68,7 +68,7 @@ class _LoginPageState extends State<LoginPage>
   Future<void> _delayPrincipal() async {
     return Timer(Duration(seconds: splashDuration), () {
       SystemChannels.textInput.invokeMethod('TextInput.hide');
-      Navigator.of(context).pushNamed('/principal');
+      Navigator.of(context).pushNamedAndRemoveUntil('/principal', (route) => false);
     });
   }
 
