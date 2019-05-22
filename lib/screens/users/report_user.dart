@@ -91,7 +91,7 @@ class _ReportUserState extends State<ReportUser> {
     if (_infoController.text == '' ||
         _selectedReason < 0 ||
         _selectedReason >= reasons.length) {
-      showInSnackBar("Rellena todos los campos correctamente", Colors.yellow);
+      showInSnackBar("Rellena todos los campos correctamente", Colors.yellow[800]);
       Navigator.of(context).pop(); // alertDialog
       _sendFunction = _onPressedSend;
     } else {

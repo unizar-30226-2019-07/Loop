@@ -121,14 +121,16 @@ class _LoginPageState extends State<LoginPage>
     // Validar campos de registro
     // Contraseñas coinciden
     if (signupPasswordController.text != signupConfirmPasswordController.text) {
-      showInSnackBar("Las contraseñas no coinciden", Colors.yellow);
+      showInSnackBar("Las contraseñas no coinciden", Colors.yellow[800]);
       return;
     }
     // Campos no nulos y válidos
     if (signupLastNameController.text.length < 1 ||
+        signupLastNameController.text.length > 50 ||
         signupNameController.text.length < 1 ||
+        signupNameController.text.length > 50 ||
         !validateEmail(signupEmailController.text)) {
-      showInSnackBar("Rellena todos los campos correctamente", Colors.yellow);
+      showInSnackBar("Rellena todos los campos correctamente", Colors.yellow[800]);
       return;
     }
     

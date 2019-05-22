@@ -73,7 +73,7 @@ class _RateUserState extends State<RateUser> {
     if (_infoController.text == '' ||
         StarRatingInteractive.currentRating < 1 ||
         StarRatingInteractive.currentRating > 5) {
-      showInSnackBar("Rellena todos los campos correctamente", Colors.yellow);
+      showInSnackBar("Rellena todos los campos correctamente", Colors.yellow[800]);
       Navigator.of(context).pop(); // alertDialog
       _sendFunction = _onPressedSend;
     } else {

@@ -147,7 +147,7 @@ class _EditProfileState extends State<EditProfile> {
     if (_nameController.text.length < 1 ||
         _surnameController.text.length < 1 ||
         _emailController.text.length < 1) {
-      showInSnackBar("Rellena todos los campos correctamente", Colors.yellow);
+      showInSnackBar("Rellena todos los campos correctamente", Colors.yellow[800]);
     } else {
       double newLat = _selectedPosition.latitude;
       double newLng = _selectedPosition.longitude;
@@ -177,11 +177,11 @@ class _EditProfileState extends State<EditProfile> {
 
   void cambioPass() async {
     if (_newPassController.text != _newPassRepController.text) {
-      showInSnackBar("Las contraseñas no coinciden", Colors.yellow);
+      showInSnackBar("Las contraseñas no coinciden", Colors.yellow[800]);
     } else if (_newPassController.text.length <= 0 ||
         _newPassRepController.text.length <= 0 ||
         _oldPassController.text.length <= 0) {
-      showInSnackBar("Completa todos los campos", Colors.yellow);
+      showInSnackBar("Completa todos los campos", Colors.yellow[800]);
     } else {
       int miId = await Storage.loadUserId();
       UsuarioRequest.password(

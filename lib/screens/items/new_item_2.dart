@@ -110,15 +110,15 @@ class _NewItemState2 extends State<NewItem2> {
           formattedPrice == null ||
           _tipoPrecio == '' ||
           _divisa == '') {
-        showInSnackBar("Rellena todos los campos correctamente", Colors.yellow);
+        showInSnackBar("Rellena todos los campos correctamente", Colors.yellow[800]);
         Navigator.of(context).pop(); // alertDialog
         setState(() => _buttonFunction = createItem);
       } else if (formattedPrice < 0) {
-        showInSnackBar("El precio no puede ser negativo", Colors.yellow);
+        showInSnackBar("El precio no puede ser negativo", Colors.yellow[800]);
         Navigator.of(context).pop(); // alertDialog
         setState(() => _buttonFunction = createItem);
       } else if (formattedPrice > 1000000) {
-        showInSnackBar("El precio es demasiado alto", Colors.yellow);
+        showInSnackBar("El precio es demasiado alto", Colors.yellow[800]);
         Navigator.of(context).pop(); // alertDialog
         setState(() => _buttonFunction = createItem);
       } else {
@@ -151,7 +151,7 @@ class _NewItemState2 extends State<NewItem2> {
           formattedPrice == null ||
           _tipoPrecio == '' ||
           _divisa == '') {
-        showInSnackBar("Rellena todos los campos correctamente", Colors.yellow);
+        showInSnackBar("Rellena todos los campos correctamente", Colors.yellow[800]);
       } else {
         print('Subasta creada');
 

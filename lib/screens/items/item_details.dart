@@ -219,9 +219,30 @@ class _ItemDetails extends State<ItemDetails> {
     );
 
     if (_pujaController.text.length < 1) {
-      showInSnackBar("Rellena todos los campos correctamente", Colors.yellow);
+      showInSnackBar("Rellena todos los campos correctamente", Colors.yellow[800]);
     } else {
       print('Pujando...');
+
+      double pujaDouble = double.tryParse(_pujaController.text);
+      if (pujaDouble == null) {
+        showInSnackBar("Puja inválida", Colors.yellow[800]);
+        Navigator.of(context).pop();
+        return;
+      } else if (pujaDouble < 0) {
+        showInSnackBar("La puja no puede ser negativa", Colors.yellow[800]);
+        Navigator.of(context).pop();
+        return;
+      } else if (pujaDouble > 1000000) {
+        showInSnackBar("La puja es demasiado grande", Colors.yellow[800]);
+        Navigator.of(context).pop();
+        return;
+      } else if (pujaDouble <= _item.price ||
+          (_item.lastBid?.amount != null &&
+              pujaDouble <= _item.lastBid.amount)) {
+        showInSnackBar("La puja debe ser mayor que la actual", Colors.yellow[800]);
+        Navigator.of(context).pop();
+        return;
+      }
 
       ItemRequest.bidUp(_item, _pujaController.text, miId).then((_) {
         showInSnackBar("Puja realizada correctamente", _colorStatusBarGood);
@@ -257,7 +278,7 @@ class _ItemDetails extends State<ItemDetails> {
           showInSnackBar("Acción no autorizada", _colorStatusBarBad);
         } else if (error == "Conflict") {
           showInSnackBar(
-              "Oferta inferior o igual al precio actual", Colors.yellow);
+              "Oferta inferior o igual al precio actual", Colors.yellow[800]);
         } else {
           print("Error: $error");
           showInSnackBar("No hay conexión a internet", _colorStatusBarBad);

@@ -69,7 +69,7 @@ class _AccountState extends State<Account> {
 
   void cambioPass() async {
     if (_passController.text.length <= 0) {
-      showInSnackBar("Completa todos los campos", Colors.yellow);
+      showInSnackBar("Completa todos los campos", Colors.yellow[800]);
     } else {
       int miId = await Storage.loadUserId();
       UsuarioRequest.delete(miId).then((_) {

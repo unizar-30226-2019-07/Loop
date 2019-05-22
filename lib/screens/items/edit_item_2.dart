@@ -107,15 +107,15 @@ class _EditItemState2 extends State<EditItem2> {
           formattedPrice == null ||
           _tipoPrecio == '' ||
           _divisa == '') {
-        showInSnackBar("Rellena todos los campos correctamente", Colors.yellow);
+        showInSnackBar("Rellena todos los campos correctamente", Colors.yellow[800]);
         Navigator.of(context).pop(); // alertDialog
         setState(() => _buttonFunction = createItem);
       } else if (formattedPrice < 0) {
-        showInSnackBar("El precio no puede ser negativo", Colors.yellow);
+        showInSnackBar("El precio no puede ser negativo", Colors.yellow[800]);
         Navigator.of(context).pop(); // alertDialog
         setState(() => _buttonFunction = createItem);
       } else if (formattedPrice > 1000000) {
-        showInSnackBar("El precio es demasiado alto", Colors.yellow);
+        showInSnackBar("El precio es demasiado alto", Colors.yellow[800]);
         Navigator.of(context).pop(); // alertDialog
         setState(() => _buttonFunction = createItem);
       } else {
@@ -157,7 +157,7 @@ class _EditItemState2 extends State<EditItem2> {
           _tipoPrecio == '' ||
           _divisa == '') {
         showInSnackBar(
-            "Rellena todos los campos correctamente 2", Colors.yellow);
+            "Rellena todos los campos correctamente", Colors.yellow[800]);
       } else {
         _item.updateAuction(
             price: formattedPrice,

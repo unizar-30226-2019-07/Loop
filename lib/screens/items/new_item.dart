@@ -90,7 +90,7 @@ class _NewItemState extends State<NewItem> {
     if (_titleController.text.length < 1 ||
         _descriptionController.text.length < 1 ||
         _categoria == '') {
-      showInSnackBar("Rellena todos los campos correctamente", Colors.yellow);
+      showInSnackBar("Rellena todos los campos correctamente", Colors.yellow[800]);
     } else {
       // Quitar imágenes no usadas
       List nonNull = List.from(_images.where((x) => x != null));
