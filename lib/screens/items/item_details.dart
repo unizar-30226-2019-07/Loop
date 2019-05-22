@@ -970,6 +970,8 @@ class _ItemDetails extends State<ItemDetails> {
                                         style: _styleDialogContent)))),
                   ]))
               : Container(),
+          _item.type == "auction" && miId != _item.owner.userId
+              ?
           Container(
               padding: EdgeInsets.only(top: 15, bottom: 35),
               child: new Theme(
@@ -989,14 +991,16 @@ class _ItemDetails extends State<ItemDetails> {
                   controller: _pujaController,
                   keyboardType: TextInputType.number,
                 ),
-              )),
+              )) : Container(),
+          _item.type == "auction" && miId != _item.owner.userId
+              ?
           RaisedButton(
             padding: EdgeInsets.symmetric(vertical: 7.0, horizontal: 40.0),
             color: Colors.white,
             child: Text('Pujar',
                 style: TextStyle(fontSize: 19.0, color: Colors.black)),
             onPressed: pujar,
-          )
+          ) : Container()
         ],
       ),
     );

@@ -27,7 +27,7 @@ class _EditItemState2 extends State<EditItem2> {
   String _divisa = '';
 
   //Lista opciones categoria
-  String _tipoPrecio = 'sale';
+  String _tipoPrecio = '';
 
   ItemClass _item;
 
@@ -43,7 +43,7 @@ class _EditItemState2 extends State<EditItem2> {
     _priceController.text = item.price.toString();
     _divisa = item.currency;
     _buttonFunction = createItem;
-    _tipoPrecio = item.type == "Subasta" ? "auction" : "sale";
+    _tipoPrecio = item.type;
     _selectedDate = item.endDate;
   }
 
@@ -122,7 +122,7 @@ class _EditItemState2 extends State<EditItem2> {
         // Redondear precio a 2 decimales
         formattedPrice = double.parse(formattedPrice.toStringAsFixed(2));
 
-        _item.update(price: formattedPrice, currency: _divisa);
+        _item.update(price: formattedPrice, currency: _divisa, type: _item.type);
 
         ItemRequest.edit(_item).then((_) {
           print('Item actualizado');
@@ -159,11 +159,13 @@ class _EditItemState2 extends State<EditItem2> {
         showInSnackBar(
             "Rellena todos los campos correctamente", Colors.yellow[800]);
       } else {
+        print(_item.type);
         _item.updateAuction(
             price: formattedPrice,
+            type: _item.type,
             currency: _divisa,
             endDate: _selectedDate);
-
+        print(_item.type);
         ItemRequest.editAuction(_item).then((_) {
           _item.updateList(
               (List<ItemClass> list) => list.forEach((ItemClass listItem) {
