@@ -28,8 +28,9 @@ class _NewItemState2 extends State<NewItem2> {
   String _divisa = '';
 
   //Lista opciones categoria
-  List<String> _tiposPrecio = <String>['sale', 'auction'];
-  String _tipoPrecio = 'sale';
+  List<String> _tiposPrecio = <String>['Producto', 'Subasta'];
+  Map<String, String> _renombrePrecio = {'Producto': 'sale', 'Subasta': 'auction'};
+  String _tipoPrecio = 'Producto';
 
   ItemClass _item;
 
@@ -105,7 +106,7 @@ class _NewItemState2 extends State<NewItem2> {
     double formattedPrice =
         double.tryParse(_priceController.text.replaceAll(',', '.'));
 
-    if (_tipoPrecio == 'sale') {
+    if (_tipoPrecio == 'Producto') {
       if (_priceController.text.length < 1 ||
           formattedPrice == null ||
           _tipoPrecio == '' ||
@@ -126,7 +127,7 @@ class _NewItemState2 extends State<NewItem2> {
         formattedPrice = double.parse(formattedPrice.toStringAsFixed(2));
 
         _item.update(
-            type: _tipoPrecio, price: formattedPrice, currency: _divisa);
+            type: _renombrePrecio[_tipoPrecio], price: formattedPrice, currency: _divisa);
 
         ItemRequest.create(_item).then((_) {
           _item.updateList((List<ItemClass> list) => list.add(_item));
@@ -156,7 +157,7 @@ class _NewItemState2 extends State<NewItem2> {
         print('Subasta creada');
 
         _item.updateAuction(
-            type: _tipoPrecio,
+            type: _renombrePrecio[_tipoPrecio],
             price: formattedPrice,
             currency: _divisa,
             endDate: _selectedDate);
@@ -429,7 +430,7 @@ class _NewItemState2 extends State<NewItem2> {
         child: new Form(
             key: _formKey,
             autovalidate: true,
-            child: _tipoPrecio == 'sale'
+            child: _tipoPrecio == 'Producto'
                 ? new ListView(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
                     children: <Widget>[

@@ -43,7 +43,7 @@ class _EditItemState2 extends State<EditItem2> {
     _priceController.text = item.price.toString();
     _divisa = item.currency;
     _buttonFunction = createItem;
-    _tipoPrecio = item.type == "auction" ? "auction" : "sale";
+    _tipoPrecio = item.type == "Subasta" ? "auction" : "sale";
     _selectedDate = item.endDate;
   }
 
@@ -122,8 +122,7 @@ class _EditItemState2 extends State<EditItem2> {
         // Redondear precio a 2 decimales
         formattedPrice = double.parse(formattedPrice.toStringAsFixed(2));
 
-        _item.update(
-            type: _tipoPrecio, price: formattedPrice, currency: _divisa);
+        _item.update(price: formattedPrice, currency: _divisa);
 
         ItemRequest.edit(_item).then((_) {
           print('Item actualizado');
@@ -161,7 +160,6 @@ class _EditItemState2 extends State<EditItem2> {
             "Rellena todos los campos correctamente 2", Colors.yellow);
       } else {
         _item.updateAuction(
-            type: _tipoPrecio,
             price: formattedPrice,
             currency: _divisa,
             endDate: _selectedDate);
