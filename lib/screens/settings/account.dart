@@ -73,7 +73,7 @@ class _AccountState extends State<Account> {
     } else {
       int miId = await Storage.loadUserId();
       UsuarioRequest.delete(miId).then((_) {
-        showInSnackBar("Cuenta eliminada correctamente", _colorStatusBarGood);
+        Navigator.of(context).pushNamedAndRemoveUntil('/login-page', (route) => false);
       }).catchError((error) {
         if (error == "Unauthorized" ||
             error == "Forbidden" ||
@@ -100,7 +100,8 @@ class _AccountState extends State<Account> {
                       labelText: 'Contraseña',
                     ),
                     controller: _passController,
-                    keyboardType: TextInputType.emailAddress,
+                    keyboardType: TextInputType.text,
+                    obscureText: true,
                   ),
                 ],
               )),
