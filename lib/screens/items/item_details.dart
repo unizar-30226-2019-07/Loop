@@ -86,10 +86,12 @@ class _ItemDetails extends State<ItemDetails> {
       _checkAuctionFinished();
     }
 
-    // Sumar uno al numero de visitas
-    ItemRequest.viewItem(itemId: _item.itemId, type: _item.type).catchError(
-        (error) =>
-            print('Ocurrio un error al sumar visitas a un producto: $error'));
+    if (_item.itemId != null) {
+      // Sumar uno al numero de visitas
+      ItemRequest.viewItem(itemId: _item.itemId, type: _item.type).catchError(
+          (error) =>
+              print('Ocurrio un error al sumar visitas a un producto: $error'));
+    }
   }
 
   @override
@@ -469,7 +471,7 @@ class _ItemDetails extends State<ItemDetails> {
                                   Container(
                                     child: Text(
                                       usuario.nombre + ' ' + usuario.apellidos,
-                                      maxLines: 2,
+                                      maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                       style: Theme.of(context)
                                           .textTheme
@@ -495,11 +497,22 @@ class _ItemDetails extends State<ItemDetails> {
             borderRadius: BorderRadius.circular(10.0)),
         title: Text('Selecciona el comprador...', style: _styleDialogTitle),
         content: SizedBox.fromSize(
-            size: Size(double.infinity, 285.0),
-            child: ListView.builder(
-              itemCount: buttonOptions.length,
-              itemBuilder: (ctx, i) => buttonOptions[i],
-            )),
+          size: Size(double.infinity, 285.0),
+          child: Column(
+            children: <Widget>[
+              Expanded(
+                  child: ListView.builder(
+                itemCount: buttonOptions.length,
+                itemBuilder: (ctx, i) => buttonOptions[i],
+              )),
+              RaisedButton(
+                  padding: EdgeInsets.symmetric(horizontal: 40.0),
+                  color: Colors.grey[200],
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text('Cerrar')),
+            ],
+          ),
+        ),
       );
 
       showDialog(context: context, builder: (context) => dialog);
@@ -568,13 +581,13 @@ class _ItemDetails extends State<ItemDetails> {
         width: double.infinity,
         child: new RaisedButton(
           padding: const EdgeInsets.all(10.0),
-          elevation: 1,
+          elevation: 4,
           textColor: Colors.white,
           color: Theme.of(context).primaryColor,
           onPressed: () {
             iniciarChatGanador();
           },
-          child: new Text('Chat con ganador',
+          child: new Text('Contactar con el ganador',
               style: TextStyle(
                   fontSize: 21.0,
                   color: Colors.white,
@@ -591,13 +604,13 @@ class _ItemDetails extends State<ItemDetails> {
         width: double.infinity,
         child: new RaisedButton(
           padding: const EdgeInsets.all(10.0),
-          elevation: 1,
+          elevation: 4,
           textColor: Colors.white,
           color: Theme.of(context).primaryColor,
           onPressed: () {
             iniciarChat();
           },
-          child: new Text('Iniciar chat',
+          child: new Text('Contactar con el vendedor',
               style: TextStyle(
                   fontSize: 21.0,
                   color: Colors.white,
@@ -614,12 +627,12 @@ class _ItemDetails extends State<ItemDetails> {
         width: double.infinity,
         child: new RaisedButton(
           padding: const EdgeInsets.all(10.0),
-          elevation: 1,
+          elevation: 4,
           textColor: Colors.white,
           color: Theme.of(context).primaryColor,
           onPressed: () =>
               Navigator.of(context).pushNamed('/rate-user', arguments: _item),
-          child: new Text('Calificar usuario',
+          child: new Text('Calificar al vendedor',
               style: TextStyle(
                   fontSize: 21.0,
                   color: Colors.white,
@@ -655,7 +668,7 @@ class _ItemDetails extends State<ItemDetails> {
             _buildChatConditional = _buildChatButtonGanador();
           }
         }
-      } else {
+      } else if (idItem != null) {
         print('Construir chat');
         setState(() {
           _buildChatConditional = _buildChatButton();
@@ -720,21 +733,20 @@ class _ItemDetails extends State<ItemDetails> {
 
   void iniciarChat() async {
     String docId;
-    if(_item.type == 'auction'){
+    if (_item.type == 'auction') {
       docId = 's' +
-        _item.itemId.toString() +
-        '_a' +
-        _item.owner.userId.toString() +
-        '_c' +
-        miId.toString();
-    }
-    else{
+          _item.itemId.toString() +
+          '_a' +
+          _item.owner.userId.toString() +
+          '_c' +
+          miId.toString();
+    } else {
       docId = 'p' +
-        _item.itemId.toString() +
-        '_a' +
-        _item.owner.userId.toString() +
-        '_c' +
-        miId.toString();
+          _item.itemId.toString() +
+          '_a' +
+          _item.owner.userId.toString() +
+          '_c' +
+          miId.toString();
     }
     Firestore.instance
         .collection('chat')
@@ -979,14 +991,7 @@ class _ItemDetails extends State<ItemDetails> {
     if (_item?.owner?.locationLat != null &&
         _item?.owner?.locationLng != null &&
         _item?.owner?.userId != null) {
-      // Generar un numero ""aleatorio"" a partir del ID de usuario
-      // No es la mejor opción para mover la ubicación, pero por ahora sirve
-      // Mover +/- 0.004 la latitud y longitud
-      double randomLat = (200 - ((_item.owner.userId * 37 + 48) % 400)) / 50000;
-      double randomLng = (200 - ((_item.owner.userId * 83 + 21) % 400)) / 50000;
-      //print('Con ID ${_item.owner.userId} se mueve ($randomLat, $randomLng)');
-      LatLng movedLL = LatLng(_item.owner.locationLat + randomLat,
-          _item.owner.locationLng + randomLng);
+      LatLng movedLL = LatLng(_item.owner.locationLat, _item.owner.locationLng);
       // Posición de cámara para mostrarla en el mapa
       _cameraPosition = CameraPosition(
         target: movedLL,
@@ -1198,7 +1203,8 @@ class _ItemDetails extends State<ItemDetails> {
                                                                     : _item.lastBid ==
                                                                                 null ||
                                                                             miId ==
-                                                                                _item.owner.userId
+                                                                                _item
+                                                                                    .owner.userId
                                                                         ? 'Cerrada'
                                                                         : _item.lastBid.bidder.userId ==
                                                                                 miId

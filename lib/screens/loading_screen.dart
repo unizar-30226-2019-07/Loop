@@ -12,7 +12,7 @@ class LoadingScreen extends StatefulWidget {
 }
 
 class _LoadingScreenState extends State<LoadingScreen> {
-  static const TIMEOUT = const Duration(seconds: 7);
+  static const TIMEOUT = const Duration(seconds: 10);
 
   final _styleLoading = TextStyle(color: Colors.white, fontSize: 18.0);
 
@@ -33,11 +33,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
   void _showErrorDialog(BuildContext context) {
     AlertDialog dialogo = AlertDialog(
       title: Text('Error al iniciar sesión'),
-      content: Text('No se ha podido conectar al servidor'),
-      actions: <Widget> [
-        // TODO borrar al terminar el debug
-        FlatButton(child: Text('Entrar igualmente'), onPressed: () { Navigator.of(context).pushNamed('/principal'); })
-      ],
+      content: Text('No se ha podido conectar al servidor. Por favor, revisa tu conexión a Internet.'),
     );
     showDialog(context: context, builder: (context) => dialogo);
   }
@@ -51,18 +47,14 @@ class _LoadingScreenState extends State<LoadingScreen> {
     super.initState();
 
     _checkForLoggedUser(context).then((_) {
-      Navigator.of(context).pop();
-
-        print('Redirect a principal');
-        Navigator.of(context).pushReplacementNamed('/principal');
-
+      print('Redirect a principal');
+      Navigator.of(context).pushNamedAndRemoveUntil('/principal', (route) => false);
     }).timeout(TIMEOUT, onTimeout: () {
       _showErrorDialog(context);
     }).catchError((error) {
-
       print('Redirect a login con error: $error');
       Storage.deleteToken();
-      Navigator.of(context).pushReplacementNamed('/login-page');
+      Navigator.of(context).pushNamedAndRemoveUntil('/login-page', (route) => false);
     });
 
   }

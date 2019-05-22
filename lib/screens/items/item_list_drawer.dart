@@ -170,7 +170,9 @@ class _ItemListDrawerState extends State<ItemListDrawer> {
             divisions: FilterListClass.absMaxPriceIndex - 1,
             showValueIndicator: true,
             valueIndicatorFormatter: (i, value) =>
-                _formatPrecio(FilterListClass.priceRange[value.toInt()]),
+                value == FilterListClass.absMaxPriceIndex - 1
+                    ? 'Sin límite'
+                    : _formatPrecio(FilterListClass.priceRange[value.toInt()]),
             onChanged: (double newLowerValue, double newUpperValue) {
               setState(() {
                 _filterManager.minPriceIndex = newLowerValue.toInt();
@@ -190,8 +192,11 @@ class _ItemListDrawerState extends State<ItemListDrawer> {
                     textAlign: TextAlign.left)),
             Expanded(
                 child: Text(
-                    _formatPrecio(FilterListClass
-                        .priceRange[_filterManager.maxPriceIndex]),
+                    _filterManager.maxPriceIndex ==
+                            FilterListClass.absMaxPriceIndex - 1
+                        ? 'Sin límite'
+                        : _formatPrecio(FilterListClass
+                            .priceRange[_filterManager.maxPriceIndex]),
                     style: _styleTextSliders,
                     textAlign: TextAlign.end)),
           ],
@@ -248,7 +253,8 @@ class _ItemListDrawerState extends State<ItemListDrawer> {
                   ),
                   Divider(color: Colors.grey[300]),
                   _buildRadioButton(
-                      <String>['Todas las categorías']..addAll(FilterListClass.categoryNames.values),
+                      <String>['Todas las categorías']
+                        ..addAll(FilterListClass.categoryNames.values),
                       _filterManager.categoryId,
                       'Selecciona una categoría',
                       _updateCategoria),

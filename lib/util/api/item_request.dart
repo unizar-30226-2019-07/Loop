@@ -1,5 +1,4 @@
 import 'package:selit/class/item_class.dart';
-import 'package:selit/class/lastBid_class.dart';
 import 'package:selit/util/api/api_config.dart';
 import 'package:selit/util/storage.dart';
 import 'package:selit/class/items/filter_list_class.dart';

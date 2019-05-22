@@ -113,7 +113,18 @@ class _NewItemState2 extends State<NewItem2> {
         showInSnackBar("Rellena todos los campos correctamente", Colors.yellow);
         Navigator.of(context).pop(); // alertDialog
         setState(() => _buttonFunction = createItem);
+      } else if (formattedPrice < 0) {
+        showInSnackBar("El precio no puede ser negativo", Colors.yellow);
+        Navigator.of(context).pop(); // alertDialog
+        setState(() => _buttonFunction = createItem);
+      } else if (formattedPrice > 1000000) {
+        showInSnackBar("El precio es demasiado alto", Colors.yellow);
+        Navigator.of(context).pop(); // alertDialog
+        setState(() => _buttonFunction = createItem);
       } else {
+        // Redondear precio a 2 decimales
+        formattedPrice = double.parse(formattedPrice.toStringAsFixed(2));
+
         _item.update(
             type: _tipoPrecio, price: formattedPrice, currency: _divisa);
 
@@ -393,8 +404,8 @@ class _NewItemState2 extends State<NewItem2> {
                   DateTime picked = await showDatePicker(
                       context: context,
                       initialDate: _selectedDate ??
-                          DateTime.now().add(new Duration(days: 0, hours: 1)),
-                      firstDate: DateTime.now(),
+                          DateTime.now().add(new Duration(days: 1, hours: 1)),
+                      firstDate: DateTime.now().add(new Duration(days: 1)),
                       lastDate: DateTime(2030, 1));
                   setState(() {
                     _selectedDate = picked;
