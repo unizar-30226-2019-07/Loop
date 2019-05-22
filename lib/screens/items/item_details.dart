@@ -82,7 +82,7 @@ class _ItemDetails extends State<ItemDetails> {
     _favoriteFunction = _favoritePressed;
     _esFavorito = (_item?.favorited == true);
     _favorite = _esFavorito ? Icons.favorite : Icons.favorite_border;
-    if (_item.type == "auction") {
+    if (_item.type == "auction" && _item.itemId != 0) {
       _checkAuctionFinished();
     }
 
@@ -219,32 +219,37 @@ class _ItemDetails extends State<ItemDetails> {
     );
 
     if (_pujaController.text.length < 1) {
-      showInSnackBar("Rellena todos los campos correctamente", Colors.yellow[800]);
+      showInSnackBar(
+          "Rellena todos los campos correctamente", Colors.yellow[800]);
     } else {
       print('Pujando...');
 
-      double pujaDouble = double.tryParse(_pujaController.text);
+      double pujaDouble = double.tryParse(_pujaController.text.replaceAll(',', '.'));
       if (pujaDouble == null) {
         showInSnackBar("Puja inválida", Colors.yellow[800]);
         Navigator.of(context).pop();
         return;
-      } else if (pujaDouble < 0) {
-        showInSnackBar("La puja no puede ser negativa", Colors.yellow[800]);
-        Navigator.of(context).pop();
-        return;
-      } else if (pujaDouble > 1000000) {
-        showInSnackBar("La puja es demasiado grande", Colors.yellow[800]);
-        Navigator.of(context).pop();
-        return;
-      } else if (pujaDouble <= _item.price ||
-          (_item.lastBid?.amount != null &&
-              pujaDouble <= _item.lastBid.amount)) {
-        showInSnackBar("La puja debe ser mayor que la actual", Colors.yellow[800]);
-        Navigator.of(context).pop();
-        return;
+      } else {
+        pujaDouble = double.parse(pujaDouble.toStringAsFixed(2)); // 2 decimales de precision
+        if (pujaDouble < 0) {
+          showInSnackBar("La puja no puede ser negativa", Colors.yellow[800]);
+          Navigator.of(context).pop();
+          return;
+        } else if (pujaDouble > 1000000) {
+          showInSnackBar("La puja es demasiado grande", Colors.yellow[800]);
+          Navigator.of(context).pop();
+          return;
+        } else if (pujaDouble <= _item.price ||
+            (_item.lastBid?.amount != null &&
+                pujaDouble <= _item.lastBid.amount)) {
+          showInSnackBar(
+              "La puja debe ser mayor que la actual", Colors.yellow[800]);
+          Navigator.of(context).pop();
+          return;
+        }
       }
 
-      ItemRequest.bidUp(_item, _pujaController.text, miId).then((_) {
+      ItemRequest.bidUp(_item, pujaDouble.toString(), miId).then((_) {
         showInSnackBar("Puja realizada correctamente", _colorStatusBarGood);
 
         //Se pide el item para obtener lastBid
@@ -374,6 +379,7 @@ class _ItemDetails extends State<ItemDetails> {
                   if (error == "Unauthorized" || error == "Forbidden") {
                     showInSnackBar("Acción no autorizada", _colorStatusBarBad);
                   } else {
+                    print('Error al eliminar producto: $error');
                     showInSnackBar(
                         "No hay conexión a internet", _colorStatusBarBad);
                   }
@@ -689,7 +695,7 @@ class _ItemDetails extends State<ItemDetails> {
             _buildChatConditional = _buildChatButtonGanador();
           }
         }
-      } else if (idItem != null) {
+      } else if (idItem != 0) {
         print('Construir chat');
         setState(() {
           _buildChatConditional = _buildChatButton();
@@ -970,37 +976,38 @@ class _ItemDetails extends State<ItemDetails> {
                                         style: _styleDialogContent)))),
                   ]))
               : Container(),
-          _item.type == "auction" && miId != _item.owner.userId
-              ?
-          Container(
-              padding: EdgeInsets.only(top: 15, bottom: 35),
-              child: new Theme(
-                data: new ThemeData(
-                    primaryColor: Colors.white,
-                    accentColor: Colors.white,
-                    hintColor: Colors.white),
-                child: new TextField(
-                  style: TextStyle(
-                    color: Colors.white,
-                  ),
-                  decoration: new InputDecoration(
-                      labelText: 'Introduce tu puja',
-                      labelStyle: TextStyle(color: Colors.white),
-                      border: new UnderlineInputBorder(
-                          borderSide: new BorderSide(color: Colors.white))),
-                  controller: _pujaController,
-                  keyboardType: TextInputType.number,
-                ),
-              )) : Container(),
-          _item.type == "auction" && miId != _item.owner.userId
-              ?
-          RaisedButton(
-            padding: EdgeInsets.symmetric(vertical: 7.0, horizontal: 40.0),
-            color: Colors.white,
-            child: Text('Pujar',
-                style: TextStyle(fontSize: 19.0, color: Colors.black)),
-            onPressed: pujar,
-          ) : Container()
+          _item.type == "auction" && _item.itemId != 0 && miId != _item.owner.userId
+              ? Container(
+                  padding: EdgeInsets.only(top: 15, bottom: 35),
+                  child: new Theme(
+                    data: new ThemeData(
+                        primaryColor: Colors.white,
+                        accentColor: Colors.white,
+                        hintColor: Colors.white),
+                    child: new TextField(
+                      style: TextStyle(
+                        color: Colors.white,
+                      ),
+                      decoration: new InputDecoration(
+                          labelText: 'Introduce tu puja',
+                          labelStyle: TextStyle(color: Colors.white),
+                          border: new UnderlineInputBorder(
+                              borderSide: new BorderSide(color: Colors.white))),
+                      controller: _pujaController,
+                      keyboardType: TextInputType.number,
+                    ),
+                  ))
+              : Container(),
+          _item.type == "auction" && _item.itemId != 0 && miId != _item.owner.userId
+              ? RaisedButton(
+                  padding:
+                      EdgeInsets.symmetric(vertical: 7.0, horizontal: 40.0),
+                  color: Colors.white,
+                  child: Text('Pujar',
+                      style: TextStyle(fontSize: 19.0, color: Colors.black)),
+                  onPressed: pujar,
+                )
+              : Container()
         ],
       ),
     );
@@ -1025,7 +1032,10 @@ class _ItemDetails extends State<ItemDetails> {
     }
     return new Scaffold(
       key: _scaffoldKey,
-      floatingActionButton: _item.type == "auction" && _item.status != "vendido"
+      floatingActionButton: _item.type == "auction" &&
+              _item.status != "vendido" &&
+              _item.itemId != 0 &&
+              miId != _item.owner?.userId
           ? new FloatingActionButton(
               elevation: 8.0,
               child: new Icon(FontAwesomeIcons.gavel),
@@ -1124,34 +1134,36 @@ class _ItemDetails extends State<ItemDetails> {
                                 Column(children: [
                                   SizedBox.fromSize(
                                     size: Size(60.0, 60.0),
-                                    child: _favoriteFunction == null
-                                        ? Container(
-                                            margin: EdgeInsets.all(15.0),
-                                            child: CircularProgressIndicator(
-                                                strokeWidth: 4.0,
-                                                valueColor:
-                                                    AlwaysStoppedAnimation<
-                                                            Color>(
-                                                        _esFavorito
-                                                            ? Colors.grey
-                                                            : Colors.red)))
-                                        : IconButton(
-                                            padding: _item.type == "auction"
-                                                ? const EdgeInsets.only(
-                                                    bottom: 0.0,
-                                                    right: 10,
-                                                    top: 20)
-                                                : const EdgeInsets.only(
-                                                    bottom: 0.0,
-                                                    right: 10,
-                                                    top: 0),
-                                            icon: Icon(_favorite),
-                                            color: Colors.red,
-                                            iconSize: 35.0,
-                                            tooltip: 'Favoritos',
-                                            splashColor: Colors.red,
-                                            onPressed: _favoriteFunction,
-                                          ),
+                                    child: _item.itemId == 0
+                                        ? Container()
+                                        : (_favoriteFunction == null
+                                            ? Container(
+                                                margin: EdgeInsets.all(15.0),
+                                                child: CircularProgressIndicator(
+                                                    strokeWidth: 4.0,
+                                                    valueColor:
+                                                        AlwaysStoppedAnimation<
+                                                                Color>(
+                                                            _esFavorito
+                                                                ? Colors.grey
+                                                                : Colors.red)))
+                                            : IconButton(
+                                                padding: _item.type == "auction"
+                                                    ? const EdgeInsets.only(
+                                                        bottom: 0.0,
+                                                        right: 10,
+                                                        top: 20)
+                                                    : const EdgeInsets.only(
+                                                        bottom: 0.0,
+                                                        right: 10,
+                                                        top: 0),
+                                                icon: Icon(_favorite),
+                                                color: Colors.red,
+                                                iconSize: 35.0,
+                                                tooltip: 'Favoritos',
+                                                splashColor: Colors.red,
+                                                onPressed: _favoriteFunction,
+                                              )),
                                   ),
                                 ]),
                               ]),

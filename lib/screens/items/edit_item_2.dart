@@ -24,10 +24,10 @@ class _EditItemState2 extends State<EditItem2> {
 
   //Lista opciones divisa
   List<String> _divisas = <String>['', 'EUR', 'USD'];
-  String _divisa = '';
+  String _divisa;
 
   //Lista opciones categoria
-  String _tipoPrecio = '';
+  String _tipoPrecio;
 
   ItemClass _item;
 
@@ -122,7 +122,7 @@ class _EditItemState2 extends State<EditItem2> {
         // Redondear precio a 2 decimales
         formattedPrice = double.parse(formattedPrice.toStringAsFixed(2));
 
-        _item.update(price: formattedPrice, currency: _divisa, type: _item.type);
+        _item.update(price: formattedPrice, currency: _divisa);
 
         ItemRequest.edit(_item).then((_) {
           print('Item actualizado');
@@ -162,7 +162,6 @@ class _EditItemState2 extends State<EditItem2> {
         print(_item.type);
         _item.updateAuction(
             price: formattedPrice,
-            type: _item.type,
             currency: _divisa,
             endDate: _selectedDate);
         print(_item.type);
