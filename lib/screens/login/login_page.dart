@@ -205,7 +205,7 @@ class _LoginPageState extends State<LoginPage>
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
                   Padding(
-                    padding: EdgeInsets.only(top: 35.0),
+                    padding: EdgeInsets.only(top: 55.0),
                     child: new Image(
                         width: 150.0,
                         height: 177.0,
