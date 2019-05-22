@@ -87,7 +87,10 @@ class _LoginPageState extends State<LoginPage>
   /// Si no se loguea correctamente, muestra un aviso al usuario de que
   /// no se ha podido iniciar sesión correctamente
   void _tryLogin() async {
-    setState(() => _loginButtonFunction = null);
+    setState(() {
+      _loginButtonFunction = null;
+      _loginActive = false;
+    });
     UsuarioRequest.login(
             loginEmailController.text, loginPasswordController.text)
         .then((loginToken) {
@@ -106,10 +109,14 @@ class _LoginPageState extends State<LoginPage>
             "Ha ocurrido un error en el servidor", _colorStatusBarBad);
       }
       print('LOGIN ERROR LOGIN ERROR');
-      setState(() => _loginButtonFunction = _tryLogin);
+      setState(() {
+        _loginButtonFunction = _tryLogin;
+        _loginActive = true;
+      });
     });
   }
 
+  bool _loginActive = true;
   Color _signUpButtonColor = Colors.grey[800]; // Desactivado
 
   /// Hacer registro de usuario con los campos del formulario
@@ -430,20 +437,20 @@ class _LoginPageState extends State<LoginPage>
                   borderRadius: BorderRadius.all(Radius.circular(5.0)),
                   boxShadow: <BoxShadow>[
                     BoxShadow(
-                      color: Theme.of(context).primaryColorLight,
+                      color: _loginActive ? Theme.of(context).primaryColorLight : Colors.grey[600],
                       offset: Offset(1.0, 6.0),
                       blurRadius: 20.0,
                     ),
                     BoxShadow(
-                      color: Theme.of(context).primaryColorDark,
+                      color: _loginActive ? Theme.of(context).primaryColorDark : Colors.grey[800],
                       offset: Offset(1.0, 6.0),
                       blurRadius: 20.0,
                     ),
                   ],
                   gradient: new LinearGradient(
                       colors: [
-                        Theme.of(context).primaryColorDark,
-                        Theme.of(context).primaryColorLight,
+                        _loginActive ? Theme.of(context).primaryColorDark : Colors.grey[700],
+                        _loginActive ? Theme.of(context).primaryColorLight : Colors.grey[500],
                       ],
                       begin: const FractionalOffset(0.2, 0.2),
                       end: const FractionalOffset(1.0, 1.0),
@@ -469,19 +476,6 @@ class _LoginPageState extends State<LoginPage>
                 ),
               ),
             ],
-          ),
-          Padding(
-            padding: EdgeInsets.only(top: 10.0),
-            child: FlatButton(
-                onPressed: () {},
-                child: Text(
-                  "He olvidado mi contraseña",
-                  style: TextStyle(
-                      decoration: TextDecoration.underline,
-                      color: Colors.white,
-                      fontSize: 16.0,
-                      fontFamily: "Nunito"),
-                )),
           ),
         ],
       ),
