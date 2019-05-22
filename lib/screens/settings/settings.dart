@@ -102,9 +102,21 @@ class _SettingsState extends State<Settings> {
         ),
       ),
       Expanded(
-        child: Container(
+        child:
+        Container(
           margin: EdgeInsets.only(top: 10.0, left: 20.0, right: 20.0),
           child: ListView(children: <Widget>[
+            Container(
+              margin: EdgeInsets.all(3.0),
+              child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10.0),
+                  child: Container(
+                    color: Colors.grey[300],
+                    padding: EdgeInsets.all(0.0),
+                    child: ListTile(
+                        leading: Icon(Icons.info), title: Text("Primeros pasos")),
+                  )),
+            ),
             Container(
               margin: EdgeInsets.all(3.0),
               child: ClipRRect(
@@ -114,22 +126,10 @@ class _SettingsState extends State<Settings> {
                       padding: EdgeInsets.all(0.0),
                       child: ListTile(
                           leading: Icon(Icons.account_circle),
-                          title: Text("Cuenta"),
+                          title: Text("Eliminar cuenta"),
                           onTap: () {
                             Navigator.of(context).pushNamed('/account');
                           }))),
-            ),
-            Container(
-              margin: EdgeInsets.all(3.0),
-              child: ClipRRect(
-                  borderRadius: BorderRadius.circular(10.0),
-                  child: Container(
-                    color: Colors.grey[300],
-                    padding: EdgeInsets.all(0.0),
-                    child: ListTile(
-                        leading: Icon(Icons.notifications),
-                        title: Text("Notificaciones")),
-                  )),
             ),
             Container(
               margin: EdgeInsets.all(3.0),
@@ -151,22 +151,11 @@ class _SettingsState extends State<Settings> {
                     color: Colors.grey[300],
                     padding: EdgeInsets.all(0.0),
                     child: ListTile(
-                        leading: Icon(Icons.info), 
+                        leading: Icon(Icons.help),
                         title: Text("FAQ"),
                         onTap: () {
                             Navigator.of(context).pushNamed('/faq');
                           }),
-                  )),
-            ),
-            Container(
-              margin: EdgeInsets.all(3.0),
-              child: ClipRRect(
-                  borderRadius: BorderRadius.circular(10.0),
-                  child: Container(
-                    color: Colors.grey[300],
-                    padding: EdgeInsets.all(0.0),
-                    child: ListTile(
-                        leading: Icon(Icons.help), title: Text("Ayuda")),
                   )),
             ),
           ]),
@@ -174,7 +163,7 @@ class _SettingsState extends State<Settings> {
       ),
       Container(
         margin: EdgeInsets.all(10.0),
-        child: Text('Selit! mobile v1.0\n(c) ALLENSHIP 2019', textAlign: TextAlign.center, style: _styleCredits)
+        child: Text('Selit! mobile v1.0\n© ALLENSHIP 2019', textAlign: TextAlign.center, style: _styleCredits)
       ),
       Container(
         margin: EdgeInsets.only(bottom: 20.0),
