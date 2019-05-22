@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:selit/util/api/usuario_request.dart';
 import 'package:selit/util/storage.dart';
 
 // Vista temporal con varios botones que llevan a diferentes vistas
@@ -49,8 +50,8 @@ class _SettingsState extends State<Settings> {
         ));
       },
     );
-    // TODO sustituir delayed por funcion API
-    Future.delayed(Duration(seconds: 2)).then((_) {
+
+      UsuarioRequest.requestData().then((_) {
       showInSnackBar("Revisa tu correo", _colorStatusBarGood);
       Navigator.of(context).pop();
     }).catchError((error) {

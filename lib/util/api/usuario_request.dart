@@ -262,6 +262,22 @@ class UsuarioRequest {
     }
   }
 
+
+  static Future<void> requestData() async {
+    String token = await Storage.loadToken();
+
+    final response =
+    await http.get('${APIConfig.BASE_URL}/users/request',
+        headers: {
+          HttpHeaders.contentTypeHeader: ContentType.json.toString(),
+          HttpHeaders.authorizationHeader: token,
+        });
+
+    if (response.statusCode != 200) {
+      throw (APIConfig.getErrorString(response));
+    }
+  }
+
   /// Realizar una valoracion acerca del producto [producto], para el usuario
   /// que vende el producto [producto.owner] con un número de estrellas y comentario
   static Future<void> rateUser(
