@@ -162,8 +162,7 @@ class _NewItemState2 extends State<NewItem2> {
             endDate: _selectedDate);
 
         ItemRequest.createAuction(_item).then((_) {
-          showInSnackBar(
-              "Datos actualizados correctamente", _colorStatusBarGood);
+          _item.updateList((List<ItemClass> list) => list.add(_item));
           Navigator.of(context).pop();
           Navigator.of(context).pop();
           Navigator.of(context).pop();

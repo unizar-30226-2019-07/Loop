@@ -167,9 +167,11 @@ class _EditItemState2 extends State<EditItem2> {
             endDate: _selectedDate);
 
         ItemRequest.editAuction(_item).then((_) {
-          print('Subasta actualizada');
-          showInSnackBar(
-              "Datos actualizados correctamente", _colorStatusBarGood);
+          _item.updateList(
+              (List<ItemClass> list) => list.forEach((ItemClass listItem) {
+                    if (listItem.itemId == _item.itemId &&
+                        listItem.type == _item.type) listItem = _item;
+                  }));
           Navigator.of(context).pop();
           Navigator.of(context).pop();
           Navigator.of(context).pop();
