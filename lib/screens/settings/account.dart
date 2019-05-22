@@ -22,7 +22,6 @@ class _AccountState extends State<Account> {
 
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
-  final Color _colorStatusBarGood = Colors.blue.withOpacity(0.5);
   final Color _colorStatusBarBad = Colors.red.withOpacity(0.5);
 
   void showInSnackBar(String value, Color alfa) {
