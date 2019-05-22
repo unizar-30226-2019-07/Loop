@@ -42,7 +42,6 @@ class _NewItemState2 extends State<NewItem2> {
   /// Fecha límite
   DateTime _selectedDate;
 
-  final Color _colorStatusBarGood = Colors.blue.withOpacity(0.5);
   final Color _colorStatusBarBad = Colors.red.withOpacity(0.5);
 
   /// Titulos

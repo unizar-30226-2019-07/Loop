@@ -45,9 +45,9 @@ class ChatScreenState extends State<ChatScreen> {
   }
 
   static final _styleUsuario =
-    TextStyle(fontSize: 14.0, color: Colors.black);
+    TextStyle(fontSize: 14.0);
   static final _styleTitle =
-      TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold);
+      TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold, color: Colors.white);
 
   @override
   Widget build(BuildContext context) {
@@ -96,6 +96,7 @@ class ChatScreenState extends State<ChatScreen> {
                         padding: const EdgeInsets.all(3.0),
                         child:
                         Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
                             Text(_chat.producto.title,
                                   overflow: TextOverflow.ellipsis,
@@ -104,15 +105,14 @@ class ChatScreenState extends State<ChatScreen> {
                             Text(_chat.usuario.nombre + ' ' + _chat.usuario.apellidos,
                                 overflow: TextOverflow.ellipsis,
                                 maxLines: 1,
-                                style: _styleUsuario),
+                                style: _styleUsuario.copyWith(color: Colors.grey[300])),
                           ],
                         )
                       ))
                 ],
               ),
             )),
-          elevation:
-              Theme.of(context).platform == TargetPlatform.iOS ? 0.0 : 4.0,
+          elevation: 0.0,
         ),
         body: new Container(
           child: new Column(
