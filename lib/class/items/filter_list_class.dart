@@ -111,7 +111,7 @@ class FilterListClass {
     }
     // Asegurar valores válidos para los filtros
     assert(newCategoryId == null ||
-        (newCategoryId >= 0 && newCategoryId < categoryNames.length));
+        (newCategoryId >= 0 && newCategoryId <= categoryNames.length));
     assert(
         newTypeId == null || (newTypeId >= 0 && newTypeId < typeNames.length));
     assert(newOrderId == null ||
