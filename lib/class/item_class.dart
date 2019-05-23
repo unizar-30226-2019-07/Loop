@@ -2,6 +2,7 @@ import 'package:selit/class/usuario_class.dart';
 import 'package:selit/class/image_class.dart';
 import 'package:selit/class/items/filter_list_class.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter/foundation.dart';
 import 'package:selit/class/lastBid_class.dart';
 
 /// Objeto/producto en venta de la aplicación, almacena información
@@ -143,15 +144,15 @@ class ItemClass {
                 ? null
                 : UsuarioClass.fromJson(json['buyer'], tokenHeader));
 
-  void update({String type, double price, String currency}) {
-    this.type = type;
+  void update({String type, @required double price, @required String currency}) {
+    this.type = type ?? this.type;
     this.price = price;
     this.currency = currency;
   }
 
   void updateAuction(
-      {String type, double price, String currency, DateTime endDate}) {
-    this.type = type;
+      {String type, @required double price, @required String currency, @required DateTime endDate}) {
+    this.type = type ?? this.type;
     this.price = price;
     this.currency = currency;
     this.endDate = endDate;
