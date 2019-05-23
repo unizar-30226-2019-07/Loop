@@ -285,8 +285,8 @@ class _LoginPageState extends State<LoginPage>
       }).catchError((error) {
         if (error == "Forbidden") {
           showInSnackBar("Operación no permitida", _colorStatusBarBad);
-        } else if (error == "Not Found") { // TODO comprobar 404 u otro error
-          showInSnackBar("El correo no es válido", _colorStatusBarBad);
+        } else if (error == "Not Found") {
+          showInSnackBar("Dirección de correo no encontrada o inválida", _colorStatusBarBad);
         } else {
           showInSnackBar("No hay conexión a Internet", _colorStatusBarBad);
         }
