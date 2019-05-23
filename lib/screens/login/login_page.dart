@@ -205,7 +205,7 @@ class _LoginPageState extends State<LoginPage>
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
                   Padding(
-                    padding: EdgeInsets.only(top: 55.0),
+                    padding: EdgeInsets.only(top: 35.0),
                     child: new Image(
                         width: 150.0,
                         height: 177.0,
@@ -274,6 +274,24 @@ class _LoginPageState extends State<LoginPage>
         ),
       ),
     );
+  }
+
+  void _onPressForgotPassword() {
+    if (loginEmailController.text.length < 1) {
+        showInSnackBar("Rellena tu dirección de correo", Colors.yellow[800]);
+    } else {
+      UsuarioRequest.forgotPassword(email: loginEmailController.text).then((_) {
+        showInSnackBar("Se ha enviado un correo a\n${loginEmailController.text}", _colorStatusBarGood);
+      }).catchError((error) {
+        if (error == "Forbidden") {
+          showInSnackBar("Operación no permitida", _colorStatusBarBad);
+        } else if (error == "Not Found") { // TODO comprobar 404 u otro error
+          showInSnackBar("El correo no es válido", _colorStatusBarBad);
+        } else {
+          showInSnackBar("No hay conexión a Internet", _colorStatusBarBad);
+        }
+      });
+    }
   }
 
   @override
@@ -476,6 +494,19 @@ class _LoginPageState extends State<LoginPage>
                 ),
               ),
             ],
+          ),
+          Padding(
+            padding: EdgeInsets.only(top: 10.0),
+            child: FlatButton(
+                onPressed: _onPressForgotPassword,
+                child: Text(
+                  "He olvidado mi contraseña",
+                  style: TextStyle(
+                      decoration: TextDecoration.underline,
+                      color: Colors.white,
+                      fontSize: 16.0,
+                      fontFamily: "Nunito"),
+                )),
           ),
         ],
       ),

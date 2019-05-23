@@ -332,4 +332,17 @@ class UsuarioRequest {
     }
   }
 
+  static Future<void> forgotPassword({String email}) async {
+    final response =
+        await http.post('${APIConfig.BASE_URL}/forgot',
+            headers: {
+              HttpHeaders.contentTypeHeader: ContentType.json.toString(),
+            }, body: email
+          );
+      
+    if (response.statusCode != 200) {
+      throw (APIConfig.getErrorString(response));
+    }
+  }
+
 }
