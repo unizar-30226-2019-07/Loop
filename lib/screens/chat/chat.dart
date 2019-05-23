@@ -234,6 +234,18 @@ class ChatScreenState extends State<ChatScreen> {
   void _sendMessage({String messageText}) async {
     messageText = messageText.trim();
     if(messageText.isNotEmpty){
+      int idAnunciante = 0;
+      int idCliente = 0;
+      if(_chat.producto.owner.userId == _miId){
+        // Soy el anunciante
+        idAnunciante = _miId;
+        idCliente = _chat.producto.owner.userId;
+      }
+      else{
+        // Soy el cliente
+        idCliente = _miId;
+        idAnunciante = _chat.producto.owner.userId;
+      }
       _textEditingController.clear();
       print('Enviando mensaje');
       // Falta poner visible al otro si no lo esta
@@ -242,7 +254,7 @@ class ChatScreenState extends State<ChatScreen> {
         print('Cambiando visibilidad');
         Firestore.instance.runTransaction((transaction) async {
           await transaction.set(Firestore.instance.collection("chat").document(_chat.docId), 
-            {'idAnunciante' : _chat.usuario.userId, 'idCliente' : _miId,
+            {'idAnunciante' : idAnunciante, 'idCliente' : idCliente,
             'idProducto' : _chat.producto.itemId, 'visible' : _chat.visible,
             'ultimoMensaje' : _chat.lastMessage, 'fechaUltimoMensaje' : _chat.lastMessageDate, 'tipoProducto': _chat.tipoProducto});   
         });
@@ -255,7 +267,7 @@ class ChatScreenState extends State<ChatScreen> {
       });
       Firestore.instance.runTransaction((transaction) async {
           await transaction.set(Firestore.instance.collection("chat").document(_chat.docId), 
-            {'idAnunciante' : _chat.usuario.userId, 'idCliente' : _miId,
+            {'idAnunciante' : idAnunciante, 'idCliente' : idCliente,
             'idProducto' : _chat.producto.itemId, 'visible' : _chat.visible,
             'ultimoMensaje' : messageText, 'fechaUltimoMensaje' : fecha, 'tipoProducto': _chat.tipoProducto});   
       });

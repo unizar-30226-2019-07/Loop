@@ -141,7 +141,7 @@ class FilterListClass {
     if (minPriceIndex > 0 || maxPriceIndex < absMaxPriceIndex - 1) {
       String filterName;
       if (maxPriceIndex == absMaxPriceIndex - 1) {
-        filterName = 'Precio: Desde ${_formatPrecio(minPriceIndex)}€';
+        filterName = 'Precio: Desde ${_formatPrecio(minPriceIndex)} €';
       } else if (minPriceIndex == 0) {
         filterName = 'Precio: Hasta ${_formatPrecio(maxPriceIndex)} €';
       } else {
