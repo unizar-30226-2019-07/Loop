@@ -92,6 +92,11 @@ flutter:
   #  - images/a_dot_burr.jpeg
   #  - images/a_dot_ham.jpeg
   assets:
+    - assets/img/paso1.JPG
+    - assets/img/paso2.JPG
+    - assets/img/paso3.JPG
+    - assets/img/paso4.JPG
+    - assets/img/paso5.JPG
     - assets/img/profile_default.jpg
     - assets/img/login_logo.png
     - assets/img/sell.png

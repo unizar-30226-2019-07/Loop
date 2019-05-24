@@ -16,6 +16,7 @@ import 'package:selit/screens/items/new_item_2.dart';
 import 'package:selit/screens/settings/settings.dart';
 import 'package:selit/screens/settings/account.dart';
 import 'package:selit/screens/settings/faq.dart';
+import 'package:selit/screens/settings/steps.dart';
 import 'package:selit/screens/settings/question.dart';
 
 class Routes {
@@ -24,6 +25,7 @@ class Routes {
     '/settings': (settings) => _buildRoute(settings, new Settings()),
     '/account': (settings) => _buildRoute(settings, new Account()),
     '/faq': (settings) => _buildRoute(settings, new FAQ()),
+    '/steps': (settings) => _buildRoute(settings, new Steps()),
     '/question': (settings) => _buildRoute(settings, new Question(answer: settings.arguments)),
     '/profile': (settings) =>
         _buildRoute(settings, new Profile(userId: settings.arguments)),

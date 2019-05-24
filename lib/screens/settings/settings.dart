@@ -114,7 +114,12 @@ class _SettingsState extends State<Settings> {
                     color: Colors.grey[300],
                     padding: EdgeInsets.all(0.0),
                     child: ListTile(
-                        leading: Icon(Icons.info), title: Text("Primeros pasos")),
+                        leading: Icon(Icons.info), 
+                        title: Text("Primeros pasos"),
+                        onTap: () {
+                            Navigator.of(context).pushNamed('/steps');
+                          }
+                        ),
                   )),
             ),
             Container(
