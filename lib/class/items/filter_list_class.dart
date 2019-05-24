@@ -111,7 +111,7 @@ class FilterListClass {
     }
     // Asegurar valores válidos para los filtros
     assert(newCategoryId == null ||
-        (newCategoryId >= 0 && newCategoryId < categoryNames.length));
+        (newCategoryId >= 0 && newCategoryId <= categoryNames.length));
     assert(
         newTypeId == null || (newTypeId >= 0 && newTypeId < typeNames.length));
     assert(newOrderId == null ||
@@ -139,11 +139,16 @@ class FilterListClass {
       filters.add({'name': '${typeNames[typeId]}', 'callback': resetType});
     }
     if (minPriceIndex > 0 || maxPriceIndex < absMaxPriceIndex - 1) {
-      filters.add({
-        'name':
-            'Precio: ${_formatPrecio(minPriceIndex)}-${_formatPrecio(maxPriceIndex)} €',
-        'callback': resetPrice
-      });
+      String filterName;
+      if (maxPriceIndex == absMaxPriceIndex - 1) {
+        filterName = 'Precio: Desde ${_formatPrecio(minPriceIndex)} €';
+      } else if (minPriceIndex == 0) {
+        filterName = 'Precio: Hasta ${_formatPrecio(maxPriceIndex)} €';
+      } else {
+        filterName =
+            'Precio: ${_formatPrecio(minPriceIndex)}-${_formatPrecio(maxPriceIndex)} €';
+      }
+      filters.add({'name': filterName, 'callback': resetPrice});
     }
     if (maxDistanceIndex < absMaxDistanceIndex - 1) {
       filters.add({
