@@ -239,7 +239,7 @@ class ChatScreenState extends State<ChatScreen> {
       if(_chat.producto.owner.userId == _miId){
         // Soy el anunciante
         idAnunciante = _miId;
-        idCliente = _chat.producto.owner.userId;
+        idCliente = _chat.usuario.userId;
       }
       else{
         // Soy el cliente
