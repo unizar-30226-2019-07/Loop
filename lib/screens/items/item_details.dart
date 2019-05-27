@@ -225,13 +225,15 @@ class _ItemDetails extends State<ItemDetails> {
     } else {
       print('Pujando...');
 
-      double pujaDouble = double.tryParse(_pujaController.text.replaceAll(',', '.'));
+      double pujaDouble =
+          double.tryParse(_pujaController.text.replaceAll(',', '.'));
       if (pujaDouble == null) {
         showInSnackBar("Puja inválida", Colors.yellow[800]);
         Navigator.of(context).pop();
         return;
       } else {
-        pujaDouble = double.parse(pujaDouble.toStringAsFixed(2)); // 2 decimales de precision
+        pujaDouble = double.parse(
+            pujaDouble.toStringAsFixed(2)); // 2 decimales de precision
         if (pujaDouble < 0) {
           showInSnackBar("La puja no puede ser negativa", Colors.yellow[800]);
           Navigator.of(context).pop();
@@ -529,10 +531,10 @@ class _ItemDetails extends State<ItemDetails> {
           child: Column(
             children: <Widget>[
               Expanded(
-                  child: ListView.builder(
-                itemCount: buttonOptions.length,
-                itemBuilder: (ctx, i) => buttonOptions[i],
-              )),
+                  child: SingleChildScrollView(
+                      child: Column(
+                children: buttonOptions,
+              ))),
               RaisedButton(
                   padding: EdgeInsets.symmetric(horizontal: 40.0),
                   color: Colors.grey[200],
@@ -649,6 +651,8 @@ class _ItemDetails extends State<ItemDetails> {
   }
 
   Widget _buildRateButton() {
+    bool isBuyer =
+        miId == _item.buyer?.userId || miId == _item.lastBid?.bidder?.userId;
     return Container(
       padding: const EdgeInsets.fromLTRB(15.0, 0.0, 15.0, 25.0),
       child: SizedBox(
@@ -658,9 +662,9 @@ class _ItemDetails extends State<ItemDetails> {
           elevation: 4,
           textColor: Colors.white,
           color: Theme.of(context).primaryColor,
-          onPressed: () =>
-              Navigator.of(context).pushNamed('/rate-user', arguments: _item),
-          child: new Text('Calificar al vendedor',
+          onPressed: () => Navigator.of(context)
+              .pushNamed('/rate-user', arguments: [_item, isBuyer]),
+          child: new Text('Calificar al ${isBuyer ? 'vendedor' : 'comprador'}',
               style: TextStyle(
                   fontSize: 21.0,
                   color: Colors.white,
@@ -977,7 +981,9 @@ class _ItemDetails extends State<ItemDetails> {
                                         style: _styleDialogContent)))),
                   ]))
               : Container(),
-          _item.type == "auction" && _item.itemId != 0 && miId != _item.owner.userId
+          _item.type == "auction" &&
+                  _item.itemId != 0 &&
+                  miId != _item.owner.userId
               ? Container(
                   padding: EdgeInsets.only(top: 15, bottom: 35),
                   child: new Theme(
@@ -999,7 +1005,9 @@ class _ItemDetails extends State<ItemDetails> {
                     ),
                   ))
               : Container(),
-          _item.type == "auction" && _item.itemId != 0 && miId != _item.owner.userId
+          _item.type == "auction" &&
+                  _item.itemId != 0 &&
+                  miId != _item.owner.userId
               ? RaisedButton(
                   padding:
                       EdgeInsets.symmetric(vertical: 7.0, horizontal: 40.0),
@@ -1352,7 +1360,10 @@ class _ItemDetails extends State<ItemDetails> {
                       ),
                     ),
                     _buildChatConditional,
-                    _item?.buyer?.userId == miId
+                    _item?.status == "vendido" &&
+                            (_item?.buyer?.userId == miId ||
+                                _item?.lastBid?.bidder?.userId == miId ||
+                                _item?.owner?.userId == miId)
                         ? _buildRateButton()
                         : Container(),
                     _cameraPosition == null

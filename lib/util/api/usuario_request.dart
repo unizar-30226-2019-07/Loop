@@ -281,22 +281,27 @@ class UsuarioRequest {
   /// Realizar una valoracion acerca del producto [producto], para el usuario
   /// que vende el producto [producto.owner] con un número de estrellas y comentario
   static Future<void> rateUser(
-      {ItemClass producto, double estrellas, String comentario}) async {
+      {bool isBuyer, ItemClass producto, double estrellas, String comentario}) async {
     String token = await Storage.loadToken();
-    int idUsuario = await Storage.loadUserId();
-    int idVendedor = producto.owner.userId;
+
+
+    int buyerId = producto.type == "sale" ? producto.buyer.userId : producto.lastBid.bidder.userId;
+    int sellerId = producto.owner.userId;
+    print('${APIConfig.BASE_URL}/users/${isBuyer ? sellerId : buyerId}/reviews');
+    print(await Storage.loadToken());
 
     // Json a enviar
     Map<String, dynamic> rateData = {
-      "id_comprador": idUsuario,
-      "id_anunciante": idVendedor,
+      "id_comprador": buyerId,
+      "id_anunciante": sellerId,
       "valor": estrellas,
       "comentario": comentario,
       (producto.isAuction() ? "id_subasta" : "id_producto"): producto.itemId,
     };
+    print(json.jsonEncode(rateData));
 
     final response =
-        await http.post('${APIConfig.BASE_URL}/users/$idVendedor/reviews',
+        await http.post('${APIConfig.BASE_URL}/users/${isBuyer ? sellerId : buyerId}/reviews',
             headers: {
               HttpHeaders.contentTypeHeader: ContentType.json.toString(),
               HttpHeaders.authorizationHeader: token,
@@ -312,6 +317,7 @@ class UsuarioRequest {
   static Future<List<RatingClass>> getRatingsFromUser(
       {int userId}) async {
 
+    int miId = await Storage.loadUserId();
     String token = await Storage.loadToken();
 
     final response =
@@ -324,7 +330,7 @@ class UsuarioRequest {
     if (response.statusCode == 200) {
       List<RatingClass> ratings = new List<RatingClass>();
       (json.jsonDecode(response.body) as List<dynamic>).forEach((itemJson) {
-        ratings.add(RatingClass.fromJson(itemJson, token));
+        ratings.add(RatingClass.fromJson(itemJson, token, miId));
       });
       return ratings;
     } else {

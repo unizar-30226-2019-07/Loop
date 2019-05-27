@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:selit/class/item_class.dart';
+import 'package:selit/class/usuario_class.dart';
 import 'package:selit/util/api/usuario_request.dart';
 import 'package:selit/widgets/profile_picture.dart';
 import 'package:selit/widgets/star_rating.dart';
@@ -11,10 +12,12 @@ import 'package:selit/widgets/star_rating_interactive.dart';
 /// Con estos campos establecen un formulario a enviar
 class RateUser extends StatefulWidget {
   final ItemClass referencedItem;
+  final bool isBuyer;
 
-  RateUser({this.referencedItem});
+  RateUser({this.referencedItem, this.isBuyer});
+  RateUser.args(List args) : this(referencedItem: args[0], isBuyer: args[1]);
   @override
-  State<StatefulWidget> createState() => _RateUserState(referencedItem);
+  State<StatefulWidget> createState() => _RateUserState(referencedItem, isBuyer);
 }
 
 class _RateUserState extends State<RateUser> {
@@ -40,11 +43,26 @@ class _RateUserState extends State<RateUser> {
   final Color _colorStatusBarBad = Colors.red.withOpacity(0.5);
 
   ItemClass _referencedItem;
+  UsuarioClass _referencedUser;
+  bool _isBuyer;
   Function _sendFunction;
 
   // Constructor
-  _RateUserState(this._referencedItem) {
-    assert(_referencedItem.owner != null, "El dueño no debe ser null");
+  _RateUserState(this._referencedItem, this._isBuyer) {
+    if (_isBuyer) {
+      // Comprador valora a vendedor
+      assert(_referencedItem.owner != null, "El vendedor no debe ser null");
+      _referencedUser = _referencedItem.owner;
+    } else {
+      // Vendedor valora a comprador
+      if (_referencedItem.type == "sale") {
+        assert(_referencedItem.buyer != null, "El comprador no debe ser null");
+        _referencedUser = _referencedItem.buyer;
+      } else { // auction
+        assert(_referencedItem.lastBid?.bidder != null, "El comprador no debe ser null");
+        _referencedUser = _referencedItem.lastBid?.bidder;
+      }
+    }
     _sendFunction = _onPressedSend;
   }
 
@@ -78,6 +96,7 @@ class _RateUserState extends State<RateUser> {
       _sendFunction = _onPressedSend;
     } else {
       UsuarioRequest.rateUser(
+              isBuyer: _isBuyer,
               producto: _referencedItem,
               estrellas: StarRatingInteractive.currentRating,
               comentario: _infoController.text)
@@ -119,7 +138,7 @@ class _RateUserState extends State<RateUser> {
       children: <Widget>[
         Container(
             margin: EdgeInsets.fromLTRB(20.0, 25.0, 0.0, 10.0),
-            child: Text('Calificar una venta', style: _styleTitle)),
+            child: Text('Calificar ${_isBuyer ? 'al vendedor' : 'al comprador'}', style: _styleTitle)),
         Container(
           margin: EdgeInsets.symmetric(horizontal: 25.0),
           child: Card(
@@ -135,7 +154,7 @@ class _RateUserState extends State<RateUser> {
                   size: Size(100.0, 100.0),
                   child: Container(
                     padding: EdgeInsets.all(2.0),
-                    child: ProfilePicture(_referencedItem.owner.profileImage),
+                    child: ProfilePicture(_referencedUser.profileImage),
                   ),
                 ),
                 Expanded(
@@ -146,9 +165,9 @@ class _RateUserState extends State<RateUser> {
                         children: <Widget>[
                           Container(
                             child: Text(
-                              _referencedItem.owner.nombre +
+                              _referencedUser.nombre +
                                   ' ' +
-                                  _referencedItem.owner.apellidos,
+                                  _referencedUser.apellidos,
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                               style: _styleCardDescription,
@@ -166,7 +185,7 @@ class _RateUserState extends State<RateUser> {
                           Container(
                               child: StarRating(
                             starRating:
-                                _referencedItem.owner?.numeroEstrellas ?? 1,
+                                _referencedUser.numeroEstrellas ?? 1,
                             starColor: Colors.black,
                             profileView: false,
                             starSize: 20.0,

@@ -34,7 +34,7 @@ class Routes {
     '/whises': (settings) =>
         _buildRoute(settings, new Wishes(user: settings.arguments)),
     '/rate-user': (settings) =>
-        _buildRoute(settings, new RateUser(referencedItem: settings.arguments)),
+        _buildRoute(settings, new RateUser.args(settings.arguments)),
     '/report-user': (settings) =>
         _buildRoute(settings, new ReportUser(otherUser: settings.arguments)),
     '/rating-list': (settings) =>
