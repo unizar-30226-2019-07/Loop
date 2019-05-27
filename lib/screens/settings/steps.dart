@@ -7,7 +7,6 @@ class Steps extends StatefulWidget {
 }
 
 class _StepsState extends State<Steps> {
-  final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
   static final _styleTitle = const TextStyle(
       fontWeight: FontWeight.bold, fontSize: 22.0, color: Colors.white);
 
@@ -37,14 +36,10 @@ class _StepsState extends State<Steps> {
       ),
       Expanded(
           child: Container(
-              child: ListView(children: <Widget>[
-        Row(children: <Widget>[
-          new Container(
-            padding: EdgeInsets.only(top: 10, left: 30.0),
-            child: SizedBox(
-                height: 710.0245,
-                width: 355.1138,
-                child: new Carousel(
+              margin: EdgeInsets.fromLTRB(30.0, 10.0, 30.0, 30.0),
+              child: AspectRatio(
+                aspectRatio: 9 / 18,
+                child: Carousel(
                   images: [
                     new AssetImage('assets/img/paso1.JPG'),
                     new AssetImage('assets/img/paso2.JPG'),
@@ -59,10 +54,8 @@ class _StepsState extends State<Steps> {
                   dotBgColor: Colors.grey.withOpacity(0),
                   borderRadius: true,
                   autoplay: false,
-                )),
-          )
-        ])
-      ])))
+                ),
+              )))
     ]);
   }
 
