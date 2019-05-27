@@ -222,7 +222,7 @@ class _RateUserState extends State<RateUser> {
                   padding: EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 10.0),
                   child: TextFormField(
                     decoration: InputDecoration(
-                      labelText: 'Añade un comentario (opcional)',
+                      labelText: 'Añade un comentario',
                       alignLabelWithHint: true,
                     ),
                     maxLength: 300,
