@@ -221,6 +221,7 @@ class _ItemDetails extends State<ItemDetails> {
     if (_pujaController.text.length < 1) {
       showInSnackBar(
           "Rellena todos los campos correctamente", Colors.yellow[800]);
+      Navigator.of(context).pop();
     } else {
       print('Pujando...');
 
