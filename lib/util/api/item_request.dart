@@ -90,7 +90,7 @@ class ItemRequest {
     String _paramsString = '?lat=$userLat&lng=$userLng&distance=9999999999.9';
     // Si status no es ni "en venta" ni "vendido", default a "en venta"
     String _statusParam = status == "vendido" ? status : "en venta";
-    _paramsString += "&owner=$userId";
+    _paramsString += "&owner=$userId&token=yes";
 
     // Esperar la respuesta de la petición
     print('ITEM USER PLAY ▶');
