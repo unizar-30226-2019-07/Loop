@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/percent_indicator.dart';
-import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 import 'package:selit/class/item_class.dart';
 import 'package:selit/util/api/item_request.dart';
 
@@ -22,17 +21,18 @@ class _EditItemState2 extends State<EditItem2> {
 
   ///Controladores de campos del formulario
   final TextEditingController _priceController = new TextEditingController();
-  final TextEditingController _limitController = new TextEditingController();
 
   //Lista opciones divisa
   List<String> _divisas = <String>['', 'EUR', 'USD'];
-  String _divisa = '';
+  String _divisa;
 
   //Lista opciones categoria
-  List<String> _tiposPrecio = <String>['sale', 'auction'];
-  String _tipoPrecio = 'sale';
+  String _tipoPrecio;
 
   ItemClass _item;
+
+  /// Fecha límite
+  DateTime _selectedDate;
 
   final Color _colorStatusBarGood = Colors.blue.withOpacity(0.5);
   final Color _colorStatusBarBad = Colors.red.withOpacity(0.5);
@@ -43,6 +43,8 @@ class _EditItemState2 extends State<EditItem2> {
     _priceController.text = item.price.toString();
     _divisa = item.currency;
     _buttonFunction = createItem;
+    _tipoPrecio = item.type;
+    _selectedDate = item.endDate;
   }
 
   /// Titulos
@@ -57,19 +59,8 @@ class _EditItemState2 extends State<EditItem2> {
 
   static final _styleButton = TextStyle(fontSize: 19.0, color: Colors.white);
 
-  ///Selector de fecha
-  DateTime selectedDate = DateTime.now();
-
-  Future<Null> _selectDate(BuildContext context) async {
-    final DateTime picked = await showDatePicker(
-        context: context,
-        initialDate: selectedDate,
-        firstDate: DateTime(2018, 8),
-        lastDate: DateTime(2101));
-    if (picked != null && picked != selectedDate)
-      setState(() {
-        selectedDate = picked;
-      });
+  String _dateString(DateTime fecha) {
+    return '${fecha.day} / ${fecha.month} / ${fecha.year}';
   }
 
   void showInSnackBar(String value, Color alfa) {
@@ -88,7 +79,7 @@ class _EditItemState2 extends State<EditItem2> {
 
   void createItem() {
     // Diálogo "cargando..." para evitar repetir
-    _buttonFunction = null;
+    setState(() => _buttonFunction = null);
     showDialog(
       barrierDismissible: false, // JUST MENTION THIS LINE
       context: context,
@@ -110,29 +101,93 @@ class _EditItemState2 extends State<EditItem2> {
     // Editar producto
     double formattedPrice =
         double.tryParse(_priceController.text.replaceAll(',', '.'));
-    if (_priceController.text.length < 1 ||
-        formattedPrice == null ||
-        _tipoPrecio == '' ||
-        _divisa == '') {
-      showInSnackBar("Rellena todos los campos correctamente", Colors.yellow);
-    } else {
-      //TODO cambiar sale por __tipoPrecio cuando estén implementadas las subastas
-      _item.update(type: "sale", price: formattedPrice, currency: _divisa);
 
-      ItemRequest.edit(_item).then((_) {
-        print('Item actualizado');
-        showInSnackBar("Datos actualizados correctamente", _colorStatusBarGood);
-        Navigator.of(context).pop();
-        Navigator.of(context).pop();
-        Navigator.of(context).pop();
-      }).catchError((error) {
-        if (error == "Unauthorized" || error == "Forbidden") {
-          showInSnackBar("Acción no autorizada", _colorStatusBarBad);
-        } else {
-          showInSnackBar("No hay conexión a internet", _colorStatusBarBad);
-        }
-        Navigator.of(context).pop();
-      });
+    if (_tipoPrecio == 'sale') {
+      if (_priceController.text.length < 1 ||
+          formattedPrice == null ||
+          _tipoPrecio == '' ||
+          _divisa == '') {
+        showInSnackBar("Rellena todos los campos correctamente", Colors.yellow[800]);
+        Navigator.of(context).pop(); // alertDialog
+        setState(() => _buttonFunction = createItem);
+      } else if (formattedPrice < 0) {
+        showInSnackBar("El precio no puede ser negativo", Colors.yellow[800]);
+        Navigator.of(context).pop(); // alertDialog
+        setState(() => _buttonFunction = createItem);
+      } else if (formattedPrice > 1000000) {
+        showInSnackBar("El precio es demasiado alto", Colors.yellow[800]);
+        Navigator.of(context).pop(); // alertDialog
+        setState(() => _buttonFunction = createItem);
+      } else {
+        // Redondear precio a 2 decimales
+        formattedPrice = double.parse(formattedPrice.toStringAsFixed(2));
+
+        _item.update(price: formattedPrice, currency: _divisa);
+
+        ItemRequest.edit(_item).then((_) {
+          print('Item actualizado');
+          showInSnackBar(
+              "Datos actualizados correctamente", _colorStatusBarGood);
+          // Callback del item
+          _item.updateList(
+              (List<ItemClass> list) => list.forEach((ItemClass listItem) {
+                    if (listItem.itemId == _item.itemId &&
+                        listItem.type == _item.type) listItem = _item;
+                  }));
+          Navigator.of(context).pop();
+          Navigator.of(context).pop();
+          Navigator.of(context).pop();
+        }).catchError((error) {
+          if (error == "Unauthorized" || error == "Forbidden") {
+            showInSnackBar("Acción no autorizada", _colorStatusBarBad);
+          } else if (error == "Internal Server Error") {
+            showInSnackBar(
+                "Imagen no válida, prueba con otra", _colorStatusBarBad);
+          } else {
+            print("Error al actualizar item: $error");
+            showInSnackBar("No hay conexión a internet", _colorStatusBarBad);
+          }
+          setState(() => _buttonFunction = createItem);
+          Navigator.of(context).pop();
+        });
+      }
+    } else {
+      if (_priceController.text.length < 1 ||
+          formattedPrice == null ||
+          _tipoPrecio == '' ||
+          _divisa == '') {
+        showInSnackBar(
+            "Rellena todos los campos correctamente", Colors.yellow[800]);
+      } else {
+        print(_item.type);
+        _item.updateAuction(
+            price: formattedPrice,
+            currency: _divisa,
+            endDate: _selectedDate);
+        print(_item.type);
+        ItemRequest.editAuction(_item).then((_) {
+          _item.updateList(
+              (List<ItemClass> list) => list.forEach((ItemClass listItem) {
+                    if (listItem.itemId == _item.itemId &&
+                        listItem.type == _item.type) listItem = _item;
+                  }));
+          Navigator.of(context).pop();
+          Navigator.of(context).pop();
+          Navigator.of(context).pop();
+        }).catchError((error) {
+          if (error == "Unauthorized" || error == "Forbidden") {
+            showInSnackBar("Acción no autorizada", _colorStatusBarBad);
+          } else if (error == "Internal Server Error") {
+            showInSnackBar(
+                "Imagen no válida, prueba con otra", _colorStatusBarBad);
+          } else {
+            print("Error: $error");
+            showInSnackBar("No hay conexión a internet", _colorStatusBarBad);
+          }
+          setState(() => _buttonFunction = createItem);
+          Navigator.of(context).pop();
+        });
+      }
     }
   }
 
@@ -234,39 +289,6 @@ class _EditItemState2 extends State<EditItem2> {
                     ],
                   ),
                 ),
-                Padding(
-                  padding: EdgeInsets.only(
-                    top: 25,
-                  ),
-                  child: new FormField(
-                    builder: (FormFieldState state) {
-                      return InputDecorator(
-                        decoration: InputDecoration(
-                          labelText: 'Tipo',
-                        ),
-                        isEmpty: _tipoPrecio == '',
-                        child: new DropdownButtonHideUnderline(
-                          child: new DropdownButton(
-                            value: _tipoPrecio,
-                            isDense: true,
-                            onChanged: (String newValue) {
-                              setState(() {
-                                _tipoPrecio = newValue;
-                                state.didChange(newValue);
-                              });
-                            },
-                            items: _tiposPrecio.map((String value) {
-                              return new DropdownMenuItem(
-                                value: value,
-                                child: new Text(value),
-                              );
-                            }).toList(),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
               ])),
         )
       ],
@@ -331,41 +353,46 @@ class _EditItemState2 extends State<EditItem2> {
       ],
     );
 
-    ///Límite en subasta
-    Widget wLimite = Row(
+    Widget wImgTitle = Padding(
+        padding: EdgeInsets.only(
+          left: 10,
+          top: 17,
+        ),
+        child: Text(
+          'Fecha límite',
+          style: new TextStyle(
+            fontSize: 15,
+            color: Colors.grey[600],
+          ),
+        ));
+
+    Widget wAge = Row(
       children: <Widget>[
         Expanded(
           flex: 8,
           child: Container(
-              margin: EdgeInsets.only(left: 10, right: 10, bottom: 20),
-              //color: Colors.red, // util para ajustar margenes
-              child: Column(
-                children: <Widget>[
-                  new TextFormField(
-                    decoration: const InputDecoration(
-                      labelText: 'Límite',
-                    ),
-                    controller: _limitController,
-                    keyboardType: TextInputType.emailAddress,
-                  ),
-                ],
+              margin: EdgeInsets.only(left: 15, right: 10, top: 10),
+              child: RaisedButton(
+                color: Colors.grey[600],
+                onPressed: () async {
+                  DateTime picked = await showDatePicker(
+                      context: context,
+                      initialDate: _selectedDate ??
+                          DateTime.now().add(new Duration(days: 1, hours: 1)),
+                      firstDate: DateTime.now().add(new Duration(days: 1)),
+                      lastDate: DateTime(2030, 1));
+                  setState(() {
+                    _selectedDate = picked;
+                  });
+                },
+                child: Text(
+                  _selectedDate == null
+                      ? 'Fecha ...'
+                      : _dateString(_selectedDate),
+                  style: _styleButton,
+                  textAlign: TextAlign.left,
+                ),
               )),
-        ),
-        Expanded(
-          flex: 2,
-          child: Container(
-              margin: EdgeInsets.only(left: 5, top: 20),
-              //color: Colors.red, // util para ajustar margenes
-              child: Column(children: <Widget>[
-                new FlatButton(
-                    onPressed: () {
-                      _selectDate(context);
-                      //_limitController.text = "${selectedDate.toLocal()}";
-                    },
-                    shape: new RoundedRectangleBorder(
-                        borderRadius: new BorderRadius.circular(30.0)),
-                    child: new Icon(Icons.calendar_today))
-              ])),
         )
       ],
     );
@@ -392,9 +419,7 @@ class _EditItemState2 extends State<EditItem2> {
                                 vertical: 7.0, horizontal: 20.0),
                             child:
                                 Text('Modificar producto', style: _styleButton),
-                            onPressed: () async {
-                              createItem();
-                            },
+                            onPressed: _buttonFunction,
                           )),
                     ],
                   )
@@ -405,7 +430,9 @@ class _EditItemState2 extends State<EditItem2> {
                       Divider(),
                       wPrecio,
                       Divider(),
-                      wLimite,
+                      wImgTitle,
+                      wAge,
+                      Divider(),
                       new Container(
                           margin: EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 30.0),
                           child: RaisedButton(
@@ -422,7 +449,6 @@ class _EditItemState2 extends State<EditItem2> {
 
   @override
   Widget build(BuildContext context) {
-    FlutterStatusbarcolor.setStatusBarColor(Theme.of(context).primaryColor);
     return Scaffold(
       key: _scaffoldKey,
       resizeToAvoidBottomInset: true,

@@ -102,7 +102,7 @@ class ItemTile extends StatelessWidget {
                               SizedBox.fromSize(
                                 size: Size(double.infinity, 20.0),
                                 child: Text(
-                                  '${_item?.price} ${_item?.currency}',
+                                  '${_item?.type == "auction" && _item?.lastBid != null ? _item?.lastBid?.amount  : _item?.price} ${_item?.currency}',
                                   textAlign: _leftImage || _item.media.isEmpty ? TextAlign.end : TextAlign.start,
                                   style: _stylePrice.copyWith(
                                       color: Theme.of(context).primaryColor),

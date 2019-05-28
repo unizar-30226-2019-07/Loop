@@ -28,8 +28,8 @@
 	<string>Selit! necesita tu localización</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Selit! necesita tu localización</string>
-    <key>NSPhotoLibraryUsageDescription</key>
-    <string>Para subir decorar tu anuncio necesitamos acceder a tus fotos</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Selit! necesita el acceso a la galería</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>

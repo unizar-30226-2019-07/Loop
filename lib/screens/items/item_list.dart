@@ -8,7 +8,6 @@ import 'package:selit/util/api/item_request.dart';
 import 'package:selit/util/storage.dart';
 import 'package:selit/class/item_class.dart';
 import 'package:selit/class/items/filter_list_class.dart';
-import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 import 'dart:async';
 
 /// Listado de productos en venta, junto con una barra de búsqueda y una pantalla
@@ -57,6 +56,11 @@ class _ItemListState extends State<ItemList> {
   /// Controlador de filtros, medio de comunicación entre ItemList e ItemListDrawer
   /// Para mas información, ver [FilterListClass]
   FilterListClass _filterManager;
+
+  // Callback llamado por los objetos al ser actualizados
+  void updateListCallback(Function(List<ItemClass>) actualizacion) {
+    setState(() => actualizacion(_items));
+  }
 
   /// Actualizar la lista de items de la página con los filtros de FilterListClass
   void _updateList() {
@@ -155,6 +159,8 @@ class _ItemListState extends State<ItemList> {
       size: ITEMS_PER_PAGE,
       page: pageNum).then((List<ItemClass> receivedItems) {
         print("Recibidos ${receivedItems.length} items");
+        // Callback para cuando se actualicen
+        receivedItems.forEach((item) => item.setUpdateListCallback(updateListCallback));
         // Evitar mostrar más items si se ha llegado al fin de la lista
         if (receivedItems.length < ITEMS_PER_PAGE) lastPetitionPage++;
         // Mostrar los items en la lista
@@ -319,10 +325,8 @@ class _ItemListState extends State<ItemList> {
       }
     }
   }
-
   @override
   Widget build(BuildContext context) {
-    FlutterStatusbarcolor.setStatusBarColor(Colors.transparent);
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: Container(

@@ -3,7 +3,6 @@ import 'package:flutter_range_slider/flutter_range_slider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:selit/screens/items/item_list.dart';
 import 'package:selit/class/items/filter_list_class.dart';
-import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 import 'dart:async';
 
 /// Listado de filtros de la lista de items, diseñado para acompañar
@@ -25,7 +24,7 @@ class _ItemListDrawerState extends State<ItemListDrawer> {
   static final _styleTextSliders =
       TextStyle(fontSize: 17.0, color: Colors.grey[200]);
 
-  /// Botones para seleccionar categoría y ordenaciónc
+  /// Botones para seleccionar categoría y ordenación
   static final _styleFilterButton =
       TextStyle(fontSize: 18.0, color: Colors.black);
 
@@ -141,8 +140,6 @@ class _ItemListDrawerState extends State<ItemListDrawer> {
   /// Menú izquierdo de filtros
   @override
   Widget build(BuildContext context) {
-    FlutterStatusbarcolor.setStatusBarColor(Colors.transparent);
-
     // Estilo para los sliders
     final _sliderThemeData = SliderTheme.of(context).copyWith(
       activeTrackColor: Colors.grey[50], // linea activa
@@ -173,7 +170,9 @@ class _ItemListDrawerState extends State<ItemListDrawer> {
             divisions: FilterListClass.absMaxPriceIndex - 1,
             showValueIndicator: true,
             valueIndicatorFormatter: (i, value) =>
-                _formatPrecio(FilterListClass.priceRange[value.toInt()]),
+                value == FilterListClass.absMaxPriceIndex - 1
+                    ? 'Sin límite'
+                    : _formatPrecio(FilterListClass.priceRange[value.toInt()]),
             onChanged: (double newLowerValue, double newUpperValue) {
               setState(() {
                 _filterManager.minPriceIndex = newLowerValue.toInt();
@@ -193,8 +192,11 @@ class _ItemListDrawerState extends State<ItemListDrawer> {
                     textAlign: TextAlign.left)),
             Expanded(
                 child: Text(
-                    _formatPrecio(FilterListClass
-                        .priceRange[_filterManager.maxPriceIndex]),
+                    _filterManager.maxPriceIndex ==
+                            FilterListClass.absMaxPriceIndex - 1
+                        ? 'Sin límite'
+                        : _formatPrecio(FilterListClass
+                            .priceRange[_filterManager.maxPriceIndex]),
                     style: _styleTextSliders,
                     textAlign: TextAlign.end)),
           ],
@@ -251,7 +253,8 @@ class _ItemListDrawerState extends State<ItemListDrawer> {
                   ),
                   Divider(color: Colors.grey[300]),
                   _buildRadioButton(
-                      <String>['Todas las categorías']..addAll(FilterListClass.categoryNames.values),
+                      <String>['Todas las categorías']
+                        ..addAll(FilterListClass.categoryNames.values),
                       _filterManager.categoryId,
                       'Selecciona una categoría',
                       _updateCategoria),

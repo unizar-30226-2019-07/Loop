@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:selit/class/usuario_class.dart';
 import 'package:selit/class/item_class.dart';
@@ -10,7 +11,7 @@ import 'package:selit/util/storage.dart';
 import 'package:selit/widgets/items/item_tile.dart';
 import 'package:selit/widgets/star_rating.dart';
 import 'package:selit/widgets/profile_picture.dart';
-import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 
 /// Perfil de usuario: muestra sus datos, foto de perfil y
 /// dos listas: una con los productos en venta y otra con los vendidos
@@ -73,6 +74,16 @@ class _ProfileState extends State<Profile> {
   bool _itemsVendidosEmpty = false; // diferenciar entre cargando y no hay
   bool _cancelled; // evitar bug al pedir objetos y cambiar de pantalla
 
+  // Callback llamado por los objetos al ser actualizados
+  void updateItemsVenta(Function(List<ItemClass>) actualizacion) {
+    setState(() => actualizacion(_itemsEnVenta));
+  }
+
+  // Callback llamado por los objetos al ser actualizados
+  void updateItemsVendidos(Function(List<ItemClass>) actualizacion) {
+    setState(() => actualizacion(_itemsVendidos));
+  }
+
   /// Usuario a mostrar en el perfil (null = placeholder)
   static UsuarioClass _user;
   int _loggedUserId;
@@ -85,6 +96,7 @@ class _ProfileState extends State<Profile> {
     _user = null;
     _ubicacionCiudad = null;
     _ubicacionResto = null;
+    _loggedUserId = null;
     _loadProfile(_userId).then((_) => _loadProfileItems());
     Storage.loadUserId().then((id) {
       print(id);
@@ -98,22 +110,17 @@ class _ProfileState extends State<Profile> {
     _cancelled = true;
   }
 
-  Future<void> _loadProfile(int _userId) async {
-    // Mostrar usuario placeholder mientras carga el real
-    _cancelled = false;
-    if (_user == null) {
-      String token = await Storage.loadToken();
-      await UsuarioRequest.getUserById(_userId).then((realUser) {
-        if (!_cancelled) {
-          setState(() {
-            realUser.token = token;
-            _user = realUser;
-          });
-        }
-      }).catchError((error) {
-        print('Error al cargar el perfil de usuario: $error');
+  Future<void> _loadRatings() async {
+    UsuarioRequest.getRatingsFromUser(userId: _user.userId).then((list) {
+      setState(() {
+        _user.setRatings(list);
       });
-    }
+    }).catchError((error) {
+      print('Error al obtener las calificaciones: $error');
+    });
+  }
+
+  Future<void> _loadLocation() async {
     if (_user?.locationLat != null && _user?.locationLng != null) {
       // Se obtienen sus valores de ubicación
       final coordinates = new Coordinates(_user.locationLat, _user.locationLng);
@@ -132,6 +139,26 @@ class _ProfileState extends State<Profile> {
     }
   }
 
+  Future<void> _loadProfile(int _userId) async {
+    // Mostrar usuario placeholder mientras carga el real
+    _cancelled = false;
+    if (_user == null) {
+      String token = await Storage.loadToken();
+      await UsuarioRequest.getUserById(_userId).then((realUser) {
+        if (!_cancelled) {
+          setState(() {
+            realUser.token = token;
+            _user = realUser;
+          });
+          _loadRatings();
+          _loadLocation();
+        }
+      }).catchError((error) {
+        print('Error al cargar el perfil de usuario: $error');
+      });
+    }
+  }
+
   void _loadProfileItems() async {
     if (_user?.userId == null) {
       print('ERROR: Intentando cargar objetos de un usuario sin ID');
@@ -146,6 +173,10 @@ class _ProfileState extends State<Profile> {
               status: "en venta")
           .then((itemsVenta) {
         if (!_cancelled) {
+          // Callback para cuando se actualicen
+          itemsVenta
+              .forEach((item) => item.setUpdateListCallback(updateItemsVenta));
+          // Acutalizar vista en la pantalla
           setState(() {
             if (itemsVenta.isEmpty) {
               _itemsEnVentaEmpty = true;
@@ -156,6 +187,7 @@ class _ProfileState extends State<Profile> {
         }
       }).catchError((error) {
         print('Error al cargar los productos en venta de usuario: $error');
+        _itemsEnVentaEmpty = true;
       });
       ItemRequest.getItemsFromUser(
               userId: _user.userId,
@@ -164,6 +196,9 @@ class _ProfileState extends State<Profile> {
               status: "vendido")
           .then((itemsVendidos) {
         if (!_cancelled) {
+          // Callback para cuando se actualicen
+          itemsVendidos.forEach(
+              (item) => item.setUpdateListCallback(updateItemsVendidos));
           setState(() {
             if (itemsVendidos.isEmpty) {
               _itemsVendidosEmpty = true;
@@ -174,12 +209,19 @@ class _ProfileState extends State<Profile> {
         }
       }).catchError((error) {
         print('Error al cargar los productos vendidos de usuario: $error');
+        _itemsVendidosEmpty = true;
       });
     }
   }
 
   void _onPressedEditProfile() {
     Navigator.of(context).pushNamed('/edit-profile', arguments: _user);
+  }
+
+  void _onPressedViewReviews() {
+    if (_user?.ratings != null) {
+      Navigator.of(context).pushNamed('/rating-list', arguments: _user.ratings);
+    }
   }
 
   // Pulsación del boton "en venta"
@@ -200,6 +242,65 @@ class _ProfileState extends State<Profile> {
       _controllerVendidos.animateTo(0,
           duration: Duration(milliseconds: 150), curve: Curves.linear);
     }
+  }
+
+  // Botón de editar perfil
+  Widget _buildEditProfileButton() {
+    return Container(
+        margin: EdgeInsets.only(right: 15),
+        child: GestureDetector(
+            onTap: _onPressedEditProfile,
+            child: ClipRRect(
+                borderRadius: BorderRadius.circular(4.0),
+                child: Container(
+                    padding: EdgeInsets.all(2.0),
+                    color: _blendColor,
+                    alignment: Alignment.centerRight,
+                    width: 130.0,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: <Widget>[
+                        Container(
+                          margin: EdgeInsets.only(right: 5),
+                          child:
+                              Icon(Icons.edit, color: Colors.white, size: 18.0),
+                        ),
+                        Container(
+                            margin: EdgeInsets.only(right: 10),
+                            child:
+                                Text('Editar perfil', style: _styleEditProfile))
+                      ],
+                    )))));
+  }
+
+  // Botón de reportar usuario
+  Widget _buildReportButton() {
+    return Container(
+        margin: EdgeInsets.only(right: 15),
+        child: GestureDetector(
+            onTap: () => Navigator.of(context)
+                .pushNamed('/report-user', arguments: _user),
+            child: ClipRRect(
+                borderRadius: BorderRadius.circular(4.0),
+                child: Container(
+                    padding: EdgeInsets.all(2.0),
+                    color: _blendColor,
+                    alignment: Alignment.centerRight,
+                    width: 159.0,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: <Widget>[
+                        Container(
+                          margin: EdgeInsets.only(left: 5, right: 5),
+                          child: Icon(Icons.report_problem,
+                              color: Colors.white, size: 18.0),
+                        ),
+                        Container(
+                            margin: EdgeInsets.only(right: 5),
+                            child: Text('Reportar usuario',
+                                style: _styleEditProfile))
+                      ],
+                    )))));
   }
 
   /// Constructor para los botones "en venta" y "vendido"
@@ -255,47 +356,31 @@ class _ProfileState extends State<Profile> {
                       profileView: true,
                     ),
             ),
-            _user?.reviews == null
+            _user?.ratings == null
                 ? Container(margin: EdgeInsets.only(top: 40))
                 : Container(
-                    margin: EdgeInsets.only(top: 5, bottom: 15),
-                    alignment: Alignment.center,
-                    child: Text('${_user?.reviews} reviews',
-                        style: _styleReviews, textAlign: _textAlignment))
+                    margin: EdgeInsets.fromLTRB(3.0, 5.0, 3.0, 10.0),
+                    child: GestureDetector(
+                        onTap: _user.ratings.length > 0 ? _onPressedViewReviews : null,
+                        child: ClipRRect(
+                            borderRadius: BorderRadius.circular(4.0),
+                            child: Container(
+                                padding: EdgeInsets.all(2.0),
+                                color: _blendColor,
+                                alignment: Alignment.center,
+                                width: 130.0,
+                                child: Text('${_user.ratings.length} valoraciones',
+                                    style: _styleReviews))))),
           ],
         ),
       ),
     );
 
-    Widget wEditProfile = (_user?.userId == null ||
-            _loggedUserId == null ||
-            _user.userId != _loggedUserId)
+    Widget wTopLeftButton = (_user?.userId == null || _loggedUserId == null)
         ? Container()
-        : Container(
-            margin: EdgeInsets.only(right: 15),
-            child: GestureDetector(
-                onTap: _onPressedEditProfile,
-                child: ClipRRect(
-                    borderRadius: BorderRadius.circular(4.0),
-                    child: Container(
-                        padding: EdgeInsets.all(2.0),
-                        color: _blendColor,
-                        alignment: Alignment.centerRight,
-                        width: 130.0,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: <Widget>[
-                            Container(
-                              margin: EdgeInsets.only(right: 5),
-                              child: Icon(Icons.edit,
-                                  color: Colors.white, size: 18.0),
-                            ),
-                            Container(
-                                margin: EdgeInsets.only(right: 10),
-                                child: Text('Editar perfil',
-                                    style: _styleEditProfile))
-                          ],
-                        )))));
+        : _user.userId == _loggedUserId
+            ? _buildEditProfileButton()
+            : _buildReportButton();
 
     Widget wLocation = _ubicacionCiudad == null || _ubicacionResto == null
         ? Container()
@@ -347,11 +432,11 @@ class _ProfileState extends State<Profile> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: <Widget>[
-              wEditProfile,
+              wTopLeftButton,
               Container(
                   alignment: Alignment.centerLeft,
                   padding: EdgeInsets.only(
-                      top: wEditProfile == Container() ? 25 : 10),
+                      top: wTopLeftButton == Container() ? 25 : 10),
                   child: Text(_user?.nombre ?? '',
                       overflow: TextOverflow.ellipsis,
                       style: _styleNombre,
@@ -373,7 +458,8 @@ class _ProfileState extends State<Profile> {
                   Container(
                       margin: EdgeInsets.only(left: 5.0),
                       child: _sexSymbol.containsKey(_user?.sexo)
-                          ? Icon(_sexSymbol[_user.sexo], color: Colors.white, size: 18.0)
+                          ? Icon(_sexSymbol[_user.sexo],
+                              color: Colors.white, size: 18.0)
                           : Container())
                 ]),
               ),
@@ -521,7 +607,6 @@ class _ProfileState extends State<Profile> {
 
   @override
   Widget build(BuildContext context) {
-    FlutterStatusbarcolor.setStatusBarColor(Colors.transparent);
     return Scaffold(
       body: Stack(
         children: <Widget>[
@@ -552,12 +637,45 @@ class _ProfileState extends State<Profile> {
               _loggedUserId == null ||
               _user.userId != _loggedUserId)
           ? Container()
-          : FloatingActionButton(
-              onPressed: () {
-                Navigator.of(context).pushNamed('/new-item', arguments: _user);
-              },
+          : SpeedDial(
+              // both default to 16
+              marginRight: 18,
+              marginBottom: 20,
+              animatedIcon: AnimatedIcons.menu_close,
+              animatedIconTheme: IconThemeData(size: 22.0),
+              // this is ignored if animatedIcon is non null
+              // child: Icon(Icons.add),
+              visible: true,
+              curve: Curves.bounceIn,
+              overlayColor: Colors.black,
+              overlayOpacity: 0.5,
+              heroTag: 'speed-dial-hero-tag',
               backgroundColor: Theme.of(context).primaryColor,
-              child: Icon(Icons.add, size: 30.0),
+              foregroundColor: Colors.white,
+              elevation: 8.0,
+              shape: CircleBorder(),
+              children: [
+                SpeedDialChild(
+                  child: Icon(Icons.add),
+                  backgroundColor: Theme.of(context).primaryColor,
+                  label: 'Añadir producto',
+                  //labelStyle: TextTheme(fontSize: 18.0),
+                  onTap: () {
+                    Navigator.of(context).pushNamed('/new-item',
+                        arguments: <dynamic>[_user, updateItemsVenta]);
+                  },
+                ),
+                SpeedDialChild(
+                  child: Icon(Icons.favorite),
+                  backgroundColor: Theme.of(context).primaryColor,
+                  label: 'Lista de deseos',
+                  //labelStyle: TextTheme(fontSize: 18.0),
+                  onTap: () {
+                    Navigator.of(context)
+                        .pushNamed('/whises', arguments: _user);
+                  },
+                ),
+              ],
             ),
     );
   }

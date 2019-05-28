@@ -6,12 +6,10 @@ import 'package:selit/util/bubble_indication_painter.dart';
 import 'package:selit/util/api/usuario_request.dart';
 import 'package:selit/class/usuario_class.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
+import 'package:selit/util/bar_color.dart';
 import 'package:location/location.dart';
 
-import 'package:selit/screens/debug_main.dart';
-
-final int splashDuration = 2;
+final int splashDuration = 1;
 double locationLat, locationLng;
 
 class LoginPage extends StatefulWidget {
@@ -70,9 +68,17 @@ class _LoginPageState extends State<LoginPage>
   Future<void> _delayPrincipal() async {
     return Timer(Duration(seconds: splashDuration), () {
       SystemChannels.textInput.invokeMethod('TextInput.hide');
-      Navigator.of(context).pushNamed('/principal');
+      Navigator.of(context).pushNamedAndRemoveUntil('/principal', (route) => false);
     });
   }
+
+  _LoginPageState() {
+    _loginButtonFunction = _tryLogin;
+    // no se da valor a _registerButtonFunction, primero toma ubicación
+  }
+
+  Function _loginButtonFunction;
+  Function _registerButtonFunction;
 
   /// Intenta hacer login de un usuario con email y contraseña
   /// según lo escrito en los campos de texto
@@ -81,6 +87,10 @@ class _LoginPageState extends State<LoginPage>
   /// Si no se loguea correctamente, muestra un aviso al usuario de que
   /// no se ha podido iniciar sesión correctamente
   void _tryLogin() async {
+    setState(() {
+      _loginButtonFunction = null;
+      _loginActive = false;
+    });
     UsuarioRequest.login(
             loginEmailController.text, loginPasswordController.text)
         .then((loginToken) {
@@ -90,17 +100,23 @@ class _LoginPageState extends State<LoginPage>
         _delayPrincipal();
       }
     }).catchError((error) {
-        if (error == "Unauthorized") {
-          showInSnackBar("La cuenta no es válida", _colorStatusBarBad);
-        } else if (error == "Forbidden") {
-          showInSnackBar("Usuario o contraseña incorrectos", _colorStatusBarBad);
-        } else {
-          showInSnackBar("Ha ocurrido un error en el servidor", _colorStatusBarBad);
-        }
+      if (error == "Unauthorized") {
+        showInSnackBar("La cuenta no es válida", _colorStatusBarBad);
+      } else if (error == "Forbidden") {
+        showInSnackBar("Usuario o contraseña incorrectos", _colorStatusBarBad);
+      } else {
+        showInSnackBar(
+            "Ha ocurrido un error en el servidor", _colorStatusBarBad);
+      }
+      print('LOGIN ERROR LOGIN ERROR');
+      setState(() {
+        _loginButtonFunction = _tryLogin;
+        _loginActive = true;
       });
+    });
   }
 
-  Function _signUpCallback;
+  bool _loginActive = true;
   Color _signUpButtonColor = Colors.grey[800]; // Desactivado
 
   /// Hacer registro de usuario con los campos del formulario
@@ -112,16 +128,23 @@ class _LoginPageState extends State<LoginPage>
     // Validar campos de registro
     // Contraseñas coinciden
     if (signupPasswordController.text != signupConfirmPasswordController.text) {
-      showInSnackBar("Las contraseñas no coinciden", Colors.yellow);
+      showInSnackBar("Las contraseñas no coinciden", Colors.yellow[800]);
       return;
     }
     // Campos no nulos y válidos
     if (signupLastNameController.text.length < 1 ||
+        signupLastNameController.text.length > 50 ||
         signupNameController.text.length < 1 ||
+        signupNameController.text.length > 50 ||
         !validateEmail(signupEmailController.text)) {
-      showInSnackBar("Rellena toodos los campos correctamente", Colors.yellow);
+      showInSnackBar("Rellena todos los campos correctamente", Colors.yellow[800]);
       return;
     }
+    
+    setState(() {
+      _registerButtonFunction = null;
+      _signUpButtonColor = Colors.grey[800];
+    });
 
     // Crear un objeto de la clase UsuarioClass para pasar datos de usuario
     UsuarioClass registeredUser = new UsuarioClass(
@@ -133,22 +156,26 @@ class _LoginPageState extends State<LoginPage>
     );
 
     // Realizar la petición de inicio de sesión e informar al usuario del resultado
-    UsuarioRequest.signUp(
-      registeredUser,
-      signupPasswordController.text
-      ).then((_) => showInSnackBar("Se ha enviado un correo de confirmación", _colorStatusBarGood)
-      ).catchError((error) {
-        if (error == "Conflict") {
-          showInSnackBar("La dirección de correo ya existe", _colorStatusBarBad);
-        } else {
-          showInSnackBar("No hay conexión a internet", _colorStatusBarBad);
-        }
+    UsuarioRequest.signUp(registeredUser, signupPasswordController.text)
+        .then((_) => showInSnackBar(
+            "Se ha enviado un correo de confirmación", _colorStatusBarGood))
+        .catchError((error) {
+      if (error == "Conflict") {
+        showInSnackBar("La dirección de correo ya existe", _colorStatusBarBad);
+      } else {
+        showInSnackBar("No hay conexión a internet", _colorStatusBarBad);
+      }
+      setState(() {
+        _registerButtonFunction = _trySignUp;
+        _signUpButtonColor = Theme.of(context).primaryColorDark;
       });
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    FlutterStatusbarcolor.setStatusBarColor(Theme.of(context).primaryColorLight);
+    BarColor.changeBarColor(
+        color: Theme.of(context).primaryColorLight, whiteForeground: true);
     return new Scaffold(
       key: _scaffoldKey,
       body: NotificationListener<OverscrollIndicatorNotification>(
@@ -177,25 +204,8 @@ class _LoginPageState extends State<LoginPage>
                 mainAxisSize: MainAxisSize.max,
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
-                  Container(
-                    alignment: FractionalOffset(1.0, 0.0),
-                    child: GestureDetector(
-                      onTap: () {
-                        // TODO X de la esquina superior derecha de la pantalla
-                        // ya no debería estar, no se usa
-                        Navigator.of(context).push(
-                          MaterialPageRoute(builder: (context) => DebugMain()),
-                        );
-                      },
-                      child: Icon(
-                        FontAwesomeIcons.times,
-                        size: 40.0,
-                        color: Colors.white70,
-                      ),
-                    ),
-                  ),
                   Padding(
-                    padding: EdgeInsets.only(top: 5.0),
+                    padding: EdgeInsets.only(top: 35.0),
                     child: new Image(
                         width: 150.0,
                         height: 177.0,
@@ -219,18 +229,23 @@ class _LoginPageState extends State<LoginPage>
                           });
                         } else if (i == 1) {
                           
-                          Location locationService = new Location();
-                          // Intentar obtener la localización del usuario
-                          try {
-                            LocationData data = await locationService.getLocation();
-                            locationLat = data.latitude;
-                            locationLng = data.longitude;
-                            setState(() {
-                              _signUpCallback = _trySignUp;
-                              _signUpButtonColor = Theme.of(context).primaryColorDark;
-                            });
-                          } on PlatformException catch (_) {
-                            showInSnackBar("Es necesaria la localización", Colors.red);
+                          if (locationLat == null || locationLng == null) {
+                            Location locationService = new Location();
+                            // Intentar obtener la localización del usuario
+                            try {
+                              LocationData data =
+                                  await locationService.getLocation();
+                              locationLat = data.latitude;
+                              locationLng = data.longitude;
+                              setState(() {
+                                _registerButtonFunction = _trySignUp;
+                                _signUpButtonColor =
+                                    Theme.of(context).primaryColorDark;
+                              });
+                            } on PlatformException catch (_) {
+                              showInSnackBar(
+                                  "Es necesaria la localización", Colors.red);
+                            }
                           }
 
                           setState(() {
@@ -259,6 +274,24 @@ class _LoginPageState extends State<LoginPage>
         ),
       ),
     );
+  }
+
+  void _onPressForgotPassword() {
+    if (loginEmailController.text.length < 1) {
+        showInSnackBar("Rellena tu dirección de correo", Colors.yellow[800]);
+    } else {
+      UsuarioRequest.forgotPassword(email: loginEmailController.text).then((_) {
+        showInSnackBar("Se ha enviado un correo a\n${loginEmailController.text}", _colorStatusBarGood);
+      }).catchError((error) {
+        if (error == "Forbidden") {
+          showInSnackBar("Operación no permitida", _colorStatusBarBad);
+        } else if (error == "Not Found") {
+          showInSnackBar("Dirección de correo no encontrada o inválida", _colorStatusBarBad);
+        } else {
+          showInSnackBar("No hay conexión a Internet", _colorStatusBarBad);
+        }
+      });
+    }
   }
 
   @override
@@ -422,20 +455,20 @@ class _LoginPageState extends State<LoginPage>
                   borderRadius: BorderRadius.all(Radius.circular(5.0)),
                   boxShadow: <BoxShadow>[
                     BoxShadow(
-                      color: Theme.of(context).primaryColorLight,
+                      color: _loginActive ? Theme.of(context).primaryColorLight : Colors.grey[600],
                       offset: Offset(1.0, 6.0),
                       blurRadius: 20.0,
                     ),
                     BoxShadow(
-                      color: Theme.of(context).primaryColorDark,
+                      color: _loginActive ? Theme.of(context).primaryColorDark : Colors.grey[800],
                       offset: Offset(1.0, 6.0),
                       blurRadius: 20.0,
                     ),
                   ],
                   gradient: new LinearGradient(
                       colors: [
-                        Theme.of(context).primaryColorDark,
-                        Theme.of(context).primaryColorLight,
+                        _loginActive ? Theme.of(context).primaryColorDark : Colors.grey[700],
+                        _loginActive ? Theme.of(context).primaryColorLight : Colors.grey[500],
                       ],
                       begin: const FractionalOffset(0.2, 0.2),
                       end: const FractionalOffset(1.0, 1.0),
@@ -457,7 +490,7 @@ class _LoginPageState extends State<LoginPage>
                           fontFamily: "NunitoBold"),
                     ),
                   ),
-                  onPressed: _tryLogin,
+                  onPressed: _loginButtonFunction,
                 ),
               ),
             ],
@@ -465,7 +498,7 @@ class _LoginPageState extends State<LoginPage>
           Padding(
             padding: EdgeInsets.only(top: 10.0),
             child: FlatButton(
-                onPressed: () {},
+                onPressed: _onPressForgotPassword,
                 child: Text(
                   "He olvidado mi contraseña",
                   style: TextStyle(
@@ -655,9 +688,10 @@ class _LoginPageState extends State<LoginPage>
                 ),
                 child: MaterialButton(
                     color: _signUpButtonColor,
+                    disabledColor: _signUpButtonColor,
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 10.0, horizontal: 42.0),
+                      padding: const EdgeInsets.fromLTRB(
+                          42.0, 10.0, 42.0, 10.0),
                       child: Text(
                         "UNIRSE",
                         style: TextStyle(
@@ -666,7 +700,7 @@ class _LoginPageState extends State<LoginPage>
                             fontFamily: "NunitoBold"),
                       ),
                     ),
-                    onPressed: _signUpCallback),
+                    onPressed: _registerButtonFunction),
               ),
             ],
           ),

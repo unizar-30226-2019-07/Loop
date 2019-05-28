@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:selit/class/usuario_class.dart';
 import 'package:selit/util/storage.dart';
+import 'package:selit/util/bar_color.dart';
 import 'package:selit/util/api/usuario_request.dart';
-import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 
 /// Pantalla de carga hasta que se puede decidir si existe un
 /// usuario registrado en la aplicación (existe un token) y ese token
@@ -13,40 +12,28 @@ class LoadingScreen extends StatefulWidget {
 }
 
 class _LoadingScreenState extends State<LoadingScreen> {
-  static const TIMEOUT = const Duration(seconds: 7);
+  static const TIMEOUT = const Duration(seconds: 10);
 
   final _styleLoading = TextStyle(color: Colors.white, fontSize: 18.0);
 
   /// Devuelve true si existe un token guardado y es válido (es decir,
   /// hay un usuario que ha iniciado sesión en la aplicación)
-  Future<bool> _checkForLoggedUser(BuildContext context) async {
-    bool legitUser = false;
+  Future<void> _checkForLoggedUser(BuildContext context) async {
     String token = await Storage.loadToken();
     if (token == null) {
       print('LOADING: No hay token');
+      throw ("NOTOKEN");
     } else {
-      UsuarioClass receivedUser = await UsuarioRequest.getUserById(0);
-      if (receivedUser == null) {
-        print('LOADING: Había token pero no era válido');
-        Storage.deleteToken();
-      } else {
+        await UsuarioRequest.getUserById(0);
         print('LOADING: Usuario registrado');
         print (token);
-        legitUser = true;
-      }
     }
-    return legitUser;
   }
 
   void _showErrorDialog(BuildContext context) {
-    // TODO comprobar si el usuario tiene internet
     AlertDialog dialogo = AlertDialog(
       title: Text('Error al iniciar sesión'),
-      content: Text('No se ha podido conectar al servidor'),
-      actions: <Widget> [
-        // TODO borrar al terminar el debug
-        FlatButton(child: Text('Entrar igualmente'), onPressed: () { Navigator.of(context).pushNamed('/principal'); })
-      ],
+      content: Text('No se ha podido conectar al servidor. Por favor, revisa tu conexión a Internet.'),
     );
     showDialog(context: context, builder: (context) => dialogo);
   }
@@ -59,26 +46,23 @@ class _LoadingScreenState extends State<LoadingScreen> {
   void initState() {
     super.initState();
 
-    _checkForLoggedUser(context).then((legit) {
-      Navigator.of(context).pop();
-      if (legit) {
-        print('Redirect a principal');
-        Navigator.of(context).pushReplacementNamed('/principal');
-      } else {
-        print('Redirect a login');
-        Navigator.of(context).pushReplacementNamed('/login-page');
-      }
+    _checkForLoggedUser(context).then((_) {
+      print('Redirect a principal');
+      Navigator.of(context).pushNamedAndRemoveUntil('/principal', (route) => false);
     }).timeout(TIMEOUT, onTimeout: () {
       _showErrorDialog(context);
-    }).catchError((_) {
-      _showErrorDialog(context);
+    }).catchError((error) {
+      print('Redirect a login con error: $error');
+      Storage.deleteToken();
+      Navigator.of(context).pushNamedAndRemoveUntil('/login-page', (route) => false);
     });
 
   }
 
   @override
   Widget build(BuildContext context) {
-    FlutterStatusbarcolor.setStatusBarColor(Colors.transparent);
+    BarColor.changeBarColor(
+        color: Theme.of(context).primaryColorLight, whiteForeground: true);
     return Scaffold(
         body: Container(
             decoration: BoxDecoration(

@@ -5,7 +5,7 @@ import 'dart:convert' as json;
 class APIConfig {
 
   /// URL base a conectar (con puerto)
-  static const BASE_URL = 'http://selit.naval.cat:8080';
+  static const BASE_URL = 'https://selit.naval.cat:8443';
 
   static Map _errorCodes = {
     400: "Bad Request",
@@ -15,7 +15,8 @@ class APIConfig {
     405: "Method Not Allowed",
     409: "Conflict",
     412: "Precondition Failed",
-    415: "Unsupported Media"
+    415: "Unsupported Media",
+    500: "Internal Server Error"
   };
 
   static String getErrorString(http.Response response) {

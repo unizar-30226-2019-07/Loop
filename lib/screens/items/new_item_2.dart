@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/percent_indicator.dart';
-import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 import 'package:selit/class/item_class.dart';
 import 'package:selit/util/api/item_request.dart';
 
@@ -9,7 +8,7 @@ import 'package:selit/util/api/item_request.dart';
 class NewItem2 extends StatefulWidget {
   final ItemClass item;
 
-  /// UsuarioClass del usuario a editar
+  /// ItemClass del item a editar
   NewItem2({@required this.item});
 
   @override
@@ -22,15 +21,16 @@ class _NewItemState2 extends State<NewItem2> {
 
   ///Controladores de campos del formulario
   final TextEditingController _priceController = new TextEditingController();
-  final TextEditingController _limitController = new TextEditingController();
+  //final TextEditingController _limitController = new TextEditingController();
 
   //Lista opciones divisa
   List<String> _divisas = <String>['', 'EUR', 'USD'];
   String _divisa = '';
 
   //Lista opciones categoria
-  List<String> _tiposPrecio = <String>['sale', 'auction'];
-  String _tipoPrecio = 'sale';
+  List<String> _tiposPrecio = <String>['Producto', 'Subasta'];
+  Map<String, String> _renombrePrecio = {'Producto': 'sale', 'Subasta': 'auction'};
+  String _tipoPrecio = 'Producto';
 
   ItemClass _item;
 
@@ -39,7 +39,9 @@ class _NewItemState2 extends State<NewItem2> {
     _buttonFunction = createItem;
   }
 
-  final Color _colorStatusBarGood = Colors.blue.withOpacity(0.5);
+  /// Fecha límite
+  DateTime _selectedDate;
+
   final Color _colorStatusBarBad = Colors.red.withOpacity(0.5);
 
   /// Titulos
@@ -56,18 +58,12 @@ class _NewItemState2 extends State<NewItem2> {
 
   ///Selector de fecha
   DateTime selectedDate = DateTime.now();
+  TimeOfDay selectedTime = TimeOfDay.now();
 
-  Future<Null> _selectDate(BuildContext context) async {
-    final DateTime picked = await showDatePicker(
-        context: context,
-        initialDate: selectedDate,
-        firstDate: DateTime(2018, 8),
-        lastDate: DateTime(2101));
-    if (picked != null && picked != selectedDate)
-      setState(() {
-        selectedDate = picked;
-      });
+  String _dateString(DateTime fecha) {
+    return '${fecha.day} / ${fecha.month} / ${fecha.year}';
   }
+
 
   void showInSnackBar(String value, Color alfa) {
     FocusScope.of(context).requestFocus(new FocusNode());
@@ -85,7 +81,7 @@ class _NewItemState2 extends State<NewItem2> {
 
   void createItem() {
     // Diálogo "cargando..." para evitar repetir
-    _buttonFunction = null;
+    setState(() => _buttonFunction = null);
     showDialog(
       barrierDismissible: false, // JUST MENTION THIS LINE
       context: context,
@@ -104,33 +100,85 @@ class _NewItemState2 extends State<NewItem2> {
         ));
       },
     );
+
     // Subir producto
     double formattedPrice =
         double.tryParse(_priceController.text.replaceAll(',', '.'));
-    if (_priceController.text.length < 1 ||
-        formattedPrice == null ||
-        _tipoPrecio == '' ||
-        _divisa == '') {
-      showInSnackBar("Rellena todos los campos correctamente", Colors.yellow);
-    } else {
-      ///TODO cambiar sale por __tipoPrecio cuando estén implementadas las subastas
-      _item.update(type: "sale", price: formattedPrice, currency: _divisa);
 
-      ItemRequest.create(_item).then((_) {
-        showInSnackBar("Datos actualizados correctamente", _colorStatusBarGood);
-        Navigator.of(context).pop();
-        Navigator.of(context).pop();
-        Navigator.of(context).pop();
-      }).catchError((error) {
-        if (error == "Unauthorized" || error == "Forbidden") {
-          showInSnackBar("Acción no autorizada", _colorStatusBarBad);
-        } else {
-          print("Error: $error");
-          showInSnackBar("No hay conexión a internet", _colorStatusBarBad);
-        }
-        _buttonFunction = createItem;
-        Navigator.of(context).pop();
-      });
+    if (_tipoPrecio == 'Producto') {
+      if (_priceController.text.length < 1 ||
+          formattedPrice == null ||
+          _tipoPrecio == '' ||
+          _divisa == '') {
+        showInSnackBar("Rellena todos los campos correctamente", Colors.yellow[800]);
+        Navigator.of(context).pop(); // alertDialog
+        setState(() => _buttonFunction = createItem);
+      } else if (formattedPrice < 0) {
+        showInSnackBar("El precio no puede ser negativo", Colors.yellow[800]);
+        Navigator.of(context).pop(); // alertDialog
+        setState(() => _buttonFunction = createItem);
+      } else if (formattedPrice > 1000000) {
+        showInSnackBar("El precio es demasiado alto", Colors.yellow[800]);
+        Navigator.of(context).pop(); // alertDialog
+        setState(() => _buttonFunction = createItem);
+      } else {
+        // Redondear precio a 2 decimales
+        formattedPrice = double.parse(formattedPrice.toStringAsFixed(2));
+
+        _item.update(
+            type: _renombrePrecio[_tipoPrecio], price: formattedPrice, currency: _divisa);
+
+        ItemRequest.create(_item).then((_) {
+          _item.updateList((List<ItemClass> list) => list.add(_item));
+          Navigator.of(context).pop();
+          Navigator.of(context).pop();
+          Navigator.of(context).pop();
+        }).catchError((error) {
+          if (error == "Unauthorized" || error == "Forbidden") {
+            showInSnackBar("Acción no autorizada", _colorStatusBarBad);
+          } else if (error == "Internal Server Error") {
+            showInSnackBar("Imagen no válida, prueba con otra", _colorStatusBarBad);
+          } else {
+            print("Error: $error");
+            showInSnackBar("No hay conexión a internet", _colorStatusBarBad);
+          }
+          setState(() => _buttonFunction = createItem);
+          Navigator.of(context).pop();
+        });
+      }
+    } else {
+      if (_priceController.text.length < 1 ||
+          formattedPrice == null ||
+          _tipoPrecio == '' ||
+          _divisa == '') {
+        showInSnackBar("Rellena todos los campos correctamente", Colors.yellow[800]);
+      } else {
+        print('Subasta creada');
+
+        _item.updateAuction(
+            type: _renombrePrecio[_tipoPrecio],
+            price: formattedPrice,
+            currency: _divisa,
+            endDate: _selectedDate);
+
+        ItemRequest.createAuction(_item).then((_) {
+          _item.updateList((List<ItemClass> list) => list.add(_item));
+          Navigator.of(context).pop();
+          Navigator.of(context).pop();
+          Navigator.of(context).pop();
+        }).catchError((error) {
+          if (error == "Unauthorized" || error == "Forbidden") {
+            showInSnackBar("Acción no autorizada", _colorStatusBarBad);
+          } else if (error == "Internal Server Error") {
+            showInSnackBar("Imagen no válida, prueba con otra", _colorStatusBarBad);
+          } else {
+            print("Error: $error");
+            showInSnackBar("No hay conexión a internet", _colorStatusBarBad);
+          }
+          setState(() => _buttonFunction = createItem);
+          Navigator.of(context).pop();
+        });
+      }
     }
   }
 
@@ -330,45 +378,50 @@ class _NewItemState2 extends State<NewItem2> {
       ],
     );
 
-    ///Límite en subasta
-    Widget wLimite = Row(
+    Widget wImgTitle = Padding(
+        padding: EdgeInsets.only(
+          left: 10,
+          top: 17,
+        ),
+        child: Text(
+          'Fecha límite',
+          style: new TextStyle(
+            fontSize: 15,
+            color: Colors.grey[600],
+          ),
+        ));
+
+    Widget wAge = Row(
       children: <Widget>[
         Expanded(
           flex: 8,
           child: Container(
-              margin: EdgeInsets.only(left: 10, right: 10, bottom: 20),
-              //color: Colors.red, // util para ajustar margenes
-              child: Column(
-                children: <Widget>[
-                  new TextFormField(
-                    decoration: const InputDecoration(
-                      labelText: 'Límite',
-                    ),
-                    controller: _limitController,
-                    keyboardType: TextInputType.numberWithOptions(
-                        signed: false, decimal: true),
-                  ),
-                ],
+              margin: EdgeInsets.only(left: 15, right: 10, top: 10),
+              child: RaisedButton(
+                color: Colors.grey[600],
+                onPressed: () async {
+                  DateTime picked = await showDatePicker(
+                      context: context,
+                      initialDate: _selectedDate ??
+                          DateTime.now().add(new Duration(days: 1, hours: 1)),
+                      firstDate: DateTime.now().add(new Duration(days: 1)),
+                      lastDate: DateTime(2030, 1));
+                  setState(() {
+                    _selectedDate = picked;
+                  });
+                },
+                child: Text(
+                  _selectedDate == null
+                      ? 'Fecha ...'
+                      : _dateString(_selectedDate),
+                  style: _styleButton,
+                  textAlign: TextAlign.left,
+                ),
               )),
-        ),
-        Expanded(
-          flex: 2,
-          child: Container(
-              margin: EdgeInsets.only(left: 5, top: 20),
-              //color: Colors.red, // util para ajustar margenes
-              child: Column(children: <Widget>[
-                new FlatButton(
-                    onPressed: () {
-                      _selectDate(context);
-                      //_limitController.text = "${selectedDate.toLocal()}";
-                    },
-                    shape: new RoundedRectangleBorder(
-                        borderRadius: new BorderRadius.circular(30.0)),
-                    child: new Icon(Icons.calendar_today))
-              ])),
         )
       ],
     );
+
 
     return SafeArea(
         top: false,
@@ -376,7 +429,7 @@ class _NewItemState2 extends State<NewItem2> {
         child: new Form(
             key: _formKey,
             autovalidate: true,
-            child: _tipoPrecio == 'sale'
+            child: _tipoPrecio == 'Producto'
                 ? new ListView(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
                     children: <Widget>[
@@ -401,7 +454,8 @@ class _NewItemState2 extends State<NewItem2> {
                       Divider(),
                       wPrecio,
                       Divider(),
-                      wLimite,
+                      wImgTitle,
+                      wAge,
                       Divider(),
                       new Container(
                           margin: EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 30.0),
@@ -410,9 +464,7 @@ class _NewItemState2 extends State<NewItem2> {
                             padding: EdgeInsets.symmetric(
                                 vertical: 7.0, horizontal: 20.0),
                             child: Text('Subir producto', style: _styleButton),
-                            onPressed: () async {
-                              createItem();
-                            },
+                            onPressed: _buttonFunction,
                           )),
                     ],
                   )));
@@ -420,7 +472,6 @@ class _NewItemState2 extends State<NewItem2> {
 
   @override
   Widget build(BuildContext context) {
-    FlutterStatusbarcolor.setStatusBarColor(Theme.of(context).primaryColor);
     return Scaffold(
       key: _scaffoldKey,
       resizeToAvoidBottomInset: true,

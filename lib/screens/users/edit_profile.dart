@@ -10,7 +10,6 @@ import 'package:selit/util/storage.dart';
 import 'package:selit/util/api/usuario_request.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 
 /// Página de edición de perfil (formulario con los campos
 /// necesarios para modificar los atributos del usuario)
@@ -111,8 +110,10 @@ class _EditProfileState extends State<EditProfile> {
   }
 
   void _loadCoordinates() async {
-    if (_selectedPosition?.latitude != null && _selectedPosition?.longitude != null) {
-      final coordinates = new Coordinates(_selectedPosition.latitude, _selectedPosition.longitude);
+    if (_selectedPosition?.latitude != null &&
+        _selectedPosition?.longitude != null) {
+      final coordinates = new Coordinates(
+          _selectedPosition.latitude, _selectedPosition.longitude);
       try {
         var addresses =
             await Geocoder.local.findAddressesFromCoordinates(coordinates);
@@ -146,7 +147,7 @@ class _EditProfileState extends State<EditProfile> {
     if (_nameController.text.length < 1 ||
         _surnameController.text.length < 1 ||
         _emailController.text.length < 1) {
-      showInSnackBar("Rellena todos los campos correctamente", Colors.yellow);
+      showInSnackBar("Rellena todos los campos correctamente", Colors.yellow[800]);
     } else {
       double newLat = _selectedPosition.latitude;
       double newLng = _selectedPosition.longitude;
@@ -176,11 +177,11 @@ class _EditProfileState extends State<EditProfile> {
 
   void cambioPass() async {
     if (_newPassController.text != _newPassRepController.text) {
-      showInSnackBar("Las contraseñas no coinciden", Colors.yellow);
+      showInSnackBar("Las contraseñas no coinciden", Colors.yellow[800]);
     } else if (_newPassController.text.length <= 0 ||
         _newPassRepController.text.length <= 0 ||
         _oldPassController.text.length <= 0) {
-      showInSnackBar("Completa todos los campos", Colors.yellow);
+      showInSnackBar("Completa todos los campos", Colors.yellow[800]);
     } else {
       int miId = await Storage.loadUserId();
       UsuarioRequest.password(
@@ -683,8 +684,6 @@ class _EditProfileState extends State<EditProfile> {
 
   @override
   Widget build(BuildContext context) {
-    FlutterStatusbarcolor.setStatusBarColor(
-        Theme.of(context).primaryColor.withAlpha(200));
     return Scaffold(key: _scaffoldKey, body: _buildForm());
   }
 }

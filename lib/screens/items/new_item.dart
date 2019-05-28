@@ -5,19 +5,21 @@ import 'package:selit/class/item_class.dart';
 import 'package:selit/class/items/filter_list_class.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:percent_indicator/percent_indicator.dart';
-import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 import 'package:selit/class/usuario_class.dart';
 
 /// Primera pantalla del formulario de subida de un nuevo producto
 /// Incluye tiítulo, descripción, categoría y fotos
 class NewItem extends StatefulWidget {
   final UsuarioClass user;
+  final Function(Function(List<ItemClass>)) callback;
+
+  NewItem(this.user, this.callback);
 
   /// UsuarioClass del usuario
-  NewItem({@required this.user});
+  NewItem.args(List arguments) : this(arguments[0], arguments[1]);
 
   @override
-  _NewItemState createState() => new _NewItemState(user);
+  _NewItemState createState() => new _NewItemState(user, callback);
 }
 
 class _NewItemState extends State<NewItem> {
@@ -41,11 +43,10 @@ class _NewItemState extends State<NewItem> {
 
   //Prpietario del producto
   UsuarioClass _user;
+  Function(Function(List<ItemClass>)) _addCallback;
 
   /// Constructor:
-  _NewItemState(UsuarioClass _user) {
-    this._user = _user;
-  }
+  _NewItemState(this._user, this._addCallback);
 
   /// Titulos
   static final _styleTitle = TextStyle(
@@ -89,7 +90,7 @@ class _NewItemState extends State<NewItem> {
     if (_titleController.text.length < 1 ||
         _descriptionController.text.length < 1 ||
         _categoria == '') {
-      showInSnackBar("Rellena todos los campos correctamente", Colors.yellow);
+      showInSnackBar("Rellena todos los campos correctamente", Colors.yellow[800]);
     } else {
       // Quitar imágenes no usadas
       List nonNull = List.from(_images.where((x) => x != null));
@@ -100,12 +101,16 @@ class _NewItemState extends State<NewItem> {
           description: _descriptionController.text,
           locationLat: _user.locationLat,
           locationLng: _user.locationLng,
+          status: "en venta",
+          distance: 0,
           category: FilterListClass.categoryNames.keys
               .where((k) => FilterListClass.categoryNames[k] == _categoria)
               .first,
           owner: _user,
           media: List.generate(
               nonNull.length, (i) => ImageClass.file(fileImage: nonNull[i])));
+
+      _item.setUpdateListCallback(_addCallback);
 
       Navigator.of(context).pushNamed('/new-item2', arguments: _item);
     }
@@ -342,7 +347,6 @@ class _NewItemState extends State<NewItem> {
 
   @override
   Widget build(BuildContext context) {
-    FlutterStatusbarcolor.setStatusBarColor(Theme.of(context).primaryColor);
     return Scaffold(
       key: _scaffoldKey,
       resizeToAvoidBottomInset: true,

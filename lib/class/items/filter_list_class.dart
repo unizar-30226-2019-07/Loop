@@ -3,27 +3,24 @@
 class FilterListClass {
   /// Nombres de categorías empleados por la API
   /// Mapa (nombre de API) -> (nombre en la aplicación)
-  // TODO actualizar cuando se refleje en la base de datos
+  /// NOTA: Ambos nombres son iguales, pero es importante diferenciar
+  /// los nombres de la API con los nombres de la aplicación
   static final Map<String, String> categoryNames = {
-    'Automocion': 'Automoción',
-    'Automoción': 'Automoción con tilde', // en la BD hay de las dos
-    'Informatica': 'Informática',
-    'Ropa': 'Moda',
-    'Deporte': 'Deporte y ocio',
+    'Automoción': 'Automoción',
+    'Informática': 'Informática',
+    'Moda': 'Moda',
+    'Deporte y ocio': 'Deporte y ocio',
     'Videojuegos': 'Videojuegos',
-    'Libros': 'Libros y música',
-    'Hogar': 'Hogar y jardín',
-    'Foto': 'Foto y audio',
+    'Libros y música': 'Libros y música',
+    'Hogar y jardín': 'Hogar y jardín',
+    'Foto y audio': 'Foto y audio',
   };
-  static final List<String> typeNames = [
-    'Venta y subasta',
-    'Solo ventas',
-    'Solo subastas'
-  ];
+  static final List<String> typeNames = ['En venta', 'Subastas'];
   static final List<String> orderNames = [
     'Más cercanos',
     'Más baratos',
     'Más caros',
+    'Más populares',
     'Novedades'
   ];
 
@@ -37,7 +34,8 @@ class FilterListClass {
     ..addAll(List.generate(5, (i) => (i + 1) * 50.0 + 100.0)) // 150-300
     ..addAll(List.generate(7, (i) => (i + 1) * 100.0 + 300.0)) // 300-1000
     ..addAll(List.generate(3, (i) => (i + 1) * 2000.0)) // 2000-8000
-    ..addAll(List.generate(3, (i) => (i + 1) * 10000.0)); // 10000-30000
+    ..addAll(List.generate(3, (i) => (i + 1) * 10000.0)) // 10000-30000
+    ..add(-1);
   static final int absMaxPriceIndex = priceRange.length;
   static final List<double> distanceRange = List<double>()
     ..addAll(List.generate(9, (i) => (i + 1) * 1000.0))
@@ -113,7 +111,7 @@ class FilterListClass {
     }
     // Asegurar valores válidos para los filtros
     assert(newCategoryId == null ||
-        (newCategoryId >= 0 && newCategoryId < categoryNames.length));
+        (newCategoryId >= 0 && newCategoryId <= categoryNames.length));
     assert(
         newTypeId == null || (newTypeId >= 0 && newTypeId < typeNames.length));
     assert(newOrderId == null ||
@@ -132,18 +130,25 @@ class FilterListClass {
   List<Map<String, dynamic>> getFiltersList() {
     List<Map<String, dynamic>> filters = new List<Map<String, dynamic>>();
     if (categoryId != 0) {
-      filters.add(
-          {'name': '${categoryNames.values.toList()[categoryId - 1]}', 'callback': resetCategory});
+      filters.add({
+        'name': '${categoryNames.values.toList()[categoryId - 1]}',
+        'callback': resetCategory
+      });
     }
     if (typeId != 0) {
       filters.add({'name': '${typeNames[typeId]}', 'callback': resetType});
     }
     if (minPriceIndex > 0 || maxPriceIndex < absMaxPriceIndex - 1) {
-      filters.add({
-        'name':
-            'Precio: ${_formatPrecio(minPriceIndex)}-${_formatPrecio(maxPriceIndex)} €',
-        'callback': resetPrice
-      });
+      String filterName;
+      if (maxPriceIndex == absMaxPriceIndex - 1) {
+        filterName = 'Precio: Desde ${_formatPrecio(minPriceIndex)} €';
+      } else if (minPriceIndex == 0) {
+        filterName = 'Precio: Hasta ${_formatPrecio(maxPriceIndex)} €';
+      } else {
+        filterName =
+            'Precio: ${_formatPrecio(minPriceIndex)}-${_formatPrecio(maxPriceIndex)} €';
+      }
+      filters.add({'name': filterName, 'callback': resetPrice});
     }
     if (maxDistanceIndex < absMaxDistanceIndex - 1) {
       filters.add({
@@ -167,21 +172,26 @@ class FilterListClass {
     if (searchQuery != null && searchQuery.isNotEmpty)
       map.putIfAbsent("search", () => searchQuery);
     // Tipos: venta o subasta
-    if (typeId == 1) map.putIfAbsent("type", () => "sale");
-    if (typeId == 2) map.putIfAbsent("type", () => "auction");
+    if (typeId == 0) map.putIfAbsent("type", () => "sale");
+    if (typeId == 1) map.putIfAbsent("type", () => "auction");
     // Precio
     map.putIfAbsent("priceFrom", () => priceRange[minPriceIndex].toString());
-    map.putIfAbsent("priceTo", () => priceRange[maxPriceIndex].toString());
+    if (maxPriceIndex < absMaxPriceIndex - 1) {
+      map.putIfAbsent("priceTo", () => priceRange[maxPriceIndex].toString());
+    }
     // Distancia
-    map.putIfAbsent("distance", () => (distanceRange[maxDistanceIndex] ~/ 1000).toString());
+    map.putIfAbsent(
+        "distance", () => (distanceRange[maxDistanceIndex] ~/ 1000).toString());
     // Categoria
     if (categoryId != 0)
-      map.putIfAbsent("category", () => categoryNames.keys.toList()[categoryId - 1]);
+      map.putIfAbsent(
+          "category", () => categoryNames.keys.toList()[categoryId - 1]);
     // Ordenación
     final _sortList = [
       'distance ASC',
       'price ASC',
       'price DESC',
+      'views DESC',
       'published DESC'
     ];
     map.putIfAbsent("\$sort", () => _sortList[orderId]);
